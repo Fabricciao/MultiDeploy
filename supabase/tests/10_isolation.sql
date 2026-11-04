@@ -33,6 +33,7 @@ insert into auth.users (id, email) values
 select public.provision_organization('agence-a','Agence A','סוכנות א','Agency A','fr','a0000000-0000-0000-0000-000000000001') as org_a \gset
 select public.provision_organization('agence-b','Agence B','סוכנות ב','Agency B','he','b0000000-0000-0000-0000-000000000001') as org_b \gset
 
+update public.organizations set plan = 'pro';   -- les fixtures ont besoin de plus de 3 sièges
 insert into public.memberships (organization_id, user_id, role) values
   (:'org_a','a0000000-0000-0000-0000-000000000002','agent'),
   (:'org_a','c0000000-0000-0000-0000-000000000001','agent'),

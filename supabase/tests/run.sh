@@ -21,7 +21,7 @@ PSQL=(psql -X -q -h "$DIR" -p "$PORT" -U postgres -v ON_ERROR_STOP=1)
 echo ">> stub Supabase"; "${PSQL[@]}" -d t -f "$ROOT/supabase/tests/00_stub_supabase.sql"
 for f in "$ROOT"/supabase/migrations/*.sql; do echo ">> migration $(basename "$f")"; "${PSQL[@]}" -d t -f "$f"; done
 echo ">> tests"
-if ! "${PSQL[@]}" -d t -f "$ROOT/supabase/tests/10_isolation.sql" -f "$ROOT/supabase/tests/20_visibility_and_coverage.sql" -f "$ROOT/supabase/tests/30_phase1.sql" -f "$ROOT/supabase/tests/40_phase2.sql" >"$DIR/out" 2>&1; then
+if ! "${PSQL[@]}" -d t -f "$ROOT/supabase/tests/10_isolation.sql" -f "$ROOT/supabase/tests/20_visibility_and_coverage.sql" -f "$ROOT/supabase/tests/30_phase1.sql" -f "$ROOT/supabase/tests/40_phase2.sql" -f "$ROOT/supabase/tests/50_phase3.sql" >"$DIR/out" 2>&1; then
   grep -E "NOTICE|ERROR|CONTEXT|DETAIL" "$DIR/out" | sed -E 's/^psql:[^ ]+:[0-9]+: //'; echo "!! ÉCHEC DES TESTS"; exit 1
 fi
 sed -E 's/^psql:[^ ]+:[0-9]+: //' "$DIR/out" | grep -E "^(NOTICE|===)" | sed 's/^NOTICE:  //'

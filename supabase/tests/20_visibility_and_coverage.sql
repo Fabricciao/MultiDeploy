@@ -79,12 +79,12 @@ select tests.assert(not exists (
   select 1 from pg_class c join pg_namespace n on n.oid=c.relnamespace
   where n.nspname='public' and c.relkind='r'
     and not exists (select 1 from pg_policy p where p.polrelid=c.oid)
-    and c.relname not in ('platform_admins','org_counters')),
+    and c.relname not in ('platform_admins','org_counters','billing_events','platform_audit_log','outbox_events','webhook_deliveries')),
   'toute table public a au moins une policy (sauf liste blanche service-only)');
 select tests.assert(not exists (
   select 1 from information_schema.tables t
   where t.table_schema='public' and t.table_type='BASE TABLE'
-    and t.table_name not in ('organizations','profiles','platform_admins','geo_places')
+    and t.table_name not in ('organizations','profiles','platform_admins','geo_places','plans','billing_events','webhook_deliveries')
     and not exists (select 1 from information_schema.columns c
       where c.table_schema='public' and c.table_name=t.table_name and c.column_name='organization_id')
     and t.table_name <> 'contact_shares'),
@@ -92,7 +92,7 @@ select tests.assert(not exists (
 select tests.assert(not exists (
   select 1 from information_schema.columns c
   where c.table_schema='public' and c.column_name='organization_id' and c.is_nullable='YES'
-    and c.table_name not in ('role_capabilities','audit_log')),
+    and c.table_name not in ('role_capabilities','audit_log','platform_audit_log')),
   'organization_id est NOT NULL partout (sauf défauts globaux et audit)');
 select tests.assert(not has_table_privilege('anon','public.contacts','select'), 'anon sans privilège sur contacts');
 \echo ''
