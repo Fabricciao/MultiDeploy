@@ -85,7 +85,9 @@
       "oauth": "Google sign-in failed.",
       "email": "Invalid email address.",
       "magic": "Could not send the link. Make sure you have been invited.",
-      "auth": "Could not sign in. Please try again."
+      "auth": "Could not sign in. Please try again.",
+      "no_agency": "Your account is not linked to an active agency. Ask for an invitation.",
+      "unknown_tenant": "This address does not match any agency."
     }
   },
   "design": {
@@ -413,7 +415,8 @@
       "too_small": "image too small",
       "limit": "25-photo limit reached",
       "failed": "processing failed",
-      "none": "No valid file or insufficient rights."
+      "none": "No valid file or insufficient rights.",
+      "quota": "plan storage quota reached"
     }
   },
   "brand": {
@@ -581,5 +584,177 @@
       "price": "price",
       "city_id": "city"
     }
+  },
+  "settings": {
+    "title": "Settings",
+    "tabs": {
+      "brand": "Brand",
+      "team": "Team",
+      "plan": "Plan & billing",
+      "integrations": "Integrations",
+      "audit": "Audit log",
+      "data": "Data"
+    }
+  },
+  "team": {
+    "title": "Team",
+    "seats": "{used} of {limit} seats used",
+    "forbidden": "Administrators only.",
+    "member": "Member",
+    "role": "Role",
+    "status": "Status",
+    "you": "you",
+    "statuses": {
+      "active": "Active",
+      "disabled": "Disabled",
+      "invited": "Invited"
+    },
+    "disable": "Disable",
+    "enable": "Re-enable",
+    "invite": "Invite a member",
+    "sendInvite": "Send invitation",
+    "inviteHint": "The link is valid for 7 days. The invitee must sign in with this email address.",
+    "pending": "Pending invitations",
+    "revoke": "Revoke",
+    "expires": "expires {date}",
+    "errors": {
+      "seat_limit": "Your plan's seat limit is reached.",
+      "last_owner": "An agency must always keep at least one active owner.",
+      "forbidden": "Insufficient rights.",
+      "invalid_email": "Invalid email address.",
+      "already_member": "This person is already on the team.",
+      "unknown": "Action not possible."
+    },
+    "ok": {
+      "invited": "Invitation sent.",
+      "saved": "Change saved."
+    },
+    "acceptTitle": "Join {name}",
+    "acceptSub": "Invitation for {email}. Sign in with this address to accept.",
+    "accept": "Accept invitation",
+    "acceptErrors": {
+      "wrong_account": "This invitation is for a different email address.",
+      "seat_limit": "The agency reached its seat limit.",
+      "invalid": "Invalid or expired invitation."
+    }
+  },
+  "plan": {
+    "title": "Plan and billing",
+    "current": "Current plan: {plan}",
+    "forbidden": "Owner only.",
+    "seats": "Seats",
+    "storage": "Storage",
+    "credits": "AI credits",
+    "monthly": "{n} credits granted monthly",
+    "subscription": "Subscription",
+    "subStatus": {
+      "trialing": "Trial",
+      "active": "Active",
+      "past_due": "Past due",
+      "canceled": "Canceled",
+      "paused": "Paused"
+    },
+    "renews": "Next renewal: {date}",
+    "manageBilling": "Manage billing",
+    "yourPlan": "Your plan",
+    "price": "{price} ₪ / user / month",
+    "priceOnQuote": "Pricing on request",
+    "limitSeats": "{n} users",
+    "limitStorage": "{n} GB storage",
+    "limitCredits": "{n} AI credits / month",
+    "features": {
+      "custom_domain": "Custom domain",
+      "white_label": "White label",
+      "whatsapp_api": "WhatsApp API",
+      "api": "Public API & webhooks",
+      "creative_posters": "Creative AI posters"
+    },
+    "choose": "Choose this plan",
+    "thanks": "Thank you! Your subscription is being activated.",
+    "notConfigured": "Online payment is not configured yet: contact us to change plan.",
+    "errors": {
+      "forbidden": "Insufficient rights.",
+      "billing_unavailable": "Online payment is currently unavailable."
+    }
+  },
+  "onboarding": {
+    "title": "Get started with your agency",
+    "steps": {
+      "brand": "Import your brand and fill the legal notice",
+      "team": "Invite your team",
+      "property": "Add your first property",
+      "photo": "Upload photos",
+      "contact": "Add your first client"
+    }
+  },
+  "platform": {
+    "badge": "Platform console",
+    "agencies": "Agencies",
+    "count": "{count, plural, one {# agency} other {# agencies}}",
+    "kpi": {
+      "active": "Active agencies",
+      "users": "Users",
+      "properties": "Properties",
+      "contacts": "Clients"
+    },
+    "agency": "Agency",
+    "plan": "Plan",
+    "seats": "Seats",
+    "storage": "Storage",
+    "credits": "AI credits",
+    "status": "Status",
+    "lastActivity": "Last activity",
+    "statuses": {
+      "active": "Active",
+      "suspended": "Suspended",
+      "archived": "Archived"
+    },
+    "create": "New agency",
+    "nameFr": "Name (French)",
+    "nameHe": "Name (Hebrew)",
+    "nameEn": "Name (English)",
+    "ownerEmail": "Owner email",
+    "defaultLocale": "Default language",
+    "createBtn": "Create agency",
+    "createHint": "Creates the isolated workspace, owner, default pipeline and brand, then emails access.",
+    "errors": {
+      "invalid_slug": "Invalid slug (lowercase letters, digits, dashes, 3–32).",
+      "reserved_slug": "Reserved slug.",
+      "slug_taken": "Slug already taken.",
+      "invalid_email": "Invalid email.",
+      "invalid_name": "Enter at least one name.",
+      "invalid_plan": "Unknown plan.",
+      "invalid_amount": "Invalid amount.",
+      "confirm_mismatch": "Confirmation does not match the slug."
+    },
+    "ok": {
+      "created": "Agency created. The owner received access.",
+      "saved": "Change saved.",
+      "purged": "Agency permanently deleted."
+    },
+    "impersonate": "View as agency (read-only)",
+    "usage": "Usage",
+    "team": "Team",
+    "journal": "Platform log",
+    "grantCredits": "Add / remove AI credits",
+    "reason": "Reason",
+    "overrides": "Overrides and options",
+    "features": {
+      "custom_domain": "Custom domain",
+      "white_label": "White label",
+      "whatsapp_api": "WhatsApp API",
+      "api": "Public API",
+      "creative_posters": "Creative AI posters"
+    },
+    "save": "Save",
+    "suspend": "Suspend agency",
+    "reactivate": "Reactivate agency",
+    "danger": "Danger zone",
+    "purgeHint": "Permanently deletes the agency, its data and files. Export first. Type “{slug}” to confirm.",
+    "purge": "Delete permanently"
+  },
+  "support": {
+    "banner": "Support mode — read-only — agency {name}",
+    "exit": "Exit"
   }
 }

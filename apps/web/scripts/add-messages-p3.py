@@ -1,0 +1,62 @@
+# Fusionne des clés (fr, he, en) dans messages/*.json — garantit la parité des 3 langues.
+import json, sys
+T = {}
+def add(prefix, rows):
+    for k, v in rows.items(): T[f"{prefix}.{k}"] = v
+add("settings", {"title": ("Paramètres", "הגדרות", "Settings"), "tabs.brand": ("Charte", "מיתוג", "Brand"), "tabs.team": ("Équipe", "צוות", "Team"), "tabs.plan": ("Plan & facturation", "תוכנית וחיוב", "Plan & billing"), "tabs.integrations": ("Intégrations", "אינטגרציות", "Integrations"), "tabs.audit": ("Journal d'audit", "יומן ביקורת", "Audit log"), "tabs.data": ("Données", "נתונים", "Data")})
+add("support", {})
+add("common", {"support.banner": ("Mode support — lecture seule — agence {name}", "מצב תמיכה — קריאה בלבד — סוכנות {name}", "Support mode — read-only — agency {name}"), "support.exit": ("Quitter", "יציאה", "Exit")})
+add("login", {"errors.no_agency": ("Votre compte n'est rattaché à aucune agence active. Demandez une invitation.", "החשבון שלכם אינו משויך לסוכנות פעילה. בקשו הזמנה.", "Your account is not linked to an active agency. Ask for an invitation."), "errors.unknown_tenant": ("Cette adresse ne correspond à aucune agence.", "כתובת זו אינה תואמת לאף סוכנות.", "This address does not match any agency.")})
+add("team", {
+ "title": ("Équipe", "צוות", "Team"), "seats": ("{used} sièges utilisés sur {limit}", "{used} מושבים בשימוש מתוך {limit}", "{used} of {limit} seats used"), "forbidden": ("Réservé aux administrateurs.", "שמור למנהלים.", "Administrators only."),
+ "member": ("Membre", "חבר", "Member"), "role": ("Rôle", "תפקיד", "Role"), "status": ("Statut", "סטטוס", "Status"), "you": ("vous", "אתם", "you"), "statuses.active": ("Actif", "פעיל", "Active"), "statuses.disabled": ("Désactivé", "מושבת", "Disabled"), "statuses.invited": ("Invité", "הוזמן", "Invited"),
+ "disable": ("Désactiver", "השבתה", "Disable"), "enable": ("Réactiver", "הפעלה מחדש", "Re-enable"), "invite": ("Inviter un membre", "הזמנת חבר", "Invite a member"), "sendInvite": ("Envoyer l'invitation", "שליחת הזמנה", "Send invitation"),
+ "inviteHint": ("Le lien est valable 7 jours. L'invité doit se connecter avec cette adresse e-mail.", "הקישור תקף ל-7 ימים. המוזמן חייב להתחבר עם כתובת האימייל הזו.", "The link is valid for 7 days. The invitee must sign in with this email address."),
+ "pending": ("Invitations en attente", "הזמנות ממתינות", "Pending invitations"), "revoke": ("Révoquer", "ביטול", "Revoke"), "expires": ("expire le {date}", "פג ב-{date}", "expires {date}"),
+ "errors.seat_limit": ("Limite de sièges de votre plan atteinte.", "הגעתם למגבלת המושבים בתוכנית.", "Your plan's seat limit is reached."), "errors.last_owner": ("Une agence doit toujours avoir au moins un propriétaire actif.", "לסוכנות חייב להיות תמיד לפחות בעלים פעיל אחד.", "An agency must always keep at least one active owner."),
+ "errors.forbidden": ("Droits insuffisants.", "אין הרשאה.", "Insufficient rights."), "errors.invalid_email": ("Adresse e-mail invalide.", "כתובת אימייל לא תקינה.", "Invalid email address."), "errors.already_member": ("Cette personne fait déjà partie de l'équipe.", "אדם זה כבר חבר בצוות.", "This person is already on the team."), "errors.unknown": ("Action impossible.", "לא ניתן לבצע את הפעולה.", "Action not possible."),
+ "ok.invited": ("Invitation envoyée.", "ההזמנה נשלחה.", "Invitation sent."), "ok.saved": ("Modification enregistrée.", "השינוי נשמר.", "Change saved."),
+ "acceptTitle": ("Rejoindre {name}", "הצטרפות ל-{name}", "Join {name}"), "acceptSub": ("Invitation pour {email}. Connectez-vous avec cette adresse pour l'accepter.", "הזמנה עבור {email}. התחברו עם כתובת זו כדי לאשר.", "Invitation for {email}. Sign in with this address to accept."), "accept": ("Accepter l'invitation", "אישור ההזמנה", "Accept invitation"),
+ "acceptErrors.wrong_account": ("Cette invitation est destinée à une autre adresse e-mail.", "ההזמנה מיועדת לכתובת אימייל אחרת.", "This invitation is for a different email address."), "acceptErrors.seat_limit": ("L'agence a atteint sa limite de sièges.", "הסוכנות הגיעה למגבלת המושבים.", "The agency reached its seat limit."), "acceptErrors.invalid": ("Invitation invalide ou expirée.", "הזמנה לא תקינה או שפג תוקפה.", "Invalid or expired invitation."),
+})
+add("plan", {
+ "title": ("Plan et facturation", "תוכנית וחיוב", "Plan and billing"), "current": ("Plan actuel : {plan}", "תוכנית נוכחית: {plan}", "Current plan: {plan}"), "forbidden": ("Réservé au propriétaire.", "שמור לבעלים.", "Owner only."),
+ "seats": ("Sièges", "מושבים", "Seats"), "storage": ("Stockage", "אחסון", "Storage"), "credits": ("Crédits IA", "קרדיטי AI", "AI credits"), "monthly": ("{n} crédits offerts chaque mois", "{n} קרדיטים בחודש", "{n} credits granted monthly"), "subscription": ("Abonnement", "מנוי", "Subscription"),
+ "subStatus.trialing": ("Essai", "ניסיון", "Trial"), "subStatus.active": ("Actif", "פעיל", "Active"), "subStatus.past_due": ("Paiement en retard", "תשלום באיחור", "Past due"), "subStatus.canceled": ("Résilié", "בוטל", "Canceled"), "subStatus.paused": ("En pause", "מושהה", "Paused"),
+ "renews": ("Prochaine échéance : {date}", "חידוש הבא: {date}", "Next renewal: {date}"), "manageBilling": ("Gérer la facturation", "ניהול חיוב", "Manage billing"), "yourPlan": ("Votre plan", "התוכנית שלכם", "Your plan"),
+ "price": ("{price} ₪ / utilisateur / mois", "{price} ₪ למשתמש לחודש", "{price} ₪ / user / month"), "priceOnQuote": ("Tarif sur devis", "מחיר לפי הצעה", "Pricing on request"),
+ "limitSeats": ("{n} utilisateurs", "{n} משתמשים", "{n} users"), "limitStorage": ("{n} Go de stockage", "{n} ג״ב אחסון", "{n} GB storage"), "limitCredits": ("{n} crédits IA / mois", "{n} קרדיטי AI בחודש", "{n} AI credits / month"),
+ "features.custom_domain": ("Domaine personnalisé", "דומיין מותאם", "Custom domain"), "features.white_label": ("Marque blanche", "מיתוג לבן", "White label"), "features.whatsapp_api": ("API WhatsApp", "API של WhatsApp", "WhatsApp API"), "features.api": ("API publique & webhooks", "API ציבורי וקרסי רשת", "Public API & webhooks"), "features.creative_posters": ("Affiches IA créatives", "מודעות AI יצירתיות", "Creative AI posters"),
+ "choose": ("Choisir ce plan", "בחירת התוכנית", "Choose this plan"), "thanks": ("Merci ! Votre abonnement est en cours d'activation.", "תודה! המנוי שלכם בתהליך הפעלה.", "Thank you! Your subscription is being activated."),
+ "notConfigured": ("Le paiement en ligne n'est pas encore configuré : contactez-nous pour changer de plan.", "התשלום המקוון טרם הוגדר: צרו קשר לשינוי תוכנית.", "Online payment is not configured yet: contact us to change plan."),
+ "errors.forbidden": ("Droits insuffisants.", "אין הרשאה.", "Insufficient rights."), "errors.billing_unavailable": ("Le paiement en ligne est indisponible pour le moment.", "התשלום המקוון אינו זמין כרגע.", "Online payment is currently unavailable."),
+})
+add("onboarding", {"title": ("Démarrer avec votre agence", "התחלה עם הסוכנות", "Get started with your agency"), "steps.brand": ("Importer votre charte et renseigner la mention légale", "ייבוא המיתוג והזנת ההערה המשפטית", "Import your brand and fill the legal notice"), "steps.team": ("Inviter votre équipe", "הזמנת הצוות", "Invite your team"), "steps.property": ("Ajouter votre premier bien", "הוספת הנכס הראשון", "Add your first property"), "steps.photo": ("Téléverser des photos", "העלאת תמונות", "Upload photos"), "steps.contact": ("Ajouter votre premier client", "הוספת הלקוח הראשון", "Add your first client")})
+add("platform", {
+ "badge": ("Console plateforme", "קונסולת פלטפורמה", "Platform console"), "agencies": ("Agences", "סוכנויות", "Agencies"), "count": ("{count, plural, one {# agence} other {# agences}}", "{count, plural, one {סוכנות #} two {# סוכנויות} other {# סוכנויות}}", "{count, plural, one {# agency} other {# agencies}}"),
+ "kpi.active": ("Agences actives", "סוכנויות פעילות", "Active agencies"), "kpi.users": ("Utilisateurs", "משתמשים", "Users"), "kpi.properties": ("Biens", "נכסים", "Properties"), "kpi.contacts": ("Clients", "לקוחות", "Clients"),
+ "agency": ("Agence", "סוכנות", "Agency"), "plan": ("Plan", "תוכנית", "Plan"), "seats": ("Sièges", "מושבים", "Seats"), "storage": ("Stockage", "אחסון", "Storage"), "credits": ("Crédits IA", "קרדיטי AI", "AI credits"), "status": ("Statut", "סטטוס", "Status"), "lastActivity": ("Dernière activité", "פעילות אחרונה", "Last activity"),
+ "statuses.active": ("Actif", "פעיל", "Active"), "statuses.suspended": ("Suspendu", "מושעה", "Suspended"), "statuses.archived": ("Archivé", "בארכיון", "Archived"),
+ "create": ("Nouvelle agence", "סוכנות חדשה", "New agency"), "nameFr": ("Nom (français)", "שם (צרפתית)", "Name (French)"), "nameHe": ("Nom (hébreu)", "שם (עברית)", "Name (Hebrew)"), "nameEn": ("Nom (anglais)", "שם (אנגלית)", "Name (English)"), "ownerEmail": ("E-mail du propriétaire", "אימייל הבעלים", "Owner email"), "defaultLocale": ("Langue par défaut", "שפת ברירת מחדל", "Default language"),
+ "createBtn": ("Créer l'agence", "יצירת הסוכנות", "Create agency"), "createHint": ("Crée l'espace isolé, le propriétaire, le pipeline et la charte par défaut, puis envoie l'accès.", "יוצרת סביבה מבודדת, בעלים, צינור ברירת מחדל ומיתוג, ושולחת גישה.", "Creates the isolated workspace, owner, default pipeline and brand, then emails access."),
+ "errors.invalid_slug": ("Identifiant invalide (lettres minuscules, chiffres, tirets, 3–32).", "מזהה לא תקין (אותיות קטנות, ספרות, מקפים, 3–32).", "Invalid slug (lowercase letters, digits, dashes, 3–32)."), "errors.reserved_slug": ("Identifiant réservé.", "מזהה שמור.", "Reserved slug."), "errors.slug_taken": ("Identifiant déjà utilisé.", "המזהה כבר בשימוש.", "Slug already taken."),
+ "errors.invalid_email": ("E-mail invalide.", "אימייל לא תקין.", "Invalid email."), "errors.invalid_name": ("Saisissez au moins un nom.", "הזינו לפחות שם אחד.", "Enter at least one name."), "errors.invalid_plan": ("Plan inconnu.", "תוכנית לא מוכרת.", "Unknown plan."), "errors.invalid_amount": ("Montant invalide.", "סכום לא תקין.", "Invalid amount."), "errors.confirm_mismatch": ("La confirmation ne correspond pas à l'identifiant.", "האישור אינו תואם למזהה.", "Confirmation does not match the slug."),
+ "ok.created": ("Agence créée. Le propriétaire a reçu son accès.", "הסוכנות נוצרה. הבעלים קיבל גישה.", "Agency created. The owner received access."), "ok.saved": ("Modification enregistrée.", "השינוי נשמר.", "Change saved."), "ok.purged": ("Agence supprimée définitivement.", "הסוכנות נמחקה לצמיתות.", "Agency permanently deleted."),
+ "impersonate": ("Voir comme l'agence (lecture seule)", "צפייה כסוכנות (קריאה בלבד)", "View as agency (read-only)"), "usage": ("Utilisation", "שימוש", "Usage"), "team": ("Équipe", "צוות", "Team"), "journal": ("Journal plateforme", "יומן פלטפורמה", "Platform log"),
+ "grantCredits": ("Ajouter / retirer des crédits IA", "הוספה / הסרה של קרדיטי AI", "Add / remove AI credits"), "reason": ("Motif", "סיבה", "Reason"), "overrides": ("Dérogations et options", "חריגות ואפשרויות", "Overrides and options"),
+ "features.custom_domain": ("Domaine personnalisé", "דומיין מותאם", "Custom domain"), "features.white_label": ("Marque blanche", "מיתוג לבן", "White label"), "features.whatsapp_api": ("API WhatsApp", "API של WhatsApp", "WhatsApp API"), "features.api": ("API publique", "API ציבורי", "Public API"), "features.creative_posters": ("Affiches IA créatives", "מודעות AI יצירתיות", "Creative AI posters"),
+ "save": ("Enregistrer", "שמירה", "Save"), "suspend": ("Suspendre l'agence", "השעיית הסוכנות", "Suspend agency"), "reactivate": ("Réactiver l'agence", "הפעלת הסוכנות מחדש", "Reactivate agency"), "danger": ("Zone dangereuse", "אזור מסוכן", "Danger zone"),
+ "purgeHint": ("Supprime définitivement l'agence, ses données et ses fichiers. Exportez-les d'abord. Saisissez « {slug} » pour confirmer.", "מוחק לצמיתות את הסוכנות, נתוניה וקבציה. ייצאו אותם קודם. הזינו ״{slug}״ לאישור.", "Permanently deletes the agency, its data and files. Export first. Type “{slug}” to confirm."), "purge": ("Supprimer définitivement", "מחיקה לצמיתות", "Delete permanently"),
+})
+for lang_i, lang in enumerate(["fr", "he", "en"]):
+    path = f"messages/{lang}.json"
+    data = json.load(open(path, encoding="utf-8"))
+    for key, vals in T.items():
+        node = data
+        parts = key.split(".")
+        for p in parts[:-1]:
+            node = node.setdefault(p, {})
+            assert isinstance(node, dict), key
+        node[parts[-1]] = vals[lang_i]
+    json.dump(data, open(path, "w", encoding="utf-8"), ensure_ascii=False, indent=2); open(path, "a").write("\n")
+print(len(T), "clés fusionnées")

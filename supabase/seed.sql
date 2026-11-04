@@ -18,6 +18,7 @@ begin
     (u_a, 'david@eliezer.demo', '{"full_name":"David Mizrahi"}'),
     (u_b, 'avi@eliezer.demo', '{"full_name":"Avi Bensimon"}') on conflict do nothing;
   org := public.provision_organization('eliezer', 'Eliezer.immo', 'אליעזר נדל״ן', 'Eliezer.immo', 'fr', u_owner);
+  update public.organizations set plan = 'pro' where id = org; update public.subscriptions set plan = 'pro', status = 'active' where organization_id = org;
   insert into public.memberships (organization_id, user_id, role) values (org, u_a, 'agent'), (org, u_b, 'agent');
   update public.profiles set active_organization_id = org where id in (u_a, u_b);
   select array_agg(id order by name_fr) into cities from public.geo_places where name_fr in ('Raanana','Kfar Saba','Herzliya','Netanya','Hod HaSharon','Modiin');
@@ -88,3 +89,7 @@ begin
     values (org, p, c, (array[u_owner,u_a,u_b])[1 + (i % 3)], date_trunc('day', now()) + ((i % 3) || ' days')::interval + (9 + i || ' hours')::interval, date_trunc('day', now()) + ((i % 3) || ' days')::interval + (10 + i || ' hours')::interval);
   end loop;
 end $$;
+
+-- Administrateur de plateforme de démonstration (sans agence)
+insert into auth.users (id, email, raw_user_meta_data) values ('11111111-1111-1111-1111-0000000000aa', 'root@platform.demo', '{"full_name":"Fabrice (plateforme)"}') on conflict do nothing;
+insert into public.platform_admins (user_id) select id from public.profiles where id = '11111111-1111-1111-1111-0000000000aa' on conflict do nothing;

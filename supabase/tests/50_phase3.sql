@@ -125,3 +125,18 @@ select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
 select tests.assert((select count(*) from public.properties where organization_id = :'org_a') = 0, 'corbeille : cloisonnée entre agences');
 rollback;
 \echo '=== CORBEILLE OK ==='
+
+-- ---------- règles sur les owners ----------
+insert into auth.users (id, email) values ('f2000000-0000-0000-0000-000000000001','adm@a.test');
+insert into public.memberships (organization_id, user_id, role) values (:'org_a','f2000000-0000-0000-0000-000000000001','admin');
+begin;
+select tests.login('f2000000-0000-0000-0000-000000000001', :'org_a');
+with u as (update public.memberships set role = 'agent' where organization_id = :'org_a' and user_id = 'a0000000-0000-0000-0000-000000000001' returning 1) select tests.assert((select count(*) from u) = 0, 'un admin ne peut pas rétrograder un owner');
+select tests.throws($$update public.memberships set role = 'owner' where organization_id = '$$ || :'org_a' || $$' and user_id = 'f2000000-0000-0000-0000-000000000001'$$, 'un admin ne peut pas se promouvoir owner');
+with u as (update public.memberships set role = 'assistant' where organization_id = :'org_a' and user_id = 'a0000000-0000-0000-0000-000000000002' returning 1) select tests.assert((select count(*) from u) = 1, 'un admin gère les agents');
+rollback;
+begin;
+select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
+with u as (update public.memberships set role = 'owner' where organization_id = :'org_a' and user_id = 'a0000000-0000-0000-0000-000000000002' returning 1) select tests.assert((select count(*) from u) = 1, 'un owner peut promouvoir un autre owner');
+rollback;
+\echo '=== RÈGLES OWNER OK ==='

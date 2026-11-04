@@ -8,6 +8,7 @@ import { getCtx, db } from "@/lib/session";
 import { pickName } from "@/lib/data/types";
 import { getBrandKit } from "@/lib/data/brand";
 import { themeCss } from "@/lib/theme";
+import { stopImpersonation } from "../platform/actions";
 
 export const dynamic = "force-dynamic";
 
@@ -26,6 +27,11 @@ export default async function AppLayout({ children, params }: { children: React.
       <style dangerouslySetInnerHTML={{ __html: themeCss(brand.colors.primary, brand.style.radius, brand.style.density) }} />
       <Sidebar orgName={pickName(ctx.orgName, locale) || "—"} userName={ctx.fullName} roleLabel={t(`roles.${ctx.role}`)} counts={counts} />
       <div className="main">
+        {ctx.impersonating && (
+          <form action={stopImpersonation} role="status" className="row" style={{ background: "var(--bad)", color: "#fff", padding: "8px 20px", gap: 12, fontWeight: 500 }}>
+            <input type="hidden" name="locale" value={locale} />{t("support.banner", { name: pickName(ctx.orgName, locale) })}<button className="btn sm sp" style={{ color: "var(--ink)" }}>{t("support.exit")}</button>
+          </form>
+        )}
         <header className="top">
           <form action={`/${locale}/properties`} className="search" role="search">
             <Search size={14} aria-hidden />

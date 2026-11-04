@@ -3,7 +3,7 @@ import { LocaleSwitcher } from "@/components/locale-switcher";
 import { supabaseEnv } from "@/lib/supabase/env";
 import { signInWithGoogle, signInWithMagicLink } from "./actions";
 
-export default async function LoginPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string; sent?: string }> }) {
+export default async function LoginPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string; sent?: string; next?: string }> }) {
   const { locale } = await params;
   const sp = await searchParams;
   setRequestLocale(locale);
@@ -22,16 +22,16 @@ export default async function LoginPage({ params, searchParams }: { params: Prom
         <p className="mb-6 mt-1 text-muted">{t("subtitle")}</p>
 
         {!configured && <p role="status" className="mb-4 rounded-ui border border-line bg-sunken p-3 text-[13px]">{t("notConfigured")}</p>}
-        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
+        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth", "no_agency", "unknown_tenant"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
         {sp.sent && <p role="status" className="mb-4 text-[13px] text-success">{t("sent")}</p>}
 
         <form action={signInWithGoogle}>
-          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="locale" value={locale} /><input type="hidden" name="next" value={sp.next ?? ""} />
           <button disabled={!configured} className={`${btn} border border-line-strong bg-surface hover:bg-sunken disabled:opacity-50`}>{t("google")}</button>
         </form>
         <div className="my-5 flex items-center gap-3 text-[12px] text-muted"><span className="h-px flex-1 bg-line" />{t("or")}<span className="h-px flex-1 bg-line" /></div>
         <form action={signInWithMagicLink} className="space-y-3">
-          <input type="hidden" name="locale" value={locale} />
+          <input type="hidden" name="locale" value={locale} /><input type="hidden" name="next" value={sp.next ?? ""} />
           <label className="block text-[13px] font-medium" htmlFor="email">{t("email")}</label>
           <input id="email" name="email" type="email" dir="ltr" autoComplete="email" required className={`${field} text-start`} />
           <button disabled={!configured} className={`${btn} bg-accent text-white hover:bg-accent-hover disabled:opacity-50`}>{t("magic")}</button>

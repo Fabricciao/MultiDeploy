@@ -41,3 +41,15 @@ export async function toggleTask(ctx: Ctx, id: string, done: boolean) {
 export async function createTask(ctx: Ctx, title: string, dueAt: string | null, contactId: string | null) {
   return db(ctx, async (tx) => (await tx`insert into public.tasks (organization_id, title, due_at, contact_id) values (${ctx.orgId}, ${title}, ${dueAt}, ${contactId}) returning id`).length > 0);
 }
+
+export async function getOnboarding(ctx: Ctx) {
+  if (!ctx.caps.has("org.manage") && !ctx.caps.has("brand.manage")) return null;
+  const [r] = await db(ctx, (tx) => tx`select
+    (select coalesce(legal_footer->>'fr', legal_footer->>'he', legal_footer->>'en', '') <> '' from public.brand_kits where organization_id = ${ctx.orgId}) as brand,
+    (select count(*) from public.memberships where organization_id = ${ctx.orgId} and status = 'active')::int > 1 as team,
+    (select count(*) from public.properties where deleted_at is null)::int > 0 as property,
+    (select count(*) from public.property_media)::int > 0 as photo,
+    (select count(*) from public.contacts where deleted_at is null)::int > 0 as contact`);
+  const steps = [{ key: "brand", done: !!r!.brand, href: "/settings/brand" }, { key: "team", done: !!r!.team, href: "/settings/team" }, { key: "property", done: !!r!.property, href: "/properties/new" }, { key: "photo", done: !!r!.photo, href: "/properties" }, { key: "contact", done: !!r!.contact, href: "/clients/new" }];
+  return steps.every((s) => s.done) ? null : steps;
+}

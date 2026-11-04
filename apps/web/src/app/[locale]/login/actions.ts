@@ -12,12 +12,14 @@ async function origin() {
   return process.env.NEXT_PUBLIC_SITE_URL ?? `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
 }
 
+const safeNext = (v: unknown, fallback: string) => (typeof v === "string" && v.startsWith("/") && !v.startsWith("//") && !v.includes("\\") ? v : fallback);
+
 export async function signInWithGoogle(formData: FormData) {
   const locale = localeSchema.catch("fr").parse(formData.get("locale"));
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${await origin()}/auth/callback?next=/${locale}` },
+    options: { redirectTo: `${await origin()}/auth/callback?next=${encodeURIComponent(safeNext(formData.get("next"), `/${locale}`))}` },
   });
   if (error || !data.url) redirect(`/${locale}/login?error=oauth`);
   redirect(data.url);
@@ -31,7 +33,7 @@ export async function signInWithMagicLink(formData: FormData) {
   const { error } = await supabase.auth.signInWithOtp({
     email: email.data,
     // shouldCreateUser: false → l'accès se fait uniquement par invitation d'agence
-    options: { shouldCreateUser: false, emailRedirectTo: `${await origin()}/auth/callback?next=/${locale}` },
+    options: { shouldCreateUser: false, emailRedirectTo: `${await origin()}/auth/callback?next=${encodeURIComponent(safeNext(formData.get("next"), `/${locale}`))}` },
   });
   redirect(`/${locale}/login?${error ? "error=magic" : "sent=1"}`);
 }

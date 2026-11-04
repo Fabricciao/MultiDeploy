@@ -85,7 +85,9 @@
       "oauth": "La connexion Google a échoué.",
       "email": "Adresse e-mail invalide.",
       "magic": "Impossible d'envoyer le lien. Vérifiez que vous avez été invité.",
-      "auth": "Connexion impossible. Réessayez."
+      "auth": "Connexion impossible. Réessayez.",
+      "no_agency": "Votre compte n'est rattaché à aucune agence active. Demandez une invitation.",
+      "unknown_tenant": "Cette adresse ne correspond à aucune agence."
     }
   },
   "design": {
@@ -413,7 +415,8 @@
       "too_small": "image trop petite",
       "limit": "limite de 25 photos atteinte",
       "failed": "échec du traitement",
-      "none": "Aucun fichier valide ou droits insuffisants."
+      "none": "Aucun fichier valide ou droits insuffisants.",
+      "quota": "quota de stockage du plan atteint"
     }
   },
   "brand": {
@@ -581,5 +584,177 @@
       "price": "prix",
       "city_id": "ville"
     }
+  },
+  "settings": {
+    "title": "Paramètres",
+    "tabs": {
+      "brand": "Charte",
+      "team": "Équipe",
+      "plan": "Plan & facturation",
+      "integrations": "Intégrations",
+      "audit": "Journal d'audit",
+      "data": "Données"
+    }
+  },
+  "team": {
+    "title": "Équipe",
+    "seats": "{used} sièges utilisés sur {limit}",
+    "forbidden": "Réservé aux administrateurs.",
+    "member": "Membre",
+    "role": "Rôle",
+    "status": "Statut",
+    "you": "vous",
+    "statuses": {
+      "active": "Actif",
+      "disabled": "Désactivé",
+      "invited": "Invité"
+    },
+    "disable": "Désactiver",
+    "enable": "Réactiver",
+    "invite": "Inviter un membre",
+    "sendInvite": "Envoyer l'invitation",
+    "inviteHint": "Le lien est valable 7 jours. L'invité doit se connecter avec cette adresse e-mail.",
+    "pending": "Invitations en attente",
+    "revoke": "Révoquer",
+    "expires": "expire le {date}",
+    "errors": {
+      "seat_limit": "Limite de sièges de votre plan atteinte.",
+      "last_owner": "Une agence doit toujours avoir au moins un propriétaire actif.",
+      "forbidden": "Droits insuffisants.",
+      "invalid_email": "Adresse e-mail invalide.",
+      "already_member": "Cette personne fait déjà partie de l'équipe.",
+      "unknown": "Action impossible."
+    },
+    "ok": {
+      "invited": "Invitation envoyée.",
+      "saved": "Modification enregistrée."
+    },
+    "acceptTitle": "Rejoindre {name}",
+    "acceptSub": "Invitation pour {email}. Connectez-vous avec cette adresse pour l'accepter.",
+    "accept": "Accepter l'invitation",
+    "acceptErrors": {
+      "wrong_account": "Cette invitation est destinée à une autre adresse e-mail.",
+      "seat_limit": "L'agence a atteint sa limite de sièges.",
+      "invalid": "Invitation invalide ou expirée."
+    }
+  },
+  "plan": {
+    "title": "Plan et facturation",
+    "current": "Plan actuel : {plan}",
+    "forbidden": "Réservé au propriétaire.",
+    "seats": "Sièges",
+    "storage": "Stockage",
+    "credits": "Crédits IA",
+    "monthly": "{n} crédits offerts chaque mois",
+    "subscription": "Abonnement",
+    "subStatus": {
+      "trialing": "Essai",
+      "active": "Actif",
+      "past_due": "Paiement en retard",
+      "canceled": "Résilié",
+      "paused": "En pause"
+    },
+    "renews": "Prochaine échéance : {date}",
+    "manageBilling": "Gérer la facturation",
+    "yourPlan": "Votre plan",
+    "price": "{price} ₪ / utilisateur / mois",
+    "priceOnQuote": "Tarif sur devis",
+    "limitSeats": "{n} utilisateurs",
+    "limitStorage": "{n} Go de stockage",
+    "limitCredits": "{n} crédits IA / mois",
+    "features": {
+      "custom_domain": "Domaine personnalisé",
+      "white_label": "Marque blanche",
+      "whatsapp_api": "API WhatsApp",
+      "api": "API publique & webhooks",
+      "creative_posters": "Affiches IA créatives"
+    },
+    "choose": "Choisir ce plan",
+    "thanks": "Merci ! Votre abonnement est en cours d'activation.",
+    "notConfigured": "Le paiement en ligne n'est pas encore configuré : contactez-nous pour changer de plan.",
+    "errors": {
+      "forbidden": "Droits insuffisants.",
+      "billing_unavailable": "Le paiement en ligne est indisponible pour le moment."
+    }
+  },
+  "onboarding": {
+    "title": "Démarrer avec votre agence",
+    "steps": {
+      "brand": "Importer votre charte et renseigner la mention légale",
+      "team": "Inviter votre équipe",
+      "property": "Ajouter votre premier bien",
+      "photo": "Téléverser des photos",
+      "contact": "Ajouter votre premier client"
+    }
+  },
+  "platform": {
+    "badge": "Console plateforme",
+    "agencies": "Agences",
+    "count": "{count, plural, one {# agence} other {# agences}}",
+    "kpi": {
+      "active": "Agences actives",
+      "users": "Utilisateurs",
+      "properties": "Biens",
+      "contacts": "Clients"
+    },
+    "agency": "Agence",
+    "plan": "Plan",
+    "seats": "Sièges",
+    "storage": "Stockage",
+    "credits": "Crédits IA",
+    "status": "Statut",
+    "lastActivity": "Dernière activité",
+    "statuses": {
+      "active": "Actif",
+      "suspended": "Suspendu",
+      "archived": "Archivé"
+    },
+    "create": "Nouvelle agence",
+    "nameFr": "Nom (français)",
+    "nameHe": "Nom (hébreu)",
+    "nameEn": "Nom (anglais)",
+    "ownerEmail": "E-mail du propriétaire",
+    "defaultLocale": "Langue par défaut",
+    "createBtn": "Créer l'agence",
+    "createHint": "Crée l'espace isolé, le propriétaire, le pipeline et la charte par défaut, puis envoie l'accès.",
+    "errors": {
+      "invalid_slug": "Identifiant invalide (lettres minuscules, chiffres, tirets, 3–32).",
+      "reserved_slug": "Identifiant réservé.",
+      "slug_taken": "Identifiant déjà utilisé.",
+      "invalid_email": "E-mail invalide.",
+      "invalid_name": "Saisissez au moins un nom.",
+      "invalid_plan": "Plan inconnu.",
+      "invalid_amount": "Montant invalide.",
+      "confirm_mismatch": "La confirmation ne correspond pas à l'identifiant."
+    },
+    "ok": {
+      "created": "Agence créée. Le propriétaire a reçu son accès.",
+      "saved": "Modification enregistrée.",
+      "purged": "Agence supprimée définitivement."
+    },
+    "impersonate": "Voir comme l'agence (lecture seule)",
+    "usage": "Utilisation",
+    "team": "Équipe",
+    "journal": "Journal plateforme",
+    "grantCredits": "Ajouter / retirer des crédits IA",
+    "reason": "Motif",
+    "overrides": "Dérogations et options",
+    "features": {
+      "custom_domain": "Domaine personnalisé",
+      "white_label": "Marque blanche",
+      "whatsapp_api": "API WhatsApp",
+      "api": "API publique",
+      "creative_posters": "Affiches IA créatives"
+    },
+    "save": "Enregistrer",
+    "suspend": "Suspendre l'agence",
+    "reactivate": "Réactiver l'agence",
+    "danger": "Zone dangereuse",
+    "purgeHint": "Supprime définitivement l'agence, ses données et ses fichiers. Exportez-les d'abord. Saisissez « {slug} » pour confirmer.",
+    "purge": "Supprimer définitivement"
+  },
+  "support": {
+    "banner": "Mode support — lecture seule — agence {name}",
+    "exit": "Quitter"
   }
 }

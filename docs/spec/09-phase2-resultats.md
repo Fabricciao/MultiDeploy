@@ -12,7 +12,7 @@
 | **Saisie assistée** | Texte collé → champs extraits (FR/HE/EN, nombres en lettres « quatre millions », « שני מיליון ומאתיים אלף », « trois pièces et demie », villes avec préfixe hébreu) ; écran de revue : requis manquant signalé, champs incertains « à vérifier » avec l'extrait source ; rien n'est enregistré avant validation | 29 + 5 tests unitaires, E2E |
 | **Enregistreur** | MediaRecorder (niveau sonore, 3 min max), relecture, envoi | E2E avec micro factice |
 
-**Totaux** : 86 assertions SQL, 150 tests unitaires, 61 vérifications E2E (28 + 33).
+**Totaux** : 86 assertions SQL, 150 tests unitaires, 61 vérifications E2E (28 + 33 + 34).
 
 ## Non testé (nécessite vos clés — voir la liste en fin de projet)
 - **Transcription vocale (STT)**, **extraction LLM**, **lecture de manuscrit (vision)**, **retouche d'image** : adaptateurs écrits d'après les API publiques (`lib/ai/providers.ts`) mais **jamais exécutés**. Sans clé, la saisie vocale/photo répond proprement « non configuré » et la saisie par texte fonctionne via l'extracteur à règles. Les niveaux d'affiche « amélioré/créatif » sont désactivés tant qu'aucun fournisseur d'images n'est configuré.

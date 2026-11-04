@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import { db, type Ctx } from "../session";
 import { storage } from "../storage";
 import { ImageError, processImage } from "../images";
+import { storageAllows } from "./plan";
 
 export const MAX_PHOTOS = 25;
 export type MediaRow = { id: string; storage_path: string; thumb_path: string | null; width: number | null; height: number | null; is_cover: boolean; position: number };
@@ -28,12 +29,13 @@ export async function addPhotos(ctx: Ctx, propertyId: string, files: File[]): Pr
     if (n >= MAX_PHOTOS) { res.errors.push({ name: f.name, code: "limit" }); continue; }
     try {
       const out = await processImage(Buffer.from(await f.arrayBuffer()));
+      if (!(await storageAllows(ctx, out.main.length + out.thumb.length))) { res.errors.push({ name: f.name, code: "quota" }); continue; }
       const id = randomUUID(), base = `org/${ctx.orgId}/property_photo`;
       const key = `${base}/${id}.jpg`, tkey = `${base}/${randomUUID()}.jpg`;
       await storage.put(key, out.main, "image/jpeg"); await storage.put(tkey, out.thumb, "image/jpeg");
       pos += 1;
-      await db(ctx, (tx) => tx`insert into public.property_media (id, organization_id, property_id, kind, storage_path, thumb_path, width, height, position, is_cover)
-        values (${id}, ${ctx.orgId}, ${propertyId}, 'photo', ${key}, ${tkey}, ${out.width}, ${out.height}, ${pos}, ${!hasCover})`);
+      await db(ctx, (tx) => tx`insert into public.property_media (id, organization_id, property_id, kind, storage_path, thumb_path, width, height, position, is_cover, bytes)
+        values (${id}, ${ctx.orgId}, ${propertyId}, 'photo', ${key}, ${tkey}, ${out.width}, ${out.height}, ${pos}, ${!hasCover}, ${out.main.length + out.thumb.length})`);
       hasCover = true; n += 1; res.added += 1;
     } catch (e) { res.errors.push({ name: f.name, code: e instanceof ImageError ? e.code : "failed" }); }
   }

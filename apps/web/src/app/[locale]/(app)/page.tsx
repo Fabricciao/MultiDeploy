@@ -2,7 +2,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Clock, MapPin, Target, TriangleAlert } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
-import { getToday } from "@/lib/data/today";
+import { getOnboarding, getToday } from "@/lib/data/today";
 import { contactName } from "@/lib/data/contacts";
 import { cityName } from "@/lib/data/geo";
 import { dateTime, money, num, timeOnly } from "@/lib/format";
@@ -16,12 +16,18 @@ export default async function TodayPage({ params }: { params: Promise<{ locale: 
   const t = await getTranslations("today");
   const tp = await getTranslations("props");
   const d = await getToday(ctx);
+  const onboarding = await getOnboarding(ctx);
+  const to = await getTranslations("onboarding");
   const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
   const place = (r: Record<string, any>) => [r.street, cityName({ name_fr: r.city_fr, name_he: r.city_he, name_en: r.city_en }, locale)].filter(Boolean).join(", ");
   const kpi = (label: string, value: React.ReactNode) => <div className="card card-b"><div className="note">{label}</div><div className="tab" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-.02em", marginTop: 2 }}>{value}</div></div>;
   return (
     <>
       <PageHeader title={t("hello", { name: ctx.fullName.split(" ")[0] ?? "" })} sub={greeting} />
+      {onboarding && (
+        <section className="card" style={{ marginBottom: 16, borderColor: "var(--accent)" }}><h2>{to("title")}<span className="badge acc">{onboarding.filter((s) => s.done).length}/{onboarding.length}</span></h2>
+          <div className="card-b col" style={{ gap: 8 }}>{onboarding.map((s) => <Link key={s.key} href={s.href} className="row" style={{ gap: 10, opacity: s.done ? 0.55 : 1 }}><span className={`cb ${s.done ? "on" : ""}`} style={{ borderRadius: "50%", width: 18, height: 18 }}>{s.done ? "✓" : ""}</span><span style={{ textDecoration: s.done ? "line-through" : "none" }}>{to(`steps.${s.key}`)}</span></Link>)}</div></section>
+      )}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 12, marginBottom: 16 }}>
         {kpi(t("kpi.activeProps"), num(locale, d.kpi.active_props, 0))}{kpi(t("kpi.contacts"), num(locale, d.kpi.contacts, 0))}{kpi(t("kpi.openDeals"), num(locale, d.kpi.open_deals, 0))}{kpi(t("kpi.weighted"), money(locale, d.kpi.weighted))}
       </div>
