@@ -13,7 +13,7 @@
 | **Droits** | Agent à visibilité restreinte : clients des autres en 404, bien d'un collègue non modifiable (bouton absent **et** refus en base) | E2E |
 | **i18n** | 309 clés × 3 langues, contrôle de parité + contrôle « toute clé utilisée existe » en CI | `pnpm lint` |
 
-**Chiffres** : 61 → **63 assertions SQL**, 38 tests unitaires, **34 vérifications E2E** (navigateur réel, base réelle).
+**Chiffres** : 61 → **63 assertions SQL**, 38 tests unitaires, **28 vérifications E2E** (navigateur réel, base réelle).
 
 ## Bugs trouvés par les tests (et corrigés)
 - JSON **double-encodé** (chaîne au lieu d'objet) sur téléphones/e-mails/consentement/mandat → corrigé + **contraintes `CHECK` en base** pour que ça ne puisse plus se reproduire silencieusement.
