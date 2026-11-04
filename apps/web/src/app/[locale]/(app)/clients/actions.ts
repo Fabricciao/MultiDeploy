@@ -64,3 +64,13 @@ export async function openDealAction(contactId: string, fd: FormData) {
   revalidatePath(`/${locale}/deals`);
   redirect(`/${locale}/deals`);
 }
+
+export async function anonymizeAction(contactId: string, fd: FormData) {
+  const locale = loc(fd);
+  const ctx = await getCtx(locale);
+  if (!ctx.caps.has("contacts.delete") || ctx.impersonating || fd.get("confirm") !== "on" || !/^[0-9a-f-]{36}$/i.test(contactId)) redirect(`/${locale}/clients/${contactId}?err=erase`);
+  const { db } = await import("@/lib/session");
+  try { await db(ctx, (tx) => tx`select public.anonymize_contact(${contactId})`); } catch { redirect(`/${locale}/clients/${contactId}?err=erase`); }
+  revalidatePath(`/${locale}/clients`);
+  redirect(`/${locale}/clients`);
+}

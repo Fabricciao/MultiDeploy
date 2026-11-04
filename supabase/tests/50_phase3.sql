@@ -140,3 +140,15 @@ select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
 with u as (update public.memberships set role = 'owner' where organization_id = :'org_a' and user_id = 'a0000000-0000-0000-0000-000000000002' returning 1) select tests.assert((select count(*) from u) = 1, 'un owner peut promouvoir un autre owner');
 rollback;
 \echo '=== RÈGLES OWNER OK ==='
+
+-- ---------- livraisons webhook : lecture cloisonnée ----------
+begin;
+select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
+select tests.assert((select count(*) from public.webhook_deliveries) >= 1, 'livraisons : l''owner voit celles de ses endpoints');
+select tests.throws($$update public.webhook_deliveries set status = 'delivered'$$, 'livraisons : aucune écriture par l''utilisateur');
+rollback;
+begin;
+select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
+select tests.assert((select count(*) from public.webhook_deliveries) = 0, 'livraisons : invisibles pour une autre agence');
+rollback;
+\echo '=== LIVRAISONS OK ==='

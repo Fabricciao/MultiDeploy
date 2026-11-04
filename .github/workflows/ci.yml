@@ -45,9 +45,12 @@ jobs:
           export NODE_PATH="$(npm root -g):$PWD/apps/web/node_modules"
           export CHROMIUM_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")"
           export BRAND_FETCH_ALLOW_PRIVATE=1   # autorise UNIQUEMENT le loopback (serveur de fixtures) hors production
+          export CRON_SECRET=cron_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e APP_DOMAINS=multideploy.test
           (pnpm --filter @multideploy/web dev -p 3120 > dev.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf http://localhost:3120/fr/login >/dev/null && break; sleep 2; done
           node apps/web/e2e/phase1.cjs
           node apps/web/e2e/phase2.cjs
+          node apps/web/e2e/phase3.cjs
+          node apps/web/e2e/phase4a.cjs
       - if: failure()
         run: tail -80 dev.log

@@ -397,6 +397,13 @@
       "notes": "Notes",
       "optIn": "Le client a accepté de recevoir des sélections de biens (e-mail)",
       "optInHint": "Sans consentement, l'envoi par e-mail est bloqué. Il est enregistré avec la date."
+    },
+    "privacy": {
+      "title": "Données personnelles",
+      "export": "Exporter les données (JSON)",
+      "confirm": "Je confirme l'effacement définitif des données personnelles de ce client",
+      "erase": "Effacer les données personnelles",
+      "hint": "Droit d'accès et d'effacement : l'effacement est irréversible ; l'historique commercial est conservé sans donnée personnelle."
     }
   },
   "media": {
@@ -756,5 +763,66 @@
   "support": {
     "banner": "Mode support — lecture seule — agence {name}",
     "exit": "Quitter"
+  },
+  "integrations": {
+    "title": "Intégrations",
+    "sub": "API publique, webhooks et widget pour le site de l'agence.",
+    "forbidden": "Réservé aux administrateurs.",
+    "keys": "Clés d'API",
+    "keyOnce": "Copiez cette clé maintenant : elle ne sera plus jamais affichée.",
+    "keyName": "Nom de la clé (ex. site web)",
+    "scopeProps": "Lire les biens publiés",
+    "scopeLeads": "Créer des leads",
+    "createKey": "Créer la clé",
+    "revoke": "Révoquer",
+    "revoked": "Révoquée",
+    "lastUsed": "utilisée le {date}",
+    "neverUsed": "jamais utilisée",
+    "embedTitle": "Widget pour votre site",
+    "embedHint": "Collez ce code dans votre site : biens publiés et formulaire de contact qui crée un lead dans le CRM.",
+    "webhooks": "Webhooks",
+    "addHook": "Ajouter le webhook",
+    "delete": "Supprimer",
+    "deliveries": "{ok} livrés · {ko} en échec",
+    "hookHint": "HTTPS uniquement. Chaque envoi est signé (en-tête X-MultiDeploy-Signature, HMAC-SHA256) et retenté avec délai croissant.",
+    "errors": {
+      "forbidden": "Droits insuffisants.",
+      "plan": "Cette option n'est pas incluse dans votre plan.",
+      "scopes": "Choisissez au moins une portée.",
+      "invalid_url": "L'URL doit commencer par https://.",
+      "blocked": "Cette adresse n'est pas autorisée."
+    }
+  },
+  "embed": {
+    "empty": "Aucun bien publié pour le moment.",
+    "contact": "Nous contacter",
+    "name": "Nom",
+    "phone": "Téléphone",
+    "message": "Votre message",
+    "consent": "J'accepte d'être recontacté(e) et de recevoir des sélections de biens.",
+    "send": "Envoyer",
+    "thanks": "Merci ! Nous vous recontactons très vite.",
+    "needContact": "Indiquez un téléphone ou un e-mail.",
+    "tooMany": "Trop de demandes, réessayez plus tard."
+  },
+  "data": {
+    "title": "Données",
+    "sub": "Portabilité et droits des personnes.",
+    "forbidden": "Réservé aux administrateurs.",
+    "exportText": "Téléchargez toutes les données de l'agence (biens, clients, critères, affaires, activités, tâches) au format CSV dans une archive ZIP.",
+    "exportBtn": "Exporter les données",
+    "rights": "Pour répondre à une demande d'accès ou d'effacement d'un client, utilisez les actions sur sa fiche (export JSON, effacement)."
+  },
+  "audit": {
+    "title": "Journal d'audit",
+    "sub": "Créations, modifications et suppressions des fiches sensibles (200 dernières).",
+    "forbidden": "Réservé aux administrateurs.",
+    "when": "Date",
+    "who": "Qui",
+    "action": "Action",
+    "entity": "Objet",
+    "detail": "Détail",
+    "all": "Tout",
+    "filter": "Filtrer"
   }
 }

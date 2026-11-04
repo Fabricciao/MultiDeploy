@@ -10,7 +10,7 @@ import { dateShort, dateTime, initials, money, num } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
-import { addNoteAction, addTaskAction, openDealAction, toggleTaskAction } from "../actions";
+import { addNoteAction, addTaskAction, anonymizeAction, openDealAction, toggleTaskAction } from "../actions";
 
 export default async function ClientPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
@@ -121,6 +121,14 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
               </div>
             ))}
           </div></div>
+
+          {ctx.caps.has("contacts.write") && (
+            <div className="card"><h2>{t("privacy.title")}</h2><div className="card-b col" style={{ gap: 10 }}>
+              <a className="btn sm" href={`/api/export/contact/${id}`}>{t("privacy.export")}</a>
+              {ctx.caps.has("contacts.delete") && <form action={anonymizeAction.bind(null, id)} className="col" style={{ gap: 6 }}><input type="hidden" name="locale" value={locale} />
+                <label className="row" style={{ gap: 8, fontSize: 12 }}><input type="checkbox" className="ck" name="confirm" required />{t("privacy.confirm")}</label><button className="btn sm danger">{t("privacy.erase")}</button></form>}
+              <p className="note">{t("privacy.hint")}</p></div></div>
+          )}
 
           {ctx.caps.has("deals.write") && (
             <div className="card"><h2><Handshake size={15} aria-hidden />{t("deals")}</h2><div className="card-b col" style={{ gap: 10 }}>

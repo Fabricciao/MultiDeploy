@@ -397,6 +397,13 @@
       "notes": "Notes",
       "optIn": "The client agreed to receive property selections (email)",
       "optInHint": "Without consent, email sending is blocked. Consent is stored with the date."
+    },
+    "privacy": {
+      "title": "Personal data",
+      "export": "Export data (JSON)",
+      "confirm": "I confirm permanent erasure of this client's personal data",
+      "erase": "Erase personal data",
+      "hint": "Right of access and erasure: erasure is irreversible; commercial history is kept without personal data."
     }
   },
   "media": {
@@ -756,5 +763,66 @@
   "support": {
     "banner": "Support mode — read-only — agency {name}",
     "exit": "Exit"
+  },
+  "integrations": {
+    "title": "Integrations",
+    "sub": "Public API, webhooks and widget for the agency website.",
+    "forbidden": "Administrators only.",
+    "keys": "API keys",
+    "keyOnce": "Copy this key now: it will never be shown again.",
+    "keyName": "Key name (e.g. website)",
+    "scopeProps": "Read published properties",
+    "scopeLeads": "Create leads",
+    "createKey": "Create key",
+    "revoke": "Revoke",
+    "revoked": "Revoked",
+    "lastUsed": "last used {date}",
+    "neverUsed": "never used",
+    "embedTitle": "Widget for your website",
+    "embedHint": "Paste this code into your site: published properties and a contact form that creates a lead in the CRM.",
+    "webhooks": "Webhooks",
+    "addHook": "Add webhook",
+    "delete": "Delete",
+    "deliveries": "{ok} delivered · {ko} failed",
+    "hookHint": "HTTPS only. Each delivery is signed (X-MultiDeploy-Signature header, HMAC-SHA256) and retried with increasing delay.",
+    "errors": {
+      "forbidden": "Insufficient rights.",
+      "plan": "This option is not included in your plan.",
+      "scopes": "Choose at least one scope.",
+      "invalid_url": "The URL must start with https://.",
+      "blocked": "This address is not allowed."
+    }
+  },
+  "embed": {
+    "empty": "No published property at the moment.",
+    "contact": "Contact us",
+    "name": "Name",
+    "phone": "Phone",
+    "message": "Your message",
+    "consent": "I agree to be contacted and to receive property selections.",
+    "send": "Send",
+    "thanks": "Thank you! We will contact you shortly.",
+    "needContact": "Please provide a phone or email.",
+    "tooMany": "Too many requests, try again later."
+  },
+  "data": {
+    "title": "Data",
+    "sub": "Portability and data-subject rights.",
+    "forbidden": "Administrators only.",
+    "exportText": "Download all agency data (properties, clients, criteria, deals, activities, tasks) as CSV files in a ZIP archive.",
+    "exportBtn": "Export data",
+    "rights": "To answer a client's access or erasure request, use the actions on their record (JSON export, erasure)."
+  },
+  "audit": {
+    "title": "Audit log",
+    "sub": "Creations, changes and deletions of sensitive records (last 200).",
+    "forbidden": "Administrators only.",
+    "when": "Date",
+    "who": "Who",
+    "action": "Action",
+    "entity": "Object",
+    "detail": "Detail",
+    "all": "All",
+    "filter": "Filter"
   }
 }

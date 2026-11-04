@@ -11,7 +11,12 @@ const config: NextConfig = {
   async headers() {
     return [
       {
-        source: "/:path*",
+        // pages intégrables dans l'iframe d'un site d'agence : pas de X-Frame-Options (le reste des en-têtes est conservé)
+        source: "/:locale(fr|he|en)/embed/:path*",
+        headers: [{ key: "X-Content-Type-Options", value: "nosniff" }, { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" }, { key: "Content-Security-Policy", value: "frame-ancestors *" }],
+      },
+      {
+        source: "/((?!fr/embed|he/embed|en/embed).*)",
         headers: [
           { key: "X-Content-Type-Options", value: "nosniff" },
           { key: "X-Frame-Options", value: "DENY" },
