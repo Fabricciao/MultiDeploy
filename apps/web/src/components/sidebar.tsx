@@ -1,40 +1,39 @@
 "use client";
 import { useTranslations } from "next-intl";
-import { CalendarDays, ChartNoAxesColumn, Handshake, Home, Megaphone, Settings, Sun, Users } from "lucide-react";
+import { CalendarDays, ChartNoAxesColumn, Handshake, House, Megaphone, Settings, Sun, Users } from "lucide-react";
 import { Link, usePathname } from "@/i18n/navigation";
 
 const ITEMS = [
   { key: "today", href: "/", icon: Sun, ready: true },
-  { key: "properties", href: "/properties", icon: Home, ready: false },
-  { key: "clients", href: "/clients", icon: Users, ready: false },
-  { key: "deals", href: "/deals", icon: Handshake, ready: false },
+  { key: "properties", href: "/properties", icon: House, ready: true },
+  { key: "clients", href: "/clients", icon: Users, ready: true },
+  { key: "deals", href: "/deals", icon: Handshake, ready: true },
   { key: "agenda", href: "/agenda", icon: CalendarDays, ready: false },
   { key: "marketing", href: "/marketing", icon: Megaphone, ready: false },
   { key: "reports", href: "/reports", icon: ChartNoAxesColumn, ready: false },
   { key: "settings", href: "/settings", icon: Settings, ready: false },
 ] as const;
 
-export function Sidebar() {
+export function Sidebar({ orgName, userName, roleLabel, counts }: { orgName: string; userName: string; roleLabel: string; counts: { properties: number; clients: number } }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
-    <nav aria-label={t("label")} className="flex w-52 shrink-0 flex-col gap-0.5 border-e border-line bg-surface p-2">
-      <div className="px-2 pb-3 pt-2 text-sm font-semibold tracking-tight">{t("brand")}</div>
+    <aside className="side" aria-label={t("label")}>
+      <div className="org"><div className="mark">{orgName[0]}</div><div><b>{orgName}</b><small>{roleLabel}</small></div></div>
       {ITEMS.map(({ key, href, icon: Icon, ready }) => {
-        const active = href === "/" ? pathname === "/" : pathname.startsWith(href);
-        const cls = `flex h-8 items-center gap-2.5 rounded-ui px-2 text-[13px] ${
-          active ? "bg-accent-soft font-medium text-accent-ink" : ready ? "text-ink hover:bg-sunken" : "cursor-not-allowed text-muted/70"
-        }`;
+        const on = href === "/" ? pathname === "/" : pathname.startsWith(href);
+        const cnt = key === "properties" ? counts.properties : key === "clients" ? counts.clients : null;
         return ready ? (
-          <Link key={key} href={href} className={cls} aria-current={active ? "page" : undefined}>
-            <Icon size={16} strokeWidth={1.75} aria-hidden /> {t(key)}
+          <Link key={key} href={href} className={`nav ${on ? "on" : ""}`} aria-current={on ? "page" : undefined}>
+            <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>{cnt !== null && <span className="cnt tab">{cnt}</span>}
           </Link>
         ) : (
-          <span key={key} className={cls} aria-disabled="true" title={t("soon")}>
-            <Icon size={16} strokeWidth={1.75} aria-hidden /> {t(key)}
+          <span key={key} className="nav" aria-disabled="true" title={t("soon")} style={{ opacity: 0.5, cursor: "not-allowed" }}>
+            <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>
           </span>
         );
       })}
-    </nav>
+      <div className="side-foot"><span className="avatar">{userName.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span><div className="grow"><b style={{ fontWeight: 500, display: "block", lineHeight: 1.2 }}>{userName}</b></div></div>
+    </aside>
   );
 }

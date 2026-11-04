@@ -2,7 +2,9 @@
   "name": "multideploy",
   "private": true,
   "packageManager": "pnpm@10.28.0",
-  "engines": { "node": ">=22" },
+  "engines": {
+    "node": ">=22"
+  },
   "scripts": {
     "dev": "pnpm --filter @multideploy/web dev",
     "build": "pnpm --filter @multideploy/web build",
@@ -10,6 +12,10 @@
     "typecheck": "pnpm --filter @multideploy/web typecheck",
     "test": "pnpm --filter @multideploy/web test",
     "test:db": "bash supabase/tests/run.sh",
-    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:db"
+    "check": "pnpm lint && pnpm typecheck && pnpm test && pnpm test:db",
+    "db:dev": "bash supabase/dev-db.sh up",
+    "db:reset": "bash supabase/dev-db.sh reset",
+    "db:stop": "bash supabase/dev-db.sh stop",
+    "e2e": "node apps/web/e2e/phase1.cjs"
   }
 }

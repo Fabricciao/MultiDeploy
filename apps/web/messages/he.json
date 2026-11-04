@@ -1,22 +1,397 @@
 {
-  "meta": { "title": "MultiDeploy", "description": "CRM נדל״ן לריבוי סוכנויות" },
-  "common": { "language": "שפה", "search": "חיפוש נכס, לקוח או פעולה…" },
-  "nav": { "label": "ניווט ראשי", "brand": "MultiDeploy", "soon": "יהיה זמין בשלב מאוחר יותר",
-    "today": "היום", "properties": "נכסים", "clients": "לקוחות", "deals": "עסקאות", "agenda": "יומן",
-    "marketing": "שיווק", "reports": "דוחות", "settings": "הגדרות" },
-  "today": { "title": "היום", "subtitle": "מה דורש את תשומת ליבך היום.",
-    "tasks": { "title": "משימות להיום", "empty": "אין משימות מתוכננות. מעקבים נדרשים יופיעו כאן." },
-    "visits": { "title": "ביקורים", "empty": "אין ביקורים היום." },
-    "followups": { "title": "מעקבים באיחור", "empty": "אין מעקבים באיחור." },
-    "mandates": { "title": "בלעדיויות שפוקעות", "empty": "אף בלעדיות לא פוקעת ב-30 הימים הקרובים." } },
-  "login": { "brand": "MultiDeploy", "title": "התחברות", "subtitle": "כניסה לסביבת העבודה של הסוכנות שלך.",
-    "google": "המשך עם Google", "or": "או", "email": "כתובת אימייל", "magic": "שלחו לי קישור התחברות",
-    "sent": "הקישור נשלח. בדקו את תיבת הדואר.", "inviteOnly": "הגישה בהזמנה מהסוכנות שלך.",
+  "meta": {
+    "title": "MultiDeploy",
+    "description": "CRM נדל״ן לריבוי סוכנויות"
+  },
+  "common": {
+    "language": "שפה",
+    "search": "חיפוש נכס, לקוח או פעולה…",
+    "add": "הוספה",
+    "all": "הכול",
+    "apply": "החלה",
+    "edit": "עריכה",
+    "new": "חדש",
+    "newClient": "לקוח חדש",
+    "newProperty": "נכס חדש",
+    "next": "הבא",
+    "prev": "הקודם",
+    "no": "לא",
+    "yes": "כן",
+    "reset": "איפוס",
+    "save": "שמירה",
+    "saving": "שומר…"
+  },
+  "nav": {
+    "label": "ניווט ראשי",
+    "brand": "MultiDeploy",
+    "soon": "יהיה זמין בשלב מאוחר יותר",
+    "today": "היום",
+    "properties": "נכסים",
+    "clients": "לקוחות",
+    "deals": "עסקאות",
+    "agenda": "יומן",
+    "marketing": "שיווק",
+    "reports": "דוחות",
+    "settings": "הגדרות"
+  },
+  "today": {
+    "title": "היום",
+    "subtitle": "מה דורש את תשומת ליבך היום.",
+    "tasks": {
+      "title": "משימות להיום",
+      "empty": "אין משימות מתוכננות. מעקבים נדרשים יופיעו כאן.",
+      "done": "סימון כבוצע",
+      "overdue": "באיחור"
+    },
+    "visits": {
+      "title": "ביקורים",
+      "empty": "אין ביקורים היום."
+    },
+    "followups": {
+      "title": "מעקבים באיחור",
+      "empty": "אין מעקבים באיחור."
+    },
+    "mandates": {
+      "title": "בלעדיויות שפוקעות",
+      "empty": "אף בלעדיות לא פוקעת ב-30 הימים הקרובים."
+    },
+    "hello": "בוקר טוב, {name}",
+    "kpi": {
+      "activeProps": "נכסים פעילים",
+      "contacts": "לקוחות",
+      "openDeals": "עסקאות פתוחות",
+      "weighted": "ערך משוקלל"
+    },
+    "matches": {
+      "title": "נכסים חדשים עם לקוחות מתאימים",
+      "empty": "אין כרגע נכסים חדשים שמתאימים ללקוחות.",
+      "clients": "{count, plural, one {לקוח #} two {# לקוחות} other {# לקוחות}}"
+    }
+  },
+  "login": {
+    "brand": "MultiDeploy",
+    "title": "התחברות",
+    "subtitle": "כניסה לסביבת העבודה של הסוכנות שלך.",
+    "google": "המשך עם Google",
+    "or": "או",
+    "email": "כתובת אימייל",
+    "magic": "שלחו לי קישור התחברות",
+    "sent": "הקישור נשלח. בדקו את תיבת הדואר.",
+    "inviteOnly": "הגישה בהזמנה מהסוכנות שלך.",
     "notConfigured": "Supabase אינו מוגדר בסביבה זו (ראו .env.example).",
-    "errors": { "oauth": "ההתחברות עם Google נכשלה.", "email": "כתובת אימייל לא תקינה.", "magic": "לא ניתן לשלוח את הקישור. ודאו שהוזמנתם.", "auth": "לא ניתן להתחבר. נסו שוב." } },
-  "design": { "title": "מערכת עיצוב", "palette": "סקאלת מותג", "actions": "פעולות", "primary": "שמירה", "secondary": "ביטול", "destructive": "מחיקה",
-    "bidi": "טקסט דו-כיווני", "bidiSentence": "דירת 4 חדרים ברעננה, {price}, כניסה מיידית.", "phone": "טלפון", "table": "טבלת נכסים",
-    "cols": { "ref": "מס׳", "city": "עיר", "rooms": "חדרים", "area": "שטח", "price": "מחיר", "status": "סטטוס" },
-    "status": { "active": "פעיל", "underOffer": "בהצעה", "draft": "טיוטה" },
-    "sample": { "city1": "רעננה", "city2": "נתניה", "city3": "ירושלים" } }
+    "errors": {
+      "oauth": "ההתחברות עם Google נכשלה.",
+      "email": "כתובת אימייל לא תקינה.",
+      "magic": "לא ניתן לשלוח את הקישור. ודאו שהוזמנתם.",
+      "auth": "לא ניתן להתחבר. נסו שוב."
+    }
+  },
+  "design": {
+    "title": "מערכת עיצוב",
+    "palette": "סקאלת מותג",
+    "actions": "פעולות",
+    "primary": "שמירה",
+    "secondary": "ביטול",
+    "destructive": "מחיקה",
+    "bidi": "טקסט דו-כיווני",
+    "bidiSentence": "דירת 4 חדרים ברעננה, {price}, כניסה מיידית.",
+    "phone": "טלפון",
+    "table": "טבלת נכסים",
+    "cols": {
+      "ref": "מס׳",
+      "city": "עיר",
+      "rooms": "חדרים",
+      "area": "שטח",
+      "price": "מחיר",
+      "status": "סטטוס"
+    },
+    "status": {
+      "active": "פעיל",
+      "underOffer": "בהצעה",
+      "draft": "טיוטה"
+    },
+    "sample": {
+      "city1": "רעננה",
+      "city2": "נתניה",
+      "city3": "ירושלים"
+    }
+  },
+  "roles": {
+    "owner": "בעלים",
+    "admin": "מנהל",
+    "agent": "סוכן",
+    "assistant": "עוזר/ת",
+    "viewer": "קריאה בלבד"
+  },
+  "send": {
+    "matchingClients": "לקוחות מתאימים",
+    "matchingProperties": "נכסים מתאימים",
+    "noClients": "אין כרגע לקוחות שמתאימים לנכס זה.",
+    "noProperties": "אין נכסים זמינים שמתאימים (או שכולם כבר נשלחו).",
+    "onlyActive": "ניתן לשלוח רק נכסים פעילים.",
+    "email": "אימייל",
+    "messagePlaceholder": "הודעה אישית (אופציונלי)",
+    "send": "שליחת הבחירה",
+    "sending": "שולח…",
+    "openWhatsapp": "פתיחת WhatsApp",
+    "dryRunNote": "מצב בדיקה: לא נשלח אימייל אמיתי (מפתח שליחה לא הוגדר). השליחה נרשמה ביומן.",
+    "result": {
+      "sent": "נשלח",
+      "dry_run": "בדיקה (לא נשלח)",
+      "failed": "נכשל",
+      "blocked_consent": "נחסם: אין הסכמה",
+      "blocked_no_contact_info": "פרט קשר חסר",
+      "link": "קישור מוכן"
+    },
+    "errors": {
+      "forbidden": "אין לך הרשאה לשלוח.",
+      "nothing_selected": "בחרו לפחות נמען אחד."
+    }
+  },
+  "form": {
+    "errors": {
+      "invalid_number": "מספר לא תקין.",
+      "half_rooms": "השתמשו בחצאי חדרים (3, 3.5, 4…).",
+      "invalid_date": "תאריך לא תקין.",
+      "active_needs_price_city": "נכס פעיל חייב מחיר ועיר.",
+      "name_required": "יש להזין לפחות שם אחד.",
+      "invalid_phone": "מספר טלפון לא תקין.",
+      "invalid_email": "כתובת אימייל לא תקינה.",
+      "rooms_range": "המינימום גדול מהמקסימום.",
+      "duplicate_phone": "המספר הזה כבר קיים בסוכנות שלכם.",
+      "forbidden": "פעולה לא מורשית."
+    }
+  },
+  "deals": {
+    "title": "עסקאות",
+    "sub": "{count} עסקאות פתוחות · ערך משוקלל {weighted}",
+    "moveFailed": "לא ניתן להעביר את העסקה (אין הרשאה).",
+    "moveTo": "העברה אל…",
+    "noProperty": "אין נכס מקושר",
+    "wonLine": "נסגרו: {count} עסקאות · {value}"
+  },
+  "public": {
+    "title": "בחירת הנכסים שלך",
+    "subtitle": "נבחרו עבורך על ידי {agent}.",
+    "contact": "שאלה? צרו קשר עם {agent}",
+    "call": "חיוג",
+    "legal": "המידע מובא להמחשה ובכפוף לזמינות. המחירים עשויים להשתנות.",
+    "unsubscribeTitle": "להפסיק לקבל מאיתנו בחירות נכסים?",
+    "unsubscribeConfirm": "אישור הסרה",
+    "unsubscribed": "הוסרת מהרשימה.",
+    "unsubscribedSub": "לא תקבלו עוד בחירות נכסים באימייל.",
+    "unsubscribeInvalid": "קישור לא תקין או שפג תוקפו."
+  },
+  "props": {
+    "types": {
+      "apartment": "דירה",
+      "garden_apt": "דירת גן",
+      "duplex": "דופלקס",
+      "penthouse": "פנטהאוז",
+      "house": "בית פרטי",
+      "cottage": "קוטג׳",
+      "land": "קרקע",
+      "office": "משרד",
+      "shop": "חנות"
+    },
+    "has": {
+      "mamad": "ממ״ד",
+      "parking": "חניה",
+      "elevator": "מעלית",
+      "sukkah_balcony": "מרפסת סוכה",
+      "storage": "מחסן",
+      "ac": "מיזוג"
+    },
+    "status": {
+      "draft": "טיוטה",
+      "active": "פעיל",
+      "under_offer": "בהצעה",
+      "sold": "נמכר",
+      "rented": "הושכר",
+      "withdrawn": "הוסר",
+      "expired": "פג תוקף"
+    },
+    "tx": {
+      "sale": "מכירה",
+      "rent": "השכרה"
+    },
+    "mandate": {
+      "exclusive": "בלעדיות",
+      "non_exclusive": "ללא בלעדיות",
+      "expiring": "פוקעת תוך 30 יום",
+      "expired": "פגה",
+      "expiresIn": "פוקעת בעוד {days} ימים"
+    },
+    "sort": {
+      "recent": "החדשים ביותר",
+      "price_asc": "מחיר עולה",
+      "price_desc": "מחיר יורד",
+      "mandate": "סיום בלעדיות"
+    },
+    "relation": {
+      "owner": "בעלים",
+      "tenant": "שוכר",
+      "other": "איש קשר מקושר"
+    },
+    "form": {
+      "vis": {
+        "hidden": "מוסתרת",
+        "neighborhood": "שכונה בלבד",
+        "street": "רחוב ללא מספר",
+        "exact": "כתובת מדויקת"
+      },
+      "reg": {
+        "tabu": "טאבו",
+        "minhal": "מינהל",
+        "company": "חברה משכנת",
+        "other": "אחר"
+      },
+      "basics": "פרטים כלליים",
+      "type": "סוג נכס",
+      "street": "רחוב",
+      "houseNumber": "מספר",
+      "addressVisibility": "כתובת גלויה בחומרים שיווקיים",
+      "addressVisibilityHint": "קובע מה הלקוחות רואים (אימיילים, עמוד ציבורי).",
+      "figures": "נתונים",
+      "currency": "מטבע",
+      "floorsTotal": "סה״כ קומות",
+      "arnona": "ארנונה לחודש",
+      "vaad": "ועד בית לחודש",
+      "registration": "רישום",
+      "features": "מאפיינים",
+      "mandate": "מנדט",
+      "mandateEnd": "סיום המנדט",
+      "internalNotes": "הערות פנימיות",
+      "description": "תיאור",
+      "title": "כותרת",
+      "descriptionPlaceholder": "תיאור (אופציונלי)"
+    },
+    "title": "נכסים",
+    "count": "{count, plural, one {נכס #} two {# נכסים} other {# נכסים}}",
+    "new": "נכס חדש",
+    "newTitle": "נכס חדש",
+    "editTitle": "עריכת נכס",
+    "empty": "אין נכסים שמתאימים למסננים אלה.",
+    "property": "נכס",
+    "city": "עיר",
+    "rooms": "חדרים",
+    "area": "שטח",
+    "sqm": "מ״ר",
+    "floor": "קומה",
+    "price": "מחיר",
+    "perMonth": "/ חודש",
+    "statusLabel": "סטטוס",
+    "mandateLabel": "מנדט",
+    "agent": "סוכן",
+    "details": "מאפיינים",
+    "askingPrice": "מחיר מבוקש",
+    "visits": "ביקורים",
+    "archive": "העברת הנכס לארכיון",
+    "noDescription": "אין תיאור. אפשר להוסיף בעריכה.",
+    "aiNotReviewed": "תורגם ע״י AI · לבדיקה",
+    "photosPlaceholder": "העלאת תמונות תתווסף בשלב הבא; התצוגה להמחשה בלבד.",
+    "match": {
+      "overBudget": "{pct}% מעל התקציב"
+    },
+    "filters": {
+      "q": "חיפוש (רחוב, מס׳, עיר…)",
+      "transaction": "עסקה",
+      "allTx": "מכירה והשכרה",
+      "cities": "ערים",
+      "min": "מינ׳",
+      "max": "מקס׳",
+      "features": "מאפיינים",
+      "more": "עוד",
+      "statusLabel": "סטטוס",
+      "agent": "סוכן",
+      "mandate": "מנדט",
+      "sort": "מיון"
+    }
+  },
+  "clients": {
+    "kind": {
+      "buyer": "קונה",
+      "seller": "מוכר",
+      "landlord": "משכיר",
+      "tenant": "שוכר",
+      "investor": "משקיע",
+      "lawyer": "עורך דין",
+      "partner": "שותף",
+      "other": "אחר"
+    },
+    "aliyah": {
+      "pre_aliyah": "טרום עלייה",
+      "recent": "עולה חדש/ה",
+      "resident": "תושב/ת",
+      "none": "—"
+    },
+    "activity": {
+      "created": "הכרטיס נוצר",
+      "unsubscribed": "הוסר מרשימת התפוצה",
+      "share": "נשלחה בחירת נכסים ({channel})",
+      "stage_change": "העסקה עברה שלב"
+    },
+    "title": "לקוחות",
+    "count": "{count, plural, one {לקוח #} two {# לקוחות} other {# לקוחות}}",
+    "new": "לקוח חדש",
+    "newTitle": "לקוח חדש",
+    "editTitle": "עריכת לקוח",
+    "empty": "אין לקוחות שמתאימים.",
+    "name": "שם",
+    "phone": "טלפון",
+    "typeLabel": "סוג",
+    "budget": "תקציב",
+    "lang": "שפה",
+    "lastActivity": "פעילות אחרונה",
+    "agent": "סוכן",
+    "searching": "בחיפוש",
+    "filters": {
+      "q": "שם, טלפון, אימייל…",
+      "kind": "סוג",
+      "allKinds": "כל הסוגים",
+      "owner": "סוכן",
+      "allAgents": "כל הסוכנים"
+    },
+    "call": "חיוג",
+    "optIn": "הסכמה לדיוור",
+    "noConsent": "ללא הסכמה לדיוור",
+    "criteria": "קריטריוני חיפוש",
+    "noCriteria": "לא הוגדרו קריטריונים: ההתאמה מושבתת ללקוח זה.",
+    "shares": "שליחות",
+    "noShares": "עדיין לא נשלח דבר.",
+    "sharesLine": "{n} נכסים · {channel}",
+    "opened": "נפתח",
+    "details": "פרטי קשר",
+    "tasks": "משימות",
+    "newTask": "משימה חדשה…",
+    "due": "מועד",
+    "toggleTask": "סימון משימה",
+    "activityTitle": "פעילות",
+    "addNote": "הוספת הערה…",
+    "addNoteBtn": "הוספת הערה",
+    "deals": "עסקאות",
+    "dealValue": "שווי (₪)",
+    "openDeal": "פתיחת עסקה",
+    "openExisting": "פתיחת הכרטיס הקיים",
+    "form": {
+      "identity": "זהות",
+      "firstName": "שם פרטי",
+      "lastName": "שם משפחה",
+      "firstNameHe": "שם פרטי (עברית)",
+      "lastNameHe": "שם משפחה (עברית)",
+      "phoneHint": "פורמט חופשי: 050-123-4567, ‎+33 6 12 34 56 78…",
+      "language": "שפה מועדפת",
+      "aliyah": "סטטוס עלייה",
+      "source": "מקור",
+      "kinds": "סוג איש קשר",
+      "searchProfile": "הלקוח מחפש נכס",
+      "budgetMax": "תקציב מקסימלי (₪)",
+      "roomsMin": "חדרים מינ׳",
+      "roomsMax": "חדרים מקס׳",
+      "mustHave": "חובה",
+      "notes": "הערות",
+      "optIn": "הלקוח הסכים לקבל בחירות נכסים (אימייל)",
+      "optInHint": "ללא הסכמה, שליחה באימייל חסומה. ההסכמה נשמרת עם תאריך."
+    }
+  }
 }

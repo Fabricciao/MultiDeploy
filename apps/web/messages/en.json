@@ -1,22 +1,397 @@
 {
-  "meta": { "title": "MultiDeploy", "description": "Multi-agency real estate CRM" },
-  "common": { "language": "Language", "search": "Search a property, a client, an action…" },
-  "nav": { "label": "Main navigation", "brand": "MultiDeploy", "soon": "Available in a later phase",
-    "today": "Today", "properties": "Properties", "clients": "Clients", "deals": "Deals", "agenda": "Calendar",
-    "marketing": "Marketing", "reports": "Reports", "settings": "Settings" },
-  "today": { "title": "Today", "subtitle": "What needs your attention today.",
-    "tasks": { "title": "Today's tasks", "empty": "No tasks scheduled. Follow-ups to make will show up here." },
-    "visits": { "title": "Viewings", "empty": "No viewings today." },
-    "followups": { "title": "Overdue follow-ups", "empty": "No overdue follow-ups." },
-    "mandates": { "title": "Expiring mandates", "empty": "No mandate expires in the next 30 days." } },
-  "login": { "brand": "MultiDeploy", "title": "Sign in", "subtitle": "Access your agency workspace.",
-    "google": "Continue with Google", "or": "or", "email": "Email address", "magic": "Email me a sign-in link",
-    "sent": "Link sent. Check your inbox.", "inviteOnly": "Access is by invitation from your agency.",
+  "meta": {
+    "title": "MultiDeploy",
+    "description": "Multi-agency real estate CRM"
+  },
+  "common": {
+    "language": "Language",
+    "search": "Search a property, a client, an action…",
+    "add": "Add",
+    "all": "All",
+    "apply": "Apply",
+    "edit": "Edit",
+    "new": "New",
+    "newClient": "New client",
+    "newProperty": "New property",
+    "next": "Next",
+    "prev": "Previous",
+    "no": "No",
+    "yes": "Yes",
+    "reset": "Reset",
+    "save": "Save",
+    "saving": "Saving…"
+  },
+  "nav": {
+    "label": "Main navigation",
+    "brand": "MultiDeploy",
+    "soon": "Available in a later phase",
+    "today": "Today",
+    "properties": "Properties",
+    "clients": "Clients",
+    "deals": "Deals",
+    "agenda": "Calendar",
+    "marketing": "Marketing",
+    "reports": "Reports",
+    "settings": "Settings"
+  },
+  "today": {
+    "title": "Today",
+    "subtitle": "What needs your attention today.",
+    "tasks": {
+      "title": "Today's tasks",
+      "empty": "No tasks scheduled. Follow-ups to make will show up here.",
+      "done": "Mark as done",
+      "overdue": "Overdue"
+    },
+    "visits": {
+      "title": "Viewings",
+      "empty": "No viewings today."
+    },
+    "followups": {
+      "title": "Overdue follow-ups",
+      "empty": "No overdue follow-ups."
+    },
+    "mandates": {
+      "title": "Expiring mandates",
+      "empty": "No mandate expires in the next 30 days."
+    },
+    "hello": "Good morning, {name}",
+    "kpi": {
+      "activeProps": "Active properties",
+      "contacts": "Clients",
+      "openDeals": "Open deals",
+      "weighted": "Weighted value"
+    },
+    "matches": {
+      "title": "New properties with matching clients",
+      "empty": "No new property matches a client yet.",
+      "clients": "{count, plural, one {# client} other {# clients}}"
+    }
+  },
+  "login": {
+    "brand": "MultiDeploy",
+    "title": "Sign in",
+    "subtitle": "Access your agency workspace.",
+    "google": "Continue with Google",
+    "or": "or",
+    "email": "Email address",
+    "magic": "Email me a sign-in link",
+    "sent": "Link sent. Check your inbox.",
+    "inviteOnly": "Access is by invitation from your agency.",
     "notConfigured": "Supabase is not configured in this environment (see .env.example).",
-    "errors": { "oauth": "Google sign-in failed.", "email": "Invalid email address.", "magic": "Could not send the link. Make sure you have been invited.", "auth": "Could not sign in. Please try again." } },
-  "design": { "title": "Design system", "palette": "Brand scale", "actions": "Actions", "primary": "Save", "secondary": "Cancel", "destructive": "Delete",
-    "bidi": "Bidirectional text", "bidiSentence": "4-room apartment in Ra'anana, {price}, immediate entry.", "phone": "Phone", "table": "Properties table",
-    "cols": { "ref": "Ref.", "city": "City", "rooms": "Rooms", "area": "Area", "price": "Price", "status": "Status" },
-    "status": { "active": "Active", "underOffer": "Under offer", "draft": "Draft" },
-    "sample": { "city1": "Ra'anana", "city2": "Netanya", "city3": "Jerusalem" } }
+    "errors": {
+      "oauth": "Google sign-in failed.",
+      "email": "Invalid email address.",
+      "magic": "Could not send the link. Make sure you have been invited.",
+      "auth": "Could not sign in. Please try again."
+    }
+  },
+  "design": {
+    "title": "Design system",
+    "palette": "Brand scale",
+    "actions": "Actions",
+    "primary": "Save",
+    "secondary": "Cancel",
+    "destructive": "Delete",
+    "bidi": "Bidirectional text",
+    "bidiSentence": "4-room apartment in Ra'anana, {price}, immediate entry.",
+    "phone": "Phone",
+    "table": "Properties table",
+    "cols": {
+      "ref": "Ref.",
+      "city": "City",
+      "rooms": "Rooms",
+      "area": "Area",
+      "price": "Price",
+      "status": "Status"
+    },
+    "status": {
+      "active": "Active",
+      "underOffer": "Under offer",
+      "draft": "Draft"
+    },
+    "sample": {
+      "city1": "Ra'anana",
+      "city2": "Netanya",
+      "city3": "Jerusalem"
+    }
+  },
+  "roles": {
+    "owner": "Owner",
+    "admin": "Admin",
+    "agent": "Agent",
+    "assistant": "Assistant",
+    "viewer": "Read-only"
+  },
+  "send": {
+    "matchingClients": "Matching clients",
+    "matchingProperties": "Matching properties",
+    "noClients": "No client matches this property yet.",
+    "noProperties": "No matching property available (or all were already sent).",
+    "onlyActive": "Only active properties can be sent.",
+    "email": "Email",
+    "messagePlaceholder": "Personal message (optional)",
+    "send": "Send selection",
+    "sending": "Sending…",
+    "openWhatsapp": "Open WhatsApp",
+    "dryRunNote": "Test mode: no real email was sent (sending key not configured). The send is logged.",
+    "result": {
+      "sent": "Sent",
+      "dry_run": "Test (not sent)",
+      "failed": "Failed",
+      "blocked_consent": "Blocked: no consent",
+      "blocked_no_contact_info": "Missing contact detail",
+      "link": "Link ready"
+    },
+    "errors": {
+      "forbidden": "You are not allowed to send.",
+      "nothing_selected": "Select at least one recipient."
+    }
+  },
+  "form": {
+    "errors": {
+      "invalid_number": "Invalid number.",
+      "half_rooms": "Use half rooms (3, 3.5, 4…).",
+      "invalid_date": "Invalid date.",
+      "active_needs_price_city": "An active property needs a price and a city.",
+      "name_required": "Enter at least one name.",
+      "invalid_phone": "Invalid phone number.",
+      "invalid_email": "Invalid email address.",
+      "rooms_range": "Minimum exceeds maximum.",
+      "duplicate_phone": "This number already exists in your agency.",
+      "forbidden": "Action not allowed."
+    }
+  },
+  "deals": {
+    "title": "Deals",
+    "sub": "{count} open deals · weighted value {weighted}",
+    "moveFailed": "Could not move the deal (insufficient rights).",
+    "moveTo": "Move to…",
+    "noProperty": "No linked property",
+    "wonLine": "Won: {count} deals · {value}"
+  },
+  "public": {
+    "title": "Your property selection",
+    "subtitle": "Selected for you by {agent}.",
+    "contact": "A question? Contact {agent}",
+    "call": "Call",
+    "legal": "Information is indicative and subject to availability. Prices may change.",
+    "unsubscribeTitle": "Stop receiving our selections?",
+    "unsubscribeConfirm": "Confirm unsubscribe",
+    "unsubscribed": "You have been unsubscribed.",
+    "unsubscribedSub": "You will no longer receive our selections by email.",
+    "unsubscribeInvalid": "Invalid or expired link."
+  },
+  "props": {
+    "types": {
+      "apartment": "Apartment",
+      "garden_apt": "Garden apartment",
+      "duplex": "Duplex",
+      "penthouse": "Penthouse",
+      "house": "House",
+      "cottage": "Cottage",
+      "land": "Land",
+      "office": "Office",
+      "shop": "Shop"
+    },
+    "has": {
+      "mamad": "Safe room (mamad)",
+      "parking": "Parking",
+      "elevator": "Elevator",
+      "sukkah_balcony": "Sukkah balcony",
+      "storage": "Storage",
+      "ac": "Air conditioning"
+    },
+    "status": {
+      "draft": "Draft",
+      "active": "Active",
+      "under_offer": "Under offer",
+      "sold": "Sold",
+      "rented": "Rented",
+      "withdrawn": "Withdrawn",
+      "expired": "Expired"
+    },
+    "tx": {
+      "sale": "Sale",
+      "rent": "Rent"
+    },
+    "mandate": {
+      "exclusive": "Exclusive",
+      "non_exclusive": "Non-exclusive",
+      "expiring": "Expiring within 30 days",
+      "expired": "Expired",
+      "expiresIn": "Expires in {days} d"
+    },
+    "sort": {
+      "recent": "Newest",
+      "price_asc": "Price ascending",
+      "price_desc": "Price descending",
+      "mandate": "Mandate end"
+    },
+    "relation": {
+      "owner": "Owner",
+      "tenant": "Tenant",
+      "other": "Linked contact"
+    },
+    "form": {
+      "vis": {
+        "hidden": "Hidden",
+        "neighborhood": "Neighborhood only",
+        "street": "Street without number",
+        "exact": "Exact address"
+      },
+      "reg": {
+        "tabu": "Tabu",
+        "minhal": "Minhal",
+        "company": "Management company",
+        "other": "Other"
+      },
+      "basics": "General information",
+      "type": "Property type",
+      "street": "Street",
+      "houseNumber": "Number",
+      "addressVisibility": "Address shown publicly",
+      "addressVisibilityHint": "Controls what clients see (emails, public page).",
+      "figures": "Figures",
+      "currency": "Currency",
+      "floorsTotal": "Total floors",
+      "arnona": "Arnona / month",
+      "vaad": "Building fee / month",
+      "registration": "Registration",
+      "features": "Features",
+      "mandate": "Mandate",
+      "mandateEnd": "Mandate end",
+      "internalNotes": "Internal notes",
+      "description": "Description",
+      "title": "Title",
+      "descriptionPlaceholder": "Description (optional)"
+    },
+    "title": "Properties",
+    "count": "{count, plural, one {# property} other {# properties}}",
+    "new": "New property",
+    "newTitle": "New property",
+    "editTitle": "Edit property",
+    "empty": "No property matches these filters.",
+    "property": "Property",
+    "city": "City",
+    "rooms": "Rooms",
+    "area": "Area",
+    "sqm": "sqm",
+    "floor": "Floor",
+    "price": "Price",
+    "perMonth": "/ month",
+    "statusLabel": "Status",
+    "mandateLabel": "Mandate",
+    "agent": "Agent",
+    "details": "Details",
+    "askingPrice": "Asking price",
+    "visits": "Viewings",
+    "archive": "Archive property",
+    "noDescription": "No description. Add one by editing.",
+    "aiNotReviewed": "AI translated · needs review",
+    "photosPlaceholder": "Photo upload comes in a later step; illustrative preview.",
+    "match": {
+      "overBudget": "{pct}% over budget"
+    },
+    "filters": {
+      "q": "Search (street, ref, city…)",
+      "transaction": "Transaction",
+      "allTx": "Sale and rent",
+      "cities": "Cities",
+      "min": "Min",
+      "max": "Max",
+      "features": "Features",
+      "more": "More",
+      "statusLabel": "Status",
+      "agent": "Agent",
+      "mandate": "Mandate",
+      "sort": "Sort"
+    }
+  },
+  "clients": {
+    "kind": {
+      "buyer": "Buyer",
+      "seller": "Seller",
+      "landlord": "Landlord",
+      "tenant": "Tenant",
+      "investor": "Investor",
+      "lawyer": "Lawyer",
+      "partner": "Partner",
+      "other": "Other"
+    },
+    "aliyah": {
+      "pre_aliyah": "Pre-aliyah",
+      "recent": "Recent oleh",
+      "resident": "Resident",
+      "none": "—"
+    },
+    "activity": {
+      "created": "Record created",
+      "unsubscribed": "Unsubscribed from mailings",
+      "share": "Selection sent ({channel})",
+      "stage_change": "Deal moved to another stage"
+    },
+    "title": "Clients",
+    "count": "{count, plural, one {# client} other {# clients}}",
+    "new": "New client",
+    "newTitle": "New client",
+    "editTitle": "Edit client",
+    "empty": "No client matches.",
+    "name": "Name",
+    "phone": "Phone",
+    "typeLabel": "Type",
+    "budget": "Budget",
+    "lang": "Language",
+    "lastActivity": "Last activity",
+    "agent": "Agent",
+    "searching": "Searching",
+    "filters": {
+      "q": "Name, phone, email…",
+      "kind": "Type",
+      "allKinds": "All types",
+      "owner": "Agent",
+      "allAgents": "All agents"
+    },
+    "call": "Call",
+    "optIn": "Marketing opt-in",
+    "noConsent": "No marketing consent",
+    "criteria": "Search criteria",
+    "noCriteria": "No criteria saved: matching is off for this client.",
+    "shares": "Sent selections",
+    "noShares": "Nothing sent yet.",
+    "sharesLine": "{n} property(ies) · {channel}",
+    "opened": "Opened",
+    "details": "Contact details",
+    "tasks": "Tasks",
+    "newTask": "New task…",
+    "due": "Due date",
+    "toggleTask": "Complete task",
+    "activityTitle": "Activity",
+    "addNote": "Add a note…",
+    "addNoteBtn": "Add note",
+    "deals": "Deals",
+    "dealValue": "Value (₪)",
+    "openDeal": "Open a deal",
+    "openExisting": "Open the existing record",
+    "form": {
+      "identity": "Identity",
+      "firstName": "First name",
+      "lastName": "Last name",
+      "firstNameHe": "First name (Hebrew)",
+      "lastNameHe": "Last name (Hebrew)",
+      "phoneHint": "Any format: 050-123-4567, +33 6 12 34 56 78…",
+      "language": "Preferred language",
+      "aliyah": "Aliyah status",
+      "source": "Source",
+      "kinds": "Contact type",
+      "searchProfile": "This client is looking for a property",
+      "budgetMax": "Maximum budget (₪)",
+      "roomsMin": "Min rooms",
+      "roomsMax": "Max rooms",
+      "mustHave": "Must have",
+      "notes": "Notes",
+      "optIn": "The client agreed to receive property selections (email)",
+      "optInHint": "Without consent, email sending is blocked. Consent is stored with the date."
+    }
+  }
 }

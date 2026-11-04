@@ -79,3 +79,8 @@ select tests.assert((select count(*) from public.contact_search_profiles) = 0, '
 rollback;
 \echo ''
 \echo '=== TESTS PHASE 1 PASSENT ==='
+
+-- ---------- 5. garde-fous de forme JSON ----------
+select tests.throws($$insert into public.contacts (organization_id, first_name, phones) values ('$$ || :'org_a' || $$','X', to_jsonb('[{"e164":"+1"}]'::text))$$, 'phones double-encodé (chaîne JSON) rejeté par la base');
+select tests.throws($$insert into public.properties (organization_id, transaction, property_type, mandate) values ('$$ || :'org_a' || $$','sale','apartment', to_jsonb('{"type":"exclusive"}'::text))$$, 'mandate double-encodé rejeté par la base');
+\echo '=== GARDE-FOUS JSON OK ==='

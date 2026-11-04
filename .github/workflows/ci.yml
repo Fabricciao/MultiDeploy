@@ -25,3 +25,25 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - run: bash supabase/tests/run.sh
+
+  e2e:
+    # Parcours réels : navigateur + serveur Next (dev) + Postgres jetable avec données de démo.
+    # NB : non encore exécuté sur GitHub Actions au moment de l'écriture (validé en local).
+    runs-on: ubuntu-latest
+    needs: [web]
+    env: { DATABASE_URL: "postgresql://postgres@127.0.0.1:54330/multideploy" }
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: bash supabase/dev-db.sh reset
+      - run: npm i -g playwright && playwright install --with-deps chromium
+      - name: Démarrer l'app et lancer l'E2E
+        run: |
+          (pnpm --filter @multideploy/web dev -p 3120 > dev.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://localhost:3120/fr/login >/dev/null && break; sleep 2; done
+          NODE_PATH="$(npm root -g):$PWD/apps/web/node_modules" node apps/web/e2e/phase1.cjs
+      - if: failure()
+        run: tail -80 dev.log

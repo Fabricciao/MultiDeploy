@@ -1,22 +1,397 @@
 {
-  "meta": { "title": "MultiDeploy", "description": "CRM immobilier multi-agences" },
-  "common": { "language": "Langue", "search": "Rechercher un bien, un client, une action…" },
-  "nav": { "label": "Navigation principale", "brand": "MultiDeploy", "soon": "Disponible dans une prochaine phase",
-    "today": "Aujourd'hui", "properties": "Biens", "clients": "Clients", "deals": "Affaires", "agenda": "Agenda",
-    "marketing": "Marketing", "reports": "Rapports", "settings": "Paramètres" },
-  "today": { "title": "Aujourd'hui", "subtitle": "Ce qui demande votre attention aujourd'hui.",
-    "tasks": { "title": "Tâches du jour", "empty": "Aucune tâche prévue. Les relances à faire apparaîtront ici." },
-    "visits": { "title": "Visites", "empty": "Aucune visite aujourd'hui." },
-    "followups": { "title": "Relances en retard", "empty": "Aucune relance en retard." },
-    "mandates": { "title": "Mandats qui expirent", "empty": "Aucun mandat n'expire dans les 30 prochains jours." } },
-  "login": { "brand": "MultiDeploy", "title": "Connexion", "subtitle": "Accédez à l'espace de votre agence.",
-    "google": "Continuer avec Google", "or": "ou", "email": "Adresse e-mail", "magic": "Recevoir un lien de connexion",
-    "sent": "Lien envoyé. Consultez votre boîte e-mail.", "inviteOnly": "L'accès se fait sur invitation de votre agence.",
+  "meta": {
+    "title": "MultiDeploy",
+    "description": "CRM immobilier multi-agences"
+  },
+  "common": {
+    "language": "Langue",
+    "search": "Rechercher un bien, un client, une action…",
+    "add": "Ajouter",
+    "all": "Tous",
+    "apply": "Appliquer",
+    "edit": "Modifier",
+    "new": "Nouveau",
+    "newClient": "Nouveau client",
+    "newProperty": "Nouveau bien",
+    "next": "Suivant",
+    "prev": "Précédent",
+    "no": "Non",
+    "yes": "Oui",
+    "reset": "Réinitialiser",
+    "save": "Enregistrer",
+    "saving": "Enregistrement…"
+  },
+  "nav": {
+    "label": "Navigation principale",
+    "brand": "MultiDeploy",
+    "soon": "Disponible dans une prochaine phase",
+    "today": "Aujourd'hui",
+    "properties": "Biens",
+    "clients": "Clients",
+    "deals": "Affaires",
+    "agenda": "Agenda",
+    "marketing": "Marketing",
+    "reports": "Rapports",
+    "settings": "Paramètres"
+  },
+  "today": {
+    "title": "Aujourd'hui",
+    "subtitle": "Ce qui demande votre attention aujourd'hui.",
+    "tasks": {
+      "title": "Tâches du jour",
+      "empty": "Aucune tâche prévue. Les relances à faire apparaîtront ici.",
+      "done": "Marquer comme faite",
+      "overdue": "En retard"
+    },
+    "visits": {
+      "title": "Visites",
+      "empty": "Aucune visite aujourd'hui."
+    },
+    "followups": {
+      "title": "Relances en retard",
+      "empty": "Aucune relance en retard."
+    },
+    "mandates": {
+      "title": "Mandats qui expirent",
+      "empty": "Aucun mandat n'expire dans les 30 prochains jours."
+    },
+    "hello": "Bonjour {name}",
+    "kpi": {
+      "activeProps": "Biens actifs",
+      "contacts": "Clients",
+      "openDeals": "Affaires ouvertes",
+      "weighted": "Valeur pondérée"
+    },
+    "matches": {
+      "title": "Nouveaux biens avec clients intéressés",
+      "empty": "Aucun nouveau bien ne correspond à un client pour l'instant.",
+      "clients": "{count, plural, one {# client} other {# clients}}"
+    }
+  },
+  "login": {
+    "brand": "MultiDeploy",
+    "title": "Connexion",
+    "subtitle": "Accédez à l'espace de votre agence.",
+    "google": "Continuer avec Google",
+    "or": "ou",
+    "email": "Adresse e-mail",
+    "magic": "Recevoir un lien de connexion",
+    "sent": "Lien envoyé. Consultez votre boîte e-mail.",
+    "inviteOnly": "L'accès se fait sur invitation de votre agence.",
     "notConfigured": "Supabase n'est pas configuré dans cet environnement (voir .env.example).",
-    "errors": { "oauth": "La connexion Google a échoué.", "email": "Adresse e-mail invalide.", "magic": "Impossible d'envoyer le lien. Vérifiez que vous avez été invité.", "auth": "Connexion impossible. Réessayez." } },
-  "design": { "title": "Design system", "palette": "Échelle de marque", "actions": "Actions", "primary": "Enregistrer", "secondary": "Annuler", "destructive": "Supprimer",
-    "bidi": "Texte bidirectionnel", "bidiSentence": "Appartement 4 pièces à Raanana, {price}, entrée immédiate.", "phone": "Téléphone", "table": "Tableau de biens",
-    "cols": { "ref": "Réf.", "city": "Ville", "rooms": "Pièces", "area": "Surface", "price": "Prix", "status": "Statut" },
-    "status": { "active": "Actif", "underOffer": "Sous offre", "draft": "Brouillon" },
-    "sample": { "city1": "Raanana", "city2": "Netanya", "city3": "Jérusalem" } }
+    "errors": {
+      "oauth": "La connexion Google a échoué.",
+      "email": "Adresse e-mail invalide.",
+      "magic": "Impossible d'envoyer le lien. Vérifiez que vous avez été invité.",
+      "auth": "Connexion impossible. Réessayez."
+    }
+  },
+  "design": {
+    "title": "Design system",
+    "palette": "Échelle de marque",
+    "actions": "Actions",
+    "primary": "Enregistrer",
+    "secondary": "Annuler",
+    "destructive": "Supprimer",
+    "bidi": "Texte bidirectionnel",
+    "bidiSentence": "Appartement 4 pièces à Raanana, {price}, entrée immédiate.",
+    "phone": "Téléphone",
+    "table": "Tableau de biens",
+    "cols": {
+      "ref": "Réf.",
+      "city": "Ville",
+      "rooms": "Pièces",
+      "area": "Surface",
+      "price": "Prix",
+      "status": "Statut"
+    },
+    "status": {
+      "active": "Actif",
+      "underOffer": "Sous offre",
+      "draft": "Brouillon"
+    },
+    "sample": {
+      "city1": "Raanana",
+      "city2": "Netanya",
+      "city3": "Jérusalem"
+    }
+  },
+  "roles": {
+    "owner": "Propriétaire",
+    "admin": "Administrateur",
+    "agent": "Agent",
+    "assistant": "Assistant(e)",
+    "viewer": "Lecture seule"
+  },
+  "send": {
+    "matchingClients": "Clients correspondants",
+    "matchingProperties": "Biens correspondants",
+    "noClients": "Aucun client ne correspond à ce bien pour l'instant.",
+    "noProperties": "Aucun bien disponible ne correspond (ou tous ont déjà été envoyés).",
+    "onlyActive": "Seuls les biens actifs peuvent être envoyés.",
+    "email": "E-mail",
+    "messagePlaceholder": "Message personnel (optionnel)",
+    "send": "Envoyer la sélection",
+    "sending": "Envoi…",
+    "openWhatsapp": "Ouvrir WhatsApp",
+    "dryRunNote": "Mode test : aucun e-mail réel n'est parti (clé d'envoi non configurée). L'envoi est journalisé.",
+    "result": {
+      "sent": "Envoyé",
+      "dry_run": "Test (non envoyé)",
+      "failed": "Échec",
+      "blocked_consent": "Bloqué : pas de consentement",
+      "blocked_no_contact_info": "Coordonnée manquante",
+      "link": "Lien prêt"
+    },
+    "errors": {
+      "forbidden": "Vous n'avez pas le droit d'envoyer.",
+      "nothing_selected": "Sélectionnez au moins un destinataire."
+    }
+  },
+  "form": {
+    "errors": {
+      "invalid_number": "Nombre invalide.",
+      "half_rooms": "Utilisez des demi-pièces (3, 3,5, 4…).",
+      "invalid_date": "Date invalide.",
+      "active_needs_price_city": "Un bien actif doit avoir un prix et une ville.",
+      "name_required": "Saisissez au moins un nom.",
+      "invalid_phone": "Numéro de téléphone invalide.",
+      "invalid_email": "Adresse e-mail invalide.",
+      "rooms_range": "Le minimum dépasse le maximum.",
+      "duplicate_phone": "Ce numéro existe déjà dans votre agence.",
+      "forbidden": "Action non autorisée."
+    }
+  },
+  "deals": {
+    "title": "Affaires",
+    "sub": "{count} affaires ouvertes · valeur pondérée {weighted}",
+    "moveFailed": "Impossible de déplacer l'affaire (droits insuffisants).",
+    "moveTo": "Déplacer vers…",
+    "noProperty": "Aucun bien lié",
+    "wonLine": "Conclu : {count} affaires · {value}"
+  },
+  "public": {
+    "title": "Votre sélection de biens",
+    "subtitle": "Sélectionnés pour vous par {agent}.",
+    "contact": "Une question ? Contactez {agent}",
+    "call": "Appeler",
+    "legal": "Les informations sont données à titre indicatif et sous réserve de disponibilité. Les prix peuvent évoluer.",
+    "unsubscribeTitle": "Ne plus recevoir nos sélections ?",
+    "unsubscribeConfirm": "Confirmer la désinscription",
+    "unsubscribed": "Vous êtes désinscrit(e).",
+    "unsubscribedSub": "Vous ne recevrez plus nos sélections par e-mail.",
+    "unsubscribeInvalid": "Lien invalide ou expiré."
+  },
+  "props": {
+    "types": {
+      "apartment": "Appartement",
+      "garden_apt": "Appartement jardin",
+      "duplex": "Duplex",
+      "penthouse": "Penthouse",
+      "house": "Maison",
+      "cottage": "Cottage",
+      "land": "Terrain",
+      "office": "Bureau",
+      "shop": "Commerce"
+    },
+    "has": {
+      "mamad": "Mamad",
+      "parking": "Parking",
+      "elevator": "Ascenseur",
+      "sukkah_balcony": "Balcon soukka",
+      "storage": "Cave / machsan",
+      "ac": "Climatisation"
+    },
+    "status": {
+      "draft": "Brouillon",
+      "active": "Actif",
+      "under_offer": "Sous offre",
+      "sold": "Vendu",
+      "rented": "Loué",
+      "withdrawn": "Retiré",
+      "expired": "Expiré"
+    },
+    "tx": {
+      "sale": "Vente",
+      "rent": "Location"
+    },
+    "mandate": {
+      "exclusive": "Exclusif",
+      "non_exclusive": "Non exclusif",
+      "expiring": "Expire sous 30 jours",
+      "expired": "Expiré",
+      "expiresIn": "Expire dans {days} j"
+    },
+    "sort": {
+      "recent": "Plus récents",
+      "price_asc": "Prix croissant",
+      "price_desc": "Prix décroissant",
+      "mandate": "Fin de mandat"
+    },
+    "relation": {
+      "owner": "Propriétaire",
+      "tenant": "Locataire",
+      "other": "Contact lié"
+    },
+    "form": {
+      "vis": {
+        "hidden": "Masquée",
+        "neighborhood": "Quartier seulement",
+        "street": "Rue sans numéro",
+        "exact": "Adresse exacte"
+      },
+      "reg": {
+        "tabu": "Tabou",
+        "minhal": "Minhal",
+        "company": "Société de gestion",
+        "other": "Autre"
+      },
+      "basics": "Informations générales",
+      "type": "Type de bien",
+      "street": "Rue",
+      "houseNumber": "Numéro",
+      "addressVisibility": "Adresse visible sur les supports",
+      "addressVisibilityHint": "Contrôle ce que voient les clients (e-mails, page publique).",
+      "figures": "Chiffres",
+      "currency": "Devise",
+      "floorsTotal": "Étages (total)",
+      "arnona": "Arnona / mois",
+      "vaad": "Va'ad bayit / mois",
+      "registration": "Enregistrement",
+      "features": "Équipements",
+      "mandate": "Mandat",
+      "mandateEnd": "Fin du mandat",
+      "internalNotes": "Notes internes",
+      "description": "Description",
+      "title": "Titre",
+      "descriptionPlaceholder": "Description (optionnelle)"
+    },
+    "title": "Biens",
+    "count": "{count, plural, one {# bien} other {# biens}}",
+    "new": "Nouveau bien",
+    "newTitle": "Nouveau bien",
+    "editTitle": "Modifier le bien",
+    "empty": "Aucun bien ne correspond à ces filtres.",
+    "property": "Bien",
+    "city": "Ville",
+    "rooms": "Pièces",
+    "area": "Surface",
+    "sqm": "m²",
+    "floor": "Étage",
+    "price": "Prix",
+    "perMonth": "/ mois",
+    "statusLabel": "Statut",
+    "mandateLabel": "Mandat",
+    "agent": "Agent",
+    "details": "Caractéristiques",
+    "askingPrice": "Prix demandé",
+    "visits": "Visites",
+    "archive": "Archiver le bien",
+    "noDescription": "Aucune description. Ajoutez-en une dans la fiche.",
+    "aiNotReviewed": "Traduit par IA · à relire",
+    "photosPlaceholder": "Les photos seront téléversées dans une prochaine étape ; aperçu illustratif.",
+    "match": {
+      "overBudget": "+{pct} % au-dessus du budget"
+    },
+    "filters": {
+      "q": "Rechercher (rue, réf., ville…)",
+      "transaction": "Transaction",
+      "allTx": "Vente et location",
+      "cities": "Villes",
+      "min": "Min",
+      "max": "Max",
+      "features": "Équipements",
+      "more": "Plus",
+      "statusLabel": "Statut",
+      "agent": "Agent",
+      "mandate": "Mandat",
+      "sort": "Tri"
+    }
+  },
+  "clients": {
+    "kind": {
+      "buyer": "Acheteur",
+      "seller": "Vendeur",
+      "landlord": "Bailleur",
+      "tenant": "Locataire",
+      "investor": "Investisseur",
+      "lawyer": "Avocat",
+      "partner": "Partenaire",
+      "other": "Autre"
+    },
+    "aliyah": {
+      "pre_aliyah": "Pré-alyah",
+      "recent": "Olé récent(e)",
+      "resident": "Résident(e)",
+      "none": "—"
+    },
+    "activity": {
+      "created": "Fiche créée",
+      "unsubscribed": "Désinscrit des envois",
+      "share": "Sélection envoyée ({channel})",
+      "stage_change": "Affaire déplacée d'étape"
+    },
+    "title": "Clients",
+    "count": "{count, plural, one {# client} other {# clients}}",
+    "new": "Nouveau client",
+    "newTitle": "Nouveau client",
+    "editTitle": "Modifier le client",
+    "empty": "Aucun client ne correspond.",
+    "name": "Nom",
+    "phone": "Téléphone",
+    "typeLabel": "Type",
+    "budget": "Budget",
+    "lang": "Langue",
+    "lastActivity": "Dernière activité",
+    "agent": "Agent",
+    "searching": "En recherche",
+    "filters": {
+      "q": "Nom, téléphone, e-mail…",
+      "kind": "Type",
+      "allKinds": "Tous les types",
+      "owner": "Agent",
+      "allAgents": "Tous les agents"
+    },
+    "call": "Appeler",
+    "optIn": "Opt-in marketing",
+    "noConsent": "Sans consentement marketing",
+    "criteria": "Critères de recherche",
+    "noCriteria": "Aucun critère enregistré : le matching est désactivé pour ce client.",
+    "shares": "Envois",
+    "noShares": "Aucun envoi pour l'instant.",
+    "sharesLine": "{n} bien(s) · {channel}",
+    "opened": "Ouvert",
+    "details": "Coordonnées",
+    "tasks": "Tâches",
+    "newTask": "Nouvelle tâche…",
+    "due": "Échéance",
+    "toggleTask": "Terminer la tâche",
+    "activityTitle": "Activité",
+    "addNote": "Ajouter une note…",
+    "addNoteBtn": "Ajouter la note",
+    "deals": "Affaires",
+    "dealValue": "Valeur (₪)",
+    "openDeal": "Ouvrir une affaire",
+    "openExisting": "Ouvrir la fiche existante",
+    "form": {
+      "identity": "Identité",
+      "firstName": "Prénom",
+      "lastName": "Nom",
+      "firstNameHe": "Prénom (hébreu)",
+      "lastNameHe": "Nom (hébreu)",
+      "phoneHint": "Format libre : 050-123-4567, +33 6 12 34 56 78…",
+      "language": "Langue préférée",
+      "aliyah": "Statut alyah",
+      "source": "Source",
+      "kinds": "Type de contact",
+      "searchProfile": "Ce client cherche un bien",
+      "budgetMax": "Budget maximum (₪)",
+      "roomsMin": "Pièces min",
+      "roomsMax": "Pièces max",
+      "mustHave": "Indispensable",
+      "notes": "Notes",
+      "optIn": "Le client a accepté de recevoir des sélections de biens (e-mail)",
+      "optInHint": "Sans consentement, l'envoi par e-mail est bloqué. Il est enregistré avec la date."
+    }
+  }
 }
