@@ -1,0 +1,19 @@
+<!doctype html><html lang="fr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Maquettes · MultiDeploy</title>
+<style>
+:root{--bg:#fafafb;--ink:#1b1d24;--muted:#6b7080;--line:#e4e6ec;--accent:#1f4fd8}
+*{box-sizing:border-box}body{margin:0;font:14px/1.5 system-ui,-apple-system,"Segoe UI",Heebo,sans-serif;background:var(--bg);color:var(--ink)}
+main{max-width:1280px;margin:0 auto;padding:32px 24px 64px}h1{font-size:22px;margin:0 0 4px;letter-spacing:-.01em}p{margin:0;color:var(--muted)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(520px,1fr));gap:28px;margin-top:28px}
+.item h2{font-size:14px;margin:0 0 8px;display:flex;gap:8px;align-items:baseline}.item h2 small{color:var(--muted);font-weight:400}
+.pair{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.pair a{display:block;border:1px solid var(--line);border-radius:8px;overflow:hidden;background:#fff;position:relative}
+.pair a:hover{border-color:var(--accent)}.pair img{width:100%;height:240px;object-fit:cover;object-position:top;display:block}
+.pair b{position:absolute;inset-block-start:8px;inset-inline-start:8px;background:#fff;border:1px solid var(--line);border-radius:99px;font-size:11px;padding:0 8px}
+</style></head><body><main>
+<h1>Maquettes — 8 écrans prioritaires, FR et HE</h1>
+<p>HTML statique (mêmes tokens que l'application). Cliquez une vignette pour ouvrir la page. Données fictives.</p>
+<div class="grid" id="g"></div></main>
+<script>
+const S=[["01-biens","Liste des biens","רשימת נכסים"],["02-fiche-bien","Fiche bien","כרטיס נכס"],["03-fiche-client","Fiche client","כרטיס לקוח"],["04-dictee-revue-ia","Dictée & revue IA","הכתבה ובדיקת AI"],["05-generateur-affiche","Générateur d'affiche","יצירת מודעה"],["06-onboarding-charte","Onboarding & charte","הטמעה ומיתוג"],["07-pipeline","Pipeline kanban","צינור עסקאות"],["08-console-admin","Console super-admin","קונסולת סופר-אדמין"]];
+document.getElementById("g").innerHTML=S.map(([s,f,h],i)=>`<section class="item"><h2>${i+1}. ${f} <small dir="rtl">${h}</small></h2><div class="pair">${["fr","he"].map(l=>`<a href="${l}/${s}.html"><b>${l.toUpperCase()}</b><img loading="lazy" src="png/${l}-${s}.png" alt="${f} ${l}"></a>`).join("")}</div></section>`).join("");
+</script></body></html>
