@@ -393,5 +393,24 @@
       "optIn": "Le client a accepté de recevoir des sélections de biens (e-mail)",
       "optInHint": "Sans consentement, l'envoi par e-mail est bloqué. Il est enregistré avec la date."
     }
+  },
+  "media": {
+    "empty": "Aucune photo. Ajoutez-en pour enrichir la fiche, les envois et les affiches.",
+    "cover": "Photo de couverture",
+    "delete": "Supprimer",
+    "choose": "Choisir des photos",
+    "upload": "Téléverser",
+    "uploading": "Envoi…",
+    "added": "{count, plural, one {# photo ajoutée} other {# photos ajoutées}}",
+    "hint": "JPEG, PNG ou WebP, 12 Mo max, 25 photos max. Les données GPS/EXIF sont supprimées automatiquement.",
+    "errors": {
+      "too_large": "fichier trop lourd",
+      "not_image": "ce n'est pas une image",
+      "unsupported": "format non pris en charge",
+      "too_small": "image trop petite",
+      "limit": "limite de 25 photos atteinte",
+      "failed": "échec du traitement",
+      "none": "Aucun fichier valide ou droits insuffisants."
+    }
   }
 }

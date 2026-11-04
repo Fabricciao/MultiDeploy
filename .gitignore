@@ -8,3 +8,4 @@ node_modules
 .pgtest
 spikes/**/out
 .DS_Store
+.data

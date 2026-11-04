@@ -35,7 +35,8 @@ export default async function PublicSelectionPage({ params }: { params: Promise<
             const feats = [p.mamad && tp("has.mamad"), p.parking_count > 0 && `${tp("has.parking")} ×${p.parking_count}`, p.elevator && tp("has.elevator"), p.sukkah_balcony && tp("has.sukkah_balcony"), p.storage && tp("has.storage"), p.ac && tp("has.ac")].filter(Boolean) as string[];
             return (
               <article key={p.id} className="card" style={{ overflow: "hidden" }}>
-                <div style={{ height: 220 }}><Photo seed={p.id} label={tr.title ?? ""} /></div>
+                <div style={{ height: 240 }}>{(p.photo_ids as string[]).length ? <img src={`/api/public/photo/${token}/${(p.photo_ids as string[])[0]}`} alt={tr.title ?? ""} style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <Photo seed={p.id} label={tr.title ?? ""} />}</div>
+                {(p.photo_ids as string[]).length > 1 && <div className="row" style={{ gap: 4, padding: 4, overflowX: "auto" }}>{(p.photo_ids as string[]).slice(1, 8).map((pid) => <img key={pid} src={`/api/public/photo/${token}/${pid}?w=thumb`} alt="" loading="lazy" style={{ height: 64, borderRadius: 4 }} />)}</div>}
                 <div className="card-b col" style={{ gap: 8 }}>
                   <div className="tab" style={{ fontSize: 24, fontWeight: 600 }}>{money(locale, p.price, p.currency)}</div>
                   <div style={{ fontWeight: 500, fontSize: 15 }}>{tr.title ?? ""}</div>

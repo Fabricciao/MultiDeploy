@@ -393,5 +393,24 @@
       "optIn": "The client agreed to receive property selections (email)",
       "optInHint": "Without consent, email sending is blocked. Consent is stored with the date."
     }
+  },
+  "media": {
+    "empty": "No photos. Add some to enrich the listing, shares and posters.",
+    "cover": "Cover photo",
+    "delete": "Delete",
+    "choose": "Choose photos",
+    "upload": "Upload",
+    "uploading": "Uploading…",
+    "added": "{count, plural, one {# photo added} other {# photos added}}",
+    "hint": "JPEG, PNG or WebP, 12 MB max, 25 photos max. GPS/EXIF data is stripped automatically.",
+    "errors": {
+      "too_large": "file too large",
+      "not_image": "not an image",
+      "unsupported": "unsupported format",
+      "too_small": "image too small",
+      "limit": "25-photo limit reached",
+      "failed": "processing failed",
+      "none": "No valid file or insufficient rights."
+    }
   }
 }

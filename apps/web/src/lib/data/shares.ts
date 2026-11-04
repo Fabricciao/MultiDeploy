@@ -91,7 +91,8 @@ export async function getPublicShare(token: string) {
       case p.address_visibility when 'hidden' then null when 'neighborhood' then null else p.street end as street,
       case p.address_visibility when 'exact' then p.house_number else null end as house_number,
       g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
-      coalesce((select jsonb_object_agg(t.locale, jsonb_build_object('title', t.title, 'description', t.description)) from public.property_translations t where t.property_id = p.id), '{}') as tr
+      coalesce((select jsonb_object_agg(t.locale, jsonb_build_object('title', t.title, 'description', t.description)) from public.property_translations t where t.property_id = p.id), '{}') as tr,
+      coalesce((select jsonb_agg(pm.id order by pm.is_cover desc, pm.position) from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' and pm.visibility = 'public'), '[]') as photo_ids
     from public.properties p left join public.geo_places g on g.id = p.city_id
     where p.id = any(${s.property_ids}::uuid[]) and p.organization_id = ${s.organization_id} and p.deleted_at is null and p.status in ('active','under_offer')`;
   return { share: s as Record<string, any>, props: props as unknown as Record<string, any>[], agentPhone: s.agent_phone ? formatPhone(s.agent_phone) : null };

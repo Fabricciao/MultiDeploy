@@ -10,6 +10,8 @@ import { dateTime, initials, money, num, relDays } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader, Photo } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
+import { PhotoGallery } from "@/components/photo-gallery";
+import { listMedia } from "@/lib/data/media";
 import { archivePropertyAction } from "../actions";
 
 export default async function PropertyPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -23,6 +25,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
   const data = await getProperty(ctx, id);
   if (!data) notFound();
   const { p } = data;
+  const media = await listMedia(ctx, id);
   const tr = Object.fromEntries(data.translations.map((x) => [x.locale, x]));
   const title = tr[locale]?.title || tr.fr?.title || tr.he?.title || `${t(`types.${p.property_type}`)} · ${p.street ?? ""}`;
   const desc = tr[locale]?.description || tr.fr?.description || tr.he?.description || "";
@@ -49,13 +52,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
 
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 360px", gap: 20, alignItems: "start" }} className="split">
         <div className="col" style={{ gap: 16 }}>
-          <div className="card" style={{ padding: 8 }}>
-            <div style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "140px 140px", gap: 6, borderRadius: 8, overflow: "hidden" }}>
-              <div style={{ gridRow: "span 2" }}><Photo seed={id} label={title} /></div>
-              {[1, 2, 3, 4].map((k) => <div key={k}><Photo seed={id + k} /></div>)}
-            </div>
-            <p className="note" style={{ padding: "8px 6px 2px" }}>{t("photosPlaceholder")}</p>
-          </div>
+          <PhotoGallery propertyId={id} seed={id} canEdit={canEdit} items={media.map((m) => ({ id: m.id, url: `/api/files/${m.storage_path}`, isCover: m.is_cover }))} />
 
           <div className="card"><h2>{t("details")}</h2><div className="card-b"><div className="kv">
             {spec(t("price"), money(locale, p.price, p.currency))}

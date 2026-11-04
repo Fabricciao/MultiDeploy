@@ -113,7 +113,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
                     <tr key={p.id}>
                       <td>
                         <Link href={`/properties/${p.id}`} className="row" style={{ gap: 12 }}>
-                          <div className="thumb"><Photo seed={p.id} label="" /></div>
+                          <div className="thumb">{p.cover_thumb ? <img src={`/api/files/${p.cover_thumb}`} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Photo seed={p.id} label="" />}</div>
                           <div><div style={{ fontWeight: 500 }}>{p.title ?? `${t(`types.${p.property_type}`)} · ${p.street ?? ""}`}</div><div className="note"><span className="ltr tab">{p.reference}</span></div></div>
                         </Link>
                       </td>
