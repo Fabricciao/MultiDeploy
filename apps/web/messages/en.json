@@ -1,0 +1,22 @@
+{
+  "meta": { "title": "MultiDeploy", "description": "Multi-agency real estate CRM" },
+  "common": { "language": "Language", "search": "Search a property, a client, an action…" },
+  "nav": { "label": "Main navigation", "brand": "MultiDeploy", "soon": "Available in a later phase",
+    "today": "Today", "properties": "Properties", "clients": "Clients", "deals": "Deals", "agenda": "Calendar",
+    "marketing": "Marketing", "reports": "Reports", "settings": "Settings" },
+  "today": { "title": "Today", "subtitle": "What needs your attention today.",
+    "tasks": { "title": "Today's tasks", "empty": "No tasks scheduled. Follow-ups to make will show up here." },
+    "visits": { "title": "Viewings", "empty": "No viewings today." },
+    "followups": { "title": "Overdue follow-ups", "empty": "No overdue follow-ups." },
+    "mandates": { "title": "Expiring mandates", "empty": "No mandate expires in the next 30 days." } },
+  "login": { "brand": "MultiDeploy", "title": "Sign in", "subtitle": "Access your agency workspace.",
+    "google": "Continue with Google", "or": "or", "email": "Email address", "magic": "Email me a sign-in link",
+    "sent": "Link sent. Check your inbox.", "inviteOnly": "Access is by invitation from your agency.",
+    "notConfigured": "Supabase is not configured in this environment (see .env.example).",
+    "errors": { "oauth": "Google sign-in failed.", "email": "Invalid email address.", "magic": "Could not send the link. Make sure you have been invited.", "auth": "Could not sign in. Please try again." } },
+  "design": { "title": "Design system", "palette": "Brand scale", "actions": "Actions", "primary": "Save", "secondary": "Cancel", "destructive": "Delete",
+    "bidi": "Bidirectional text", "bidiSentence": "4-room apartment in Ra'anana, {price}, immediate entry.", "phone": "Phone", "table": "Properties table",
+    "cols": { "ref": "Ref.", "city": "City", "rooms": "Rooms", "area": "Area", "price": "Price", "status": "Status" },
+    "status": { "active": "Active", "underOffer": "Under offer", "draft": "Draft" },
+    "sample": { "city1": "Ra'anana", "city2": "Netanya", "city3": "Jerusalem" } }
+}

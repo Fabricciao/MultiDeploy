@@ -1,0 +1,27 @@
+name: CI
+on:
+  push: { branches: [main, "claude/**"] }
+  pull_request:
+concurrency: { group: ci-${{ github.ref }}, cancel-in-progress: true }
+permissions: { contents: read }
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: 22, cache: pnpm }
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm lint        # garde-fous RTL (CSS logique) + parité des clés i18n FR/HE/EN
+      - run: pnpm typecheck
+      - run: pnpm test
+      - run: pnpm build
+
+  db-isolation:
+    # Isolation multi-tenant : tests SQL sur un Postgres jetable. Bloquant.
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: bash supabase/tests/run.sh

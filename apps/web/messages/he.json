@@ -1,0 +1,22 @@
+{
+  "meta": { "title": "MultiDeploy", "description": "CRM נדל״ן לריבוי סוכנויות" },
+  "common": { "language": "שפה", "search": "חיפוש נכס, לקוח או פעולה…" },
+  "nav": { "label": "ניווט ראשי", "brand": "MultiDeploy", "soon": "יהיה זמין בשלב מאוחר יותר",
+    "today": "היום", "properties": "נכסים", "clients": "לקוחות", "deals": "עסקאות", "agenda": "יומן",
+    "marketing": "שיווק", "reports": "דוחות", "settings": "הגדרות" },
+  "today": { "title": "היום", "subtitle": "מה דורש את תשומת ליבך היום.",
+    "tasks": { "title": "משימות להיום", "empty": "אין משימות מתוכננות. מעקבים נדרשים יופיעו כאן." },
+    "visits": { "title": "ביקורים", "empty": "אין ביקורים היום." },
+    "followups": { "title": "מעקבים באיחור", "empty": "אין מעקבים באיחור." },
+    "mandates": { "title": "בלעדיויות שפוקעות", "empty": "אף בלעדיות לא פוקעת ב-30 הימים הקרובים." } },
+  "login": { "brand": "MultiDeploy", "title": "התחברות", "subtitle": "כניסה לסביבת העבודה של הסוכנות שלך.",
+    "google": "המשך עם Google", "or": "או", "email": "כתובת אימייל", "magic": "שלחו לי קישור התחברות",
+    "sent": "הקישור נשלח. בדקו את תיבת הדואר.", "inviteOnly": "הגישה בהזמנה מהסוכנות שלך.",
+    "notConfigured": "Supabase אינו מוגדר בסביבה זו (ראו .env.example).",
+    "errors": { "oauth": "ההתחברות עם Google נכשלה.", "email": "כתובת אימייל לא תקינה.", "magic": "לא ניתן לשלוח את הקישור. ודאו שהוזמנתם.", "auth": "לא ניתן להתחבר. נסו שוב." } },
+  "design": { "title": "מערכת עיצוב", "palette": "סקאלת מותג", "actions": "פעולות", "primary": "שמירה", "secondary": "ביטול", "destructive": "מחיקה",
+    "bidi": "טקסט דו-כיווני", "bidiSentence": "דירת 4 חדרים ברעננה, {price}, כניסה מיידית.", "phone": "טלפון", "table": "טבלת נכסים",
+    "cols": { "ref": "מס׳", "city": "עיר", "rooms": "חדרים", "area": "שטח", "price": "מחיר", "status": "סטטוס" },
+    "status": { "active": "פעיל", "underOffer": "בהצעה", "draft": "טיוטה" },
+    "sample": { "city1": "רעננה", "city2": "נתניה", "city3": "ירושלים" } }
+}

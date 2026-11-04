@@ -1,0 +1,22 @@
+{
+  "meta": { "title": "MultiDeploy", "description": "CRM immobilier multi-agences" },
+  "common": { "language": "Langue", "search": "Rechercher un bien, un client, une action…" },
+  "nav": { "label": "Navigation principale", "brand": "MultiDeploy", "soon": "Disponible dans une prochaine phase",
+    "today": "Aujourd'hui", "properties": "Biens", "clients": "Clients", "deals": "Affaires", "agenda": "Agenda",
+    "marketing": "Marketing", "reports": "Rapports", "settings": "Paramètres" },
+  "today": { "title": "Aujourd'hui", "subtitle": "Ce qui demande votre attention aujourd'hui.",
+    "tasks": { "title": "Tâches du jour", "empty": "Aucune tâche prévue. Les relances à faire apparaîtront ici." },
+    "visits": { "title": "Visites", "empty": "Aucune visite aujourd'hui." },
+    "followups": { "title": "Relances en retard", "empty": "Aucune relance en retard." },
+    "mandates": { "title": "Mandats qui expirent", "empty": "Aucun mandat n'expire dans les 30 prochains jours." } },
+  "login": { "brand": "MultiDeploy", "title": "Connexion", "subtitle": "Accédez à l'espace de votre agence.",
+    "google": "Continuer avec Google", "or": "ou", "email": "Adresse e-mail", "magic": "Recevoir un lien de connexion",
+    "sent": "Lien envoyé. Consultez votre boîte e-mail.", "inviteOnly": "L'accès se fait sur invitation de votre agence.",
+    "notConfigured": "Supabase n'est pas configuré dans cet environnement (voir .env.example).",
+    "errors": { "oauth": "La connexion Google a échoué.", "email": "Adresse e-mail invalide.", "magic": "Impossible d'envoyer le lien. Vérifiez que vous avez été invité.", "auth": "Connexion impossible. Réessayez." } },
+  "design": { "title": "Design system", "palette": "Échelle de marque", "actions": "Actions", "primary": "Enregistrer", "secondary": "Annuler", "destructive": "Supprimer",
+    "bidi": "Texte bidirectionnel", "bidiSentence": "Appartement 4 pièces à Raanana, {price}, entrée immédiate.", "phone": "Téléphone", "table": "Tableau de biens",
+    "cols": { "ref": "Réf.", "city": "Ville", "rooms": "Pièces", "area": "Surface", "price": "Prix", "status": "Statut" },
+    "status": { "active": "Actif", "underOffer": "Sous offre", "draft": "Brouillon" },
+    "sample": { "city1": "Raanana", "city2": "Netanya", "city3": "Jérusalem" } }
+}

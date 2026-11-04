@@ -74,7 +74,8 @@ Principe : **un seul backend de données (Supabase)**, un seul déploiement appl
 Compromis optimal coût/simplicité pour des dizaines d'agences. Une base par agence n'est pas justifiée (coût, migrations ×N).
 
 - Toute table métier porte `organization_id uuid not null` (FK, indexée en tête des index composites).
-- RLS **activée et forcée** sur toutes les tables du schéma `public`; aucun accès `service_role` côté client.
+- RLS **activée** sur toutes les tables du schéma `public` (vérifié par test de couverture en CI) ; aucun accès `service_role` côté client. `FORCE ROW LEVEL SECURITY` n'est volontairement pas utilisé : le propriétaire `postgres` de Supabase a `BYPASSRLS` et les fonctions `security definer` d'autorisation (`app.org_id()`…) lisent `memberships` sans récursion.
+- **Appartenance vérifiée en base à chaque requête** (pas seulement via le JWT) : retirer un membre ou suspendre une agence coupe l'accès immédiatement, sans attendre l'expiration du token.
 - L'organisation active est portée par le **JWT** via un *Custom Access Token Hook* (claims `org_id`, `role`) ; changement d'agence = rafraîchissement de session.
 - Policies de la forme :
   ```sql
@@ -142,9 +143,9 @@ Compromis optimal coût/simplicité pour des dizaines d'agences. Une base par ag
 
 ## 8. Rendu d'affiches (point technique à valider tôt)
 Moteur de template déterministe (HTML/CSS ou JSX) → image.
-- Option A : **Satori + resvg** (`@vercel/og`) — rapide et léger, **mais gestion du texte bidirectionnel/hébreu à tester** (spike obligatoire en phase 0).
+- Option A : **Satori + resvg** (`@vercel/og`) — **ÉCARTÉE par le spike de la phase 0** : rendu RTL cassé (voir `07-phase0-resultats.md`).
 - Option B : **Chromium headless** (Playwright) dans un conteneur dédié (Fly.io / Cloud Run / Railway, quelques $/mois) ou service de rendu — rendu fidèle navigateur (RTL, ligatures, polices variables), un peu plus lent.
-- Décision : spike de 1 jour en phase 0 avec une affiche test en hébreu + français + chiffres/ILS ; on garde A si OK, sinon B derrière une interface `PosterRenderer`.
+- **Décision (spike fait) : option B, Chromium headless**, derrière une interface `PosterRenderer`.
 
 ## 9. Sécurité & conformité
 
