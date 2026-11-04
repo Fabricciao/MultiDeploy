@@ -1,0 +1,159 @@
+<!doctype html><html lang="fr" dir="ltr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Biens</title><style>
+@font-face{font-family:"Inter Var";src:url(../../fonts/inter-latin-wght-normal.woff2) format("woff2");font-weight:100 900;unicode-range:U+0000-00FF,U+0131,U+0152-0153,U+02BB-02BC,U+02C6,U+02DA,U+02DC,U+2000-206F,U+20AC,U+2122,U+2191,U+2193,U+2212,U+2215,U+FEFF,U+FFFD}
+@font-face{font-family:"Heebo Var";src:url(../../fonts/heebo-hebrew-wght-normal.woff2) format("woff2");font-weight:100 900;unicode-range:U+0307-0308,U+0590-05FF,U+200C-2010,U+20AA,U+25CC,U+FB1D-FB4F}
+@font-face{font-family:"Heebo Var";src:url(../../fonts/heebo-latin-wght-normal.woff2) format("woff2");font-weight:100 900;unicode-range:U+0000-00FF}
+:root{
+  --bg:oklch(.985 .002 250);--surface:#fff;--sunken:oklch(.965 .003 250);--line:oklch(.915 .004 250);--line-strong:oklch(.85 .006 250);
+  --ink:oklch(.22 .01 250);--muted:oklch(.5 .012 250);--faint:oklch(.66 .01 250);
+  --accent:#1f4fd8;--accent-hover:#1a43b8;--accent-soft:#eaf0fd;--accent-ink:#1a43b8;
+  --ok:oklch(.52 .12 155);--ok-soft:oklch(.96 .03 155);--warn:oklch(.58 .13 70);--warn-soft:oklch(.97 .04 85);--bad:oklch(.54 .18 27);--bad-soft:oklch(.97 .02 27);
+  --r:6px;--r-lg:10px;
+}
+*{box-sizing:border-box}
+html{font-size:14px;line-height:1.5;background:var(--bg);color:var(--ink);-webkit-font-smoothing:antialiased}
+body{margin:0;font-family:"Inter Var","Heebo Var",system-ui,sans-serif;min-height:100vh}
+h1,h2,h3,p{margin:0}
+button,input,select{font:inherit;color:inherit}
+a{color:inherit;text-decoration:none}
+svg{flex-shrink:0}
+div>svg[role=img]{width:100%;height:100%;display:block}
+.ltr{direction:ltr;unicode-bidi:isolate;display:inline-block}
+.tab{font-variant-numeric:tabular-nums}
+.muted{color:var(--muted)}.faint{color:var(--faint)}
+.flip{}[dir=rtl] .flip{transform:scaleX(-1)}
+.row{display:flex;align-items:center;gap:8px}.col{display:flex;flex-direction:column}.grow{flex:1;min-width:0}.gap4{gap:4px}.gap12{gap:12px}.gap16{gap:16px}.wrap{flex-wrap:wrap}
+.sp{margin-inline-start:auto}
+
+/* shell */
+.app{display:flex;min-height:100vh}
+.side{width:216px;flex-shrink:0;background:var(--surface);border-inline-end:1px solid var(--line);padding:10px 8px;display:flex;flex-direction:column;gap:2px;position:sticky;top:0;height:100vh}
+.org{display:flex;align-items:center;gap:9px;padding:6px 8px 12px}
+.mark{width:26px;height:26px;border-radius:7px;background:var(--accent);color:#fff;display:grid;place-items:center;font-weight:700;font-size:13px}
+.org b{font-size:13px;font-weight:600;display:block;line-height:1.2}.org small{font-size:11px;color:var(--muted)}
+.nav{display:flex;align-items:center;gap:10px;height:32px;padding:0 8px;border-radius:var(--r);font-size:13px;color:var(--ink)}
+.nav:hover{background:var(--sunken)}.nav.on{background:var(--accent-soft);color:var(--accent-ink);font-weight:500}
+.nav .cnt{margin-inline-start:auto;font-size:11px;color:var(--muted)}
+.nav-sep{height:1px;background:var(--line);margin:8px 4px}
+.side-foot{margin-top:auto;padding:8px;border-top:1px solid var(--line);display:flex;gap:9px;align-items:center;font-size:12px}
+.main{flex:1;min-width:0;display:flex;flex-direction:column}
+.top{height:52px;display:flex;align-items:center;gap:12px;padding:0 20px;background:var(--surface);border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5}
+.search span.grow{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.search{display:flex;align-items:center;gap:8px;height:32px;width:340px;padding:0 10px;border:1px solid var(--line);border-radius:var(--r);background:var(--bg);color:var(--muted);font-size:13px}
+.kbd{font-size:11px;border:1px solid var(--line-strong);border-radius:4px;padding:0 5px;color:var(--muted);background:var(--surface)}
+.page{padding:20px 24px 40px;flex:1}
+.ph{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px}
+.ph h1{font-size:20px;font-weight:600;letter-spacing:-.01em;line-height:1.25}
+.ph p{color:var(--muted);font-size:13px}
+
+/* controls */
+.btn{color:var(--ink);display:inline-flex;align-items:center;justify-content:center;gap:7px;height:32px;padding:0 12px;border-radius:var(--r);border:1px solid var(--line-strong);background:var(--surface);font-size:13px;font-weight:500;cursor:pointer;white-space:nowrap}
+.btn:hover{background:var(--sunken)}
+.btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}.btn.pri:hover{background:var(--accent-hover)}
+.btn.ghost{border-color:transparent;background:transparent}.btn.ghost:hover{background:var(--sunken)}
+.btn.sm{height:28px;padding:0 9px;font-size:12px}.btn.icon{width:32px;padding:0}.btn.sm.icon{width:28px}
+.btn.danger{color:var(--bad)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
+.seg{display:inline-flex;padding:2px;border:1px solid var(--line);border-radius:var(--r);background:var(--surface)}
+.seg>*{height:26px;padding:0 10px;display:inline-flex;align-items:center;gap:6px;border-radius:4px;font-size:12px;font-weight:500;color:var(--muted)}
+.seg>.on{background:var(--accent);color:#fff}
+.chip{display:inline-flex;align-items:center;gap:6px;height:28px;padding:0 9px;border:1px solid var(--line-strong);border-radius:999px;background:var(--surface);font-size:12px;font-weight:500}
+.chip.on{background:var(--accent-soft);border-color:color-mix(in oklab,var(--accent) 35%,white);color:var(--accent-ink)}
+.chip.dash{border-style:dashed;color:var(--muted);background:transparent}
+.chip .x{opacity:.6}
+.badge{display:inline-flex;align-items:center;gap:5px;height:20px;padding:0 8px;border-radius:999px;font-size:11.5px;font-weight:500;background:var(--sunken);color:var(--muted);white-space:nowrap}
+.badge.ok{background:var(--ok-soft);color:var(--ok)}.badge.warn{background:var(--warn-soft);color:var(--warn)}.badge.bad{background:var(--bad-soft);color:var(--bad)}.badge.acc{background:var(--accent-soft);color:var(--accent-ink)}
+.dot{width:6px;height:6px;border-radius:50%;background:currentColor}
+.input{height:32px;width:100%;padding:0 10px;border:1px solid var(--line-strong);border-radius:var(--r);background:var(--surface);font-size:13px;display:flex;align-items:center;gap:8px}
+.input.mul{height:auto;min-height:32px;padding:5px 8px;flex-wrap:wrap}
+.input.warn{border-color:color-mix(in oklab,var(--warn) 55%,white);background:var(--warn-soft)}
+.input.bad{border-color:var(--bad);background:var(--bad-soft)}
+.lbl{font-size:12px;font-weight:500;color:var(--muted);margin-bottom:5px;display:flex;align-items:center;gap:6px}
+.avatar{width:24px;height:24px;border-radius:50%;display:grid;place-items:center;font-size:10.5px;font-weight:600;background:var(--accent-soft);color:var(--accent-ink);flex-shrink:0}
+.avatar.lg{width:44px;height:44px;font-size:15px}.avatar.sm{width:20px;height:20px;font-size:9px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--r-lg)}
+.card>h2,.card-h{font-size:13px;font-weight:600;padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:8px}
+.card-b{padding:14px}
+.sw{width:100%;border:0;border-top:1px solid var(--line)}
+
+/* table */
+.tbl{width:100%;border-collapse:collapse;font-size:13px}
+.tbl th{height:34px;padding:0 10px;text-align:start;font-weight:500;font-size:12px;color:var(--muted);background:var(--sunken);border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl td{height:52px;padding:0 10px;border-bottom:1px solid var(--line);white-space:nowrap}
+.tbl tr:last-child td{border-bottom:0}.tbl tr:hover td{background:var(--sunken)}
+.tbl tr.sel td{background:var(--accent-soft)}
+.cb{width:15px;height:15px;border:1.5px solid var(--line-strong);border-radius:4px;background:var(--surface);display:inline-grid;place-items:center;vertical-align:middle}
+.cb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.thumb{width:56px;height:38px;border-radius:5px;overflow:hidden;flex-shrink:0;background:var(--sunken)}
+.thumb svg,.ph-img svg{width:100%;height:100%;display:block}
+.bar{height:5px;border-radius:3px;background:var(--line);overflow:hidden}.bar>i{display:block;height:100%;background:var(--accent)}
+.kv{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px 18px}
+.kv .k{font-size:11.5px;color:var(--muted)}.kv .v{font-size:14px;font-weight:500;margin-top:1px}
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);margin-bottom:16px}
+.tabs>*{padding:8px 12px;font-size:13px;color:var(--muted);border-bottom:2px solid transparent;margin-bottom:-1px}
+.tabs>.on{color:var(--ink);font-weight:500;border-color:var(--accent)}
+.note{font-size:12px;color:var(--muted)}
+.foot-note{position:fixed;inset-block-end:10px;inset-inline:0;margin-inline:auto;width:fit-content;pointer-events:none;font-size:11px;color:var(--muted);background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:3px 10px;z-index:50}
+
+body{background:#e6e8ee;display:grid;place-items:center;min-height:100vh;padding:24px}
+.phone{width:390px;height:844px;background:var(--bg);position:relative;overflow:hidden;display:flex;flex-direction:column;border-radius:38px;box-shadow:0 0 0 1px rgb(0 0 0/.12),0 24px 60px -20px rgb(20 30 60/.35)}
+.status{height:46px;flex-shrink:0;display:flex;align-items:flex-end;justify-content:space-between;padding:0 26px 6px;font-size:14px;font-weight:600}
+.status .r{display:flex;gap:5px;align-items:center}
+.appbar{height:48px;flex-shrink:0;display:flex;align-items:center;gap:8px;padding:0 12px 0 16px;padding-inline:16px 8px}
+.appbar h1{font-size:19px;font-weight:600;letter-spacing:-.01em}
+.ib{width:44px;height:44px;display:grid;place-items:center;border-radius:50%;flex-shrink:0}
+.ib.bd{border:1px solid var(--line-strong);background:var(--surface)}
+.scroll{flex:1;overflow:hidden;padding:4px 16px 16px;position:relative}
+.tabbar{height:78px;flex-shrink:0;background:var(--surface);border-top:1px solid var(--line);display:flex;align-items:flex-start;padding:6px 6px 0;position:relative}
+.tabbar a{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10.5px;color:var(--muted);padding-top:3px;height:52px}
+.tabbar a.on{color:var(--accent)}
+.fabw{flex:1;display:flex;justify-content:center}
+.fab{width:54px;height:54px;border-radius:50%;background:var(--accent);color:#fff;display:grid;place-items:center;margin-top:-18px;box-shadow:0 8px 20px -6px color-mix(in oklab,var(--accent) 70%,black)}
+.home{position:absolute;inset-block-end:7px;inset-inline:0;margin-inline:auto;width:128px;height:5px;border-radius:3px;background:#111;opacity:.85}
+.scrim{position:absolute;inset:0;background:rgb(12 18 36/.45)}
+.sheet{position:absolute;inset-inline:0;inset-block-end:0;background:var(--surface);border-radius:22px 22px 0 0;padding:8px 16px 30px;box-shadow:0 -10px 40px -10px rgb(0 0 0/.3)}
+.grab{width:38px;height:4px;border-radius:2px;background:var(--line-strong);margin:2px auto 12px}
+.m-card{background:var(--surface);border:1px solid var(--line);border-radius:14px}
+.m-btn{height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;border:1px solid var(--line-strong);background:var(--surface);color:var(--ink)}
+.m-btn.pri{background:var(--accent);border-color:var(--accent);color:#fff}
+.m-btn.sm{height:44px;font-size:13px}
+.m-h{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em;margin:18px 2px 8px;display:flex;align-items:center;gap:8px}
+.m-row{display:flex;align-items:center;gap:12px;padding:12px 14px;min-height:56px}
+.m-row+.m-row{border-top:1px solid var(--line)}
+.hs{display:flex;gap:8px;overflow:hidden}
+.q4{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.q4 a{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;height:68px;border-radius:12px;border:1px solid var(--line);background:var(--surface);font-size:11.5px;font-weight:500}
+.dark{background:#0d0f14;color:#fff}
+.chip{white-space:nowrap}
+</style></head><body>
+<div class="phone " dir="ltr">
+  <div class="status" style="direction:ltr;"><span class="tab">9:41</span><span class="r"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-signal" aria-hidden="true"><path d="M2 20h.01"></path><path d="M7 20v-4"></path><path d="M12 20v-8"></path><path d="M17 20V8"></path><path d="M22 4v16"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-wifi" aria-hidden="true"><path d="M12 20h.01"></path><path d="M2 8.82a15 15 0 0 1 20 0"></path><path d="M5 12.859a10 10 0 0 1 14 0"></path><path d="M8.5 16.429a5 5 0 0 1 7 0"></path></svg><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-battery-full" aria-hidden="true"><path d="M10 10v4"></path><path d="M14 10v4"></path><path d="M22 14v-4"></path><path d="M6 10v4"></path><rect x="2" y="6" width="16" height="12" rx="2"></rect></svg></span></div>
+  <div class="appbar"><h1 class="grow">Biens</h1><span class="ib"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span></div>
+  <div class="scroll" style="padding-top:0">
+   <div class="row" style="gap:8px;margin-bottom:10px"><div class="input grow" style="height:46px;border-radius:12px;font-size:15px"><svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-search" aria-hidden="true"><path d="m21 21-4.34-4.34"></path><circle cx="11" cy="11" r="8"></circle></svg><span class="muted">Ville, rue, référence…</span></div><span class="ib bd" style="width:46px;height:46px;border-radius:12px;position:relative"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sliders-horizontal" aria-hidden="true"><path d="M10 5H3"></path><path d="M12 19H3"></path><path d="M14 3v4"></path><path d="M16 17v4"></path><path d="M21 12h-9"></path><path d="M21 19h-5"></path><path d="M21 5h-7"></path><path d="M8 10v4"></path><path d="M8 12H3"></path></svg><span class="avatar sm" style="position:absolute;inset-block-start:-5px;inset-inline-end:-5px;background:var(--accent);color:#fff">3</span></span></div>
+   <div class="hs" style="margin-bottom:12px"><span class="chip on" style="height:34px">Vente<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span><span class="chip on" style="height:34px">Raanana +2<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span><span class="chip on" style="height:34px">3–5 pièces<svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x" aria-hidden="true"><path d="M18 6 6 18"></path><path d="m6 6 12 12"></path></svg></span><span class="chip" style="height:34px">Mamad</span></div>
+   <div class="row" style="margin-bottom:10px"><span class="note">112 biens</span><span class="seg sp"><span class="on"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-rows-3 lucide-panels-top-bottom" aria-hidden="true"><rect width="18" height="18" x="3" y="3" rx="2"></rect><path d="M21 9H3"></path><path d="M21 15H3"></path></svg>Liste</span><span><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-map" aria-hidden="true"><path d="M14.106 5.553a2 2 0 0 0 1.788 0l3.659-1.83A1 1 0 0 1 21 4.619v12.764a1 1 0 0 1-.553.894l-4.553 2.277a2 2 0 0 1-1.788 0l-4.212-2.106a2 2 0 0 0-1.788 0l-3.659 1.83A1 1 0 0 1 3 19.381V6.618a1 1 0 0 1 .553-.894l4.553-2.277a2 2 0 0 1 1.788 0z"></path><path d="M15 5.764v15"></path><path d="M9 3.236v15"></path></svg>Carte</span></span></div>
+   <div class="col" style="gap:12px"><div class="m-card" style="overflow:hidden"><div style="height:140px;position:relative"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+<defs><linearGradient id="p3s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(210 30% 88%)"/><stop offset="1" stop-color="hsl(210 25% 96%)"/></linearGradient>
+<pattern id="p3w" width="12" height="14" patternUnits="userSpaceOnUse"><rect x="3" y="3" width="6" height="8" fill="hsl(210 30% 90% / .75)"/></pattern></defs>
+<rect width="200" height="120" fill="url(#p3s)"/>
+<rect x="10" y="42" width="46" height="78" fill="hsl(210 16% 55.6%)"/><rect x="60" y="24" width="62" height="96" fill="hsl(210 14% 58%)"/><rect x="126" y="56" width="40" height="64" fill="hsl(210 18% 53.2%)"/><rect x="170" y="36" width="30" height="84" fill="hsl(210 20% 50.8%)"/>
+<rect x="60" y="24" width="62" height="96" fill="url(#p3w)"/><rect x="10" y="42" width="46" height="78" fill="url(#p3w)"/><rect x="126" y="56" width="40" height="64" fill="url(#p3w)"/>
+<rect y="112" width="200" height="8" fill="hsl(210 12% 40% / .35)"/></svg><span class="badge ok" style="position:absolute;inset-block-start:10px;inset-inline-start:10px;background:#fff"><i class="dot"></i>Actif</span><span class="badge warn" style="position:absolute;inset-block-start:10px;inset-inline-end:10px"><svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-clock" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><path d="M12 6v6l4 2"></path></svg>Expire dans 12 j</span><span class="ib" style="position:absolute;inset-block-end:6px;inset-inline-end:6px;background:#fff;width:36px;height:36px"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></span></div>
+     <div style="padding:11px 14px 13px"><div class="row"><b class="tab" style="font-size:18px">3 450 000 ₪</b></div><div style="font-weight:500;margin-top:1px">4 pièces · Rue Ahuza 24</div><div class="note">Raanana · Neve Zemer</div><div class="row" style="gap:14px;margin-top:6px;font-size:12.5px"><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler" aria-hidden="true"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>112 m²</span><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building" aria-hidden="true"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg><span class="ltr">3/6</span></span></div></div></div><div class="m-card" style="overflow:hidden"><div style="height:140px;position:relative"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+<defs><linearGradient id="p4s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(50 30% 88%)"/><stop offset="1" stop-color="hsl(50 25% 96%)"/></linearGradient>
+<pattern id="p4w" width="12" height="14" patternUnits="userSpaceOnUse"><rect x="3" y="3" width="6" height="8" fill="hsl(50 30% 90% / .75)"/></pattern></defs>
+<rect width="200" height="120" fill="url(#p4s)"/>
+<rect x="10" y="42" width="46" height="78" fill="hsl(50 16% 55.6%)"/><rect x="60" y="24" width="62" height="96" fill="hsl(50 14% 58%)"/><rect x="126" y="56" width="40" height="64" fill="hsl(50 18% 53.2%)"/><rect x="170" y="36" width="30" height="84" fill="hsl(50 20% 50.8%)"/>
+<rect x="60" y="24" width="62" height="96" fill="url(#p4w)"/><rect x="10" y="42" width="46" height="78" fill="url(#p4w)"/><rect x="126" y="56" width="40" height="64" fill="url(#p4w)"/>
+<rect y="112" width="200" height="8" fill="hsl(50 12% 40% / .35)"/></svg><span class="badge ok" style="position:absolute;inset-block-start:10px;inset-inline-start:10px;background:#fff"><i class="dot"></i>Actif</span><span class="ib" style="position:absolute;inset-block-end:6px;inset-inline-end:6px;background:#fff;width:36px;height:36px"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></span></div>
+     <div style="padding:11px 14px 13px"><div class="row"><b class="tab" style="font-size:18px">3 890 000 ₪</b></div><div style="font-weight:500;margin-top:1px">4 pièces jardin · Rue HaPalmach 6</div><div class="note">Kfar Saba · Nord</div><div class="row" style="gap:14px;margin-top:6px;font-size:12.5px"><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler" aria-hidden="true"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>128 m²</span><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building" aria-hidden="true"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg><span class="ltr">0/3</span></span></div></div></div><div class="m-card" style="overflow:hidden"><div style="height:140px;position:relative"><svg viewBox="0 0 200 120" preserveAspectRatio="xMidYMid slice" role="img" aria-label="">
+<defs><linearGradient id="p5s" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="hsl(160 30% 88%)"/><stop offset="1" stop-color="hsl(160 25% 96%)"/></linearGradient>
+<pattern id="p5w" width="12" height="14" patternUnits="userSpaceOnUse"><rect x="3" y="3" width="6" height="8" fill="hsl(160 30% 90% / .75)"/></pattern></defs>
+<rect width="200" height="120" fill="url(#p5s)"/>
+<rect x="10" y="42" width="46" height="78" fill="hsl(160 16% 55.6%)"/><rect x="60" y="24" width="62" height="96" fill="hsl(160 14% 58%)"/><rect x="126" y="56" width="40" height="64" fill="hsl(160 18% 53.2%)"/><rect x="170" y="36" width="30" height="84" fill="hsl(160 20% 50.8%)"/>
+<rect x="60" y="24" width="62" height="96" fill="url(#p5w)"/><rect x="10" y="42" width="46" height="78" fill="url(#p5w)"/><rect x="126" y="56" width="40" height="64" fill="url(#p5w)"/>
+<rect y="112" width="200" height="8" fill="hsl(160 12% 40% / .35)"/></svg><span class="badge warn" style="position:absolute;inset-block-start:10px;inset-inline-start:10px;background:#fff"><i class="dot"></i>Sous offre</span><span class="ib" style="position:absolute;inset-block-end:6px;inset-inline-end:6px;background:#fff;width:36px;height:36px"><svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-send" aria-hidden="true"><path d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11z"></path><path d="m21.854 2.147-10.94 10.939"></path></svg></span></div>
+     <div style="padding:11px 14px 13px"><div class="row"><b class="tab" style="font-size:18px">4 980 000 ₪</b></div><div style="font-weight:500;margin-top:1px">5 pièces · Rue Herzl 112</div><div class="note">Herzliya · Gan Rashal</div><div class="row" style="gap:14px;margin-top:6px;font-size:12.5px"><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-ruler" aria-hidden="true"><path d="M21.3 15.3a2.4 2.4 0 0 1 0 3.4l-2.6 2.6a2.4 2.4 0 0 1-3.4 0L2.7 8.7a2.41 2.41 0 0 1 0-3.4l2.6-2.6a2.41 2.41 0 0 1 3.4 0Z"></path><path d="m14.5 12.5 2-2"></path><path d="m11.5 9.5 2-2"></path><path d="m8.5 6.5 2-2"></path><path d="m17.5 15.5 2-2"></path></svg>140 m²</span><span class="row" style="gap:4px"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-building" aria-hidden="true"><path d="M12 10h.01"></path><path d="M12 14h.01"></path><path d="M12 6h.01"></path><path d="M16 10h.01"></path><path d="M16 14h.01"></path><path d="M16 6h.01"></path><path d="M8 10h.01"></path><path d="M8 14h.01"></path><path d="M8 6h.01"></path><path d="M9 22v-3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3"></path><rect x="4" y="2" width="16" height="20" rx="2"></rect></svg><span class="ltr">6/8</span></span></div></div></div></div></div>
+  <nav class="tabbar"><a class=""><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-sun" aria-hidden="true"><circle cx="12" cy="12" r="4"></circle><path d="M12 2v2"></path><path d="M12 20v2"></path><path d="m4.93 4.93 1.41 1.41"></path><path d="m17.66 17.66 1.41 1.41"></path><path d="M2 12h2"></path><path d="M20 12h2"></path><path d="m6.34 17.66-1.41 1.41"></path><path d="m19.07 4.93-1.41 1.41"></path></svg><span>Aujourd'hui</span></a><a class="on"><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-house lucide-home" aria-hidden="true"><path d="M15 21v-8a1 1 0 0 0-1-1h-4a1 1 0 0 0-1 1v8"></path><path d="M3 10a2 2 0 0 1 .709-1.528l7-6a2 2 0 0 1 2.582 0l7 6A2 2 0 0 1 21 10v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path></svg><span>Biens</span></a><div class="fabw"><span class="fab"><svg xmlns="http://www.w3.org/2000/svg" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-plus" aria-hidden="true"><path d="M5 12h14"></path><path d="M12 5v14"></path></svg></span></div><a class=""><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-users" aria-hidden="true"><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"></path><path d="M16 3.128a4 4 0 0 1 0 7.744"></path><path d="M22 21v-2a4 4 0 0 0-3-3.87"></path><circle cx="9" cy="7" r="4"></circle></svg><span>Clients</span></a><a class=""><svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu" aria-hidden="true"><path d="M4 5h16"></path><path d="M4 12h16"></path><path d="M4 19h16"></path></svg><span>Plus</span></a></nav>
+  
+  <i class="home" style=""></i>
+</div></body></html>

@@ -1,7 +1,7 @@
 import { I, shell, page, photo, avatar } from "./lib.mjs";
 
 /** Affiche en HTML/CSS (unités cqw → s'adapte à n'importe quelle taille d'aperçu). */
-function poster(L, variant, { brand = "#1f4fd8", brandInk = "#fff", seed = 0, name = "Eliezer.immo" } = {}) {
+export function poster(L, variant, { brand = "#1f4fd8", brandInk = "#fff", seed = 0, name = "Eliezer.immo" } = {}) {
   const { t, cur } = L;
   const tag = t("À VENDRE", "למכירה");
   const title = t("4 pièces · Raanana", "4 חדרים · רעננה");
