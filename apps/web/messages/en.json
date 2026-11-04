@@ -19,7 +19,9 @@
     "yes": "Yes",
     "reset": "Reset",
     "save": "Save",
-    "saving": "Saving…"
+    "saving": "Saving…",
+    "dictate": "Dictate",
+    "scan": "Scan a paper"
   },
   "nav": {
     "label": "Main navigation",
@@ -522,6 +524,62 @@
       "provider_missing": "This level requires an AI image provider.",
       "render_failed": "Rendering failed. Credits were refunded.",
       "no_format": "Choose at least one format."
+    }
+  },
+  "intake": {
+    "title": "Assisted entry",
+    "sub": "Dictate or photograph: you review and confirm before saving.",
+    "modes": {
+      "voice": "Dictate",
+      "scan": "Scan a paper",
+      "text": "Paste text"
+    },
+    "targets": {
+      "contact": "Client",
+      "property": "Property"
+    },
+    "voiceHintContact": "Say: name, phone, what the client wants, budget, cities, safe room/parking…",
+    "voiceHintProperty": "Say: type, rooms, area, floor, street and city, price, features…",
+    "record": "Record",
+    "redo": "Redo",
+    "stop": "Stop",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing…",
+    "micDenied": "Microphone access denied: allow it in the browser or paste text.",
+    "sttMissing": "Speech transcription is not configured in this environment: use “Paste text”.",
+    "visionMissing": "Document reading (vision) is not configured in this environment.",
+    "scanHint": "Photograph a handwritten or printed sheet, well lit and flat. Uncertain fields will be flagged.",
+    "choosePhoto": "Choose or take a photo",
+    "textHint": "Paste a transcript, a WhatsApp message or your notes: fields are extracted automatically.",
+    "textExampleContact": "E.g.: Dana Levi is looking for a 4-room apartment in Ra'anana, budget up to 4 million, needs a safe room. Phone 050-123-4567",
+    "textExampleProperty": "E.g.: 4-room apartment for sale, 112 sqm, floor 3 of 6, Ahuza 24 Ra'anana, price 3,450,000 ₪, safe room, elevator",
+    "privacy": "Nothing is saved before you confirm. Audio recordings are not kept.",
+    "errors": {
+      "empty": "Nothing to analyze.",
+      "forbidden": "Insufficient rights.",
+      "stt_not_configured": "Speech transcription not configured.",
+      "vision_not_configured": "Document reading not configured.",
+      "insufficient_credits": "Not enough AI credits.",
+      "too_large": "File too large.",
+      "bad_image": "Unreadable image.",
+      "provider_failed": "Analysis failed (credits refunded). Try again or paste text.",
+      "bad_audio": "Unreadable audio."
+    },
+    "reviewTitle": "Review before saving",
+    "reviewSub": "Pre-filled automatically ({provider}). Nothing is saved until you confirm.",
+    "discard": "Discard",
+    "sourceImage": "Source document",
+    "transcript": "Transcript",
+    "reviewNote": "Fields marked “verify” were inferred with lower confidence. Hover the green tick to see the source excerpt.",
+    "verify": "Verify",
+    "evidence": "In the source:",
+    "missing": "Missing: {fields}",
+    "propertyVerify": "Some fields need checking: read carefully before saving.",
+    "fields": {
+      "first_name": "name",
+      "phone": "phone",
+      "price": "price",
+      "city_id": "city"
     }
   }
 }

@@ -19,7 +19,9 @@
     "yes": "Oui",
     "reset": "Réinitialiser",
     "save": "Enregistrer",
-    "saving": "Enregistrement…"
+    "saving": "Enregistrement…",
+    "dictate": "Dicter",
+    "scan": "Scanner un papier"
   },
   "nav": {
     "label": "Navigation principale",
@@ -522,6 +524,62 @@
       "provider_missing": "Ce niveau nécessite un fournisseur d'images IA.",
       "render_failed": "Le rendu a échoué. Les crédits ont été restitués.",
       "no_format": "Choisissez au moins un format."
+    }
+  },
+  "intake": {
+    "title": "Saisie assistée",
+    "sub": "Dictez ou photographiez : vous relisez et validez avant l'enregistrement.",
+    "modes": {
+      "voice": "Dicter",
+      "scan": "Scanner un papier",
+      "text": "Coller un texte"
+    },
+    "targets": {
+      "contact": "Client",
+      "property": "Bien"
+    },
+    "voiceHintContact": "Dites : nom, téléphone, ce que cherche le client, budget, villes, mamad/parking…",
+    "voiceHintProperty": "Dites : type, pièces, surface, étage, rue et ville, prix, équipements…",
+    "record": "Enregistrer",
+    "redo": "Refaire",
+    "stop": "Terminer",
+    "analyze": "Analyser",
+    "analyzing": "Analyse…",
+    "micDenied": "Accès au micro refusé : autorisez-le dans le navigateur ou collez un texte.",
+    "sttMissing": "Transcription vocale non configurée sur cet environnement : utilisez « Coller un texte ».",
+    "visionMissing": "Lecture de documents (vision) non configurée sur cet environnement.",
+    "scanHint": "Photographiez une fiche manuscrite ou imprimée, bien éclairée, à plat. Les champs incertains seront signalés.",
+    "choosePhoto": "Choisir ou prendre une photo",
+    "textHint": "Collez une transcription, un message WhatsApp ou vos notes : les champs sont extraits automatiquement.",
+    "textExampleContact": "Ex. : Dana Lévi cherche un 4 pièces à Raanana, budget 4 millions, il lui faut un mamad. Tél 050-123-4567",
+    "textExampleProperty": "Ex. : 4 pièces à vendre, 112 m², étage 3 sur 6, rue Ahuza 24 à Raanana, prix 3 450 000 ₪, mamad, ascenseur",
+    "privacy": "Rien n'est enregistré avant votre validation. Les enregistrements audio ne sont pas conservés.",
+    "errors": {
+      "empty": "Rien à analyser.",
+      "forbidden": "Droits insuffisants.",
+      "stt_not_configured": "Transcription vocale non configurée.",
+      "vision_not_configured": "Lecture de documents non configurée.",
+      "insufficient_credits": "Crédits IA insuffisants.",
+      "too_large": "Fichier trop volumineux.",
+      "bad_image": "Image illisible.",
+      "provider_failed": "L'analyse a échoué (crédits restitués). Réessayez ou collez un texte.",
+      "bad_audio": "Audio illisible."
+    },
+    "reviewTitle": "Vérifier avant d'enregistrer",
+    "reviewSub": "Pré-rempli automatiquement ({provider}). Rien n'est enregistré tant que vous n'avez pas validé.",
+    "discard": "Abandonner",
+    "sourceImage": "Document source",
+    "transcript": "Transcription",
+    "reviewNote": "Les champs marqués « à vérifier » ont été déduits avec moins de certitude. Survolez la coche verte pour voir l'extrait source.",
+    "verify": "À vérifier",
+    "evidence": "Dans la source :",
+    "missing": "Il manque : {fields}",
+    "propertyVerify": "Certains champs sont à vérifier : relisez attentivement avant d'enregistrer.",
+    "fields": {
+      "first_name": "nom",
+      "phone": "téléphone",
+      "price": "prix",
+      "city_id": "ville"
     }
   }
 }

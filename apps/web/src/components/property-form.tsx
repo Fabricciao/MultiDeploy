@@ -8,7 +8,8 @@ import { PROPERTY_TYPES } from "@/lib/data/forms";
 type City = { id: string; label: string };
 export type PropertyDefaults = Record<string, any>;
 
-export function PropertyForm({ action, cities, d = {} }: { action: (s: FormState, fd: FormData) => Promise<FormState>; cities: City[]; d?: PropertyDefaults }) {
+export function PropertyForm({ action, cities, d = {}, missing, hints }: { action: (s: FormState, fd: FormData) => Promise<FormState>; cities: City[]; d?: PropertyDefaults; missing?: string[]; hints?: Record<string, { confidence: number; evidence?: string }> }) {
+  const ti = useTranslations("intake");
   const t = useTranslations("props");
   const tf = useTranslations("form");
   const tc = useTranslations("common");
@@ -21,6 +22,8 @@ export function PropertyForm({ action, cities, d = {} }: { action: (s: FormState
   return (
     <form action={formAction} className="col" style={{ gap: 16, maxWidth: 920 }}>
       <input type="hidden" name="locale" value={locale} />
+      {missing && missing.length > 0 && <div role="alert" className="card card-b" style={{ borderColor: "var(--bad)", background: "var(--bad-soft)" }}><b>{ti("missing", { fields: missing.map((m) => ti(`fields.${m}`)).join(", ") })}</b></div>}
+      {hints && Object.values(hints).some((h) => h.confidence < 0.7) && <div className="card card-b note">{ti("propertyVerify")}</div>}
       {state?.error && <div role="alert" className="card card-b err">{tf(`errors.${state.error}`)}</div>}
 
       <section className="card"><h2>{t("form.basics")}</h2><div className="card-b" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>

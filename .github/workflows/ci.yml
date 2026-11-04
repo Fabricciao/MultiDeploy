@@ -40,10 +40,14 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: bash supabase/dev-db.sh reset
       - run: npm i -g playwright && playwright install --with-deps chromium
-      - name: Démarrer l'app et lancer l'E2E
+      - name: Démarrer l'app et lancer les E2E (phases 1 et 2)
         run: |
+          export NODE_PATH="$(npm root -g):$PWD/apps/web/node_modules"
+          export CHROMIUM_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")"
+          export BRAND_FETCH_ALLOW_PRIVATE=1   # autorise UNIQUEMENT le loopback (serveur de fixtures) hors production
           (pnpm --filter @multideploy/web dev -p 3120 > dev.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf http://localhost:3120/fr/login >/dev/null && break; sleep 2; done
-          NODE_PATH="$(npm root -g):$PWD/apps/web/node_modules" node apps/web/e2e/phase1.cjs
+          node apps/web/e2e/phase1.cjs
+          node apps/web/e2e/phase2.cjs
       - if: failure()
         run: tail -80 dev.log

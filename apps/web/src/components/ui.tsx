@@ -40,7 +40,7 @@ export function PageHeader({ title, sub, children }: { title: string; sub?: stri
   );
 }
 
-export function Field({ label, children, error, hint }: { label: string; children: ReactNode; error?: string; hint?: string }) {
+export function Field({ label, children, error, hint }: { label: ReactNode; children: ReactNode; error?: string; hint?: ReactNode }) {
   return (
     <div>
       <label className="lbl">{label}</label>

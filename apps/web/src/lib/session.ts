@@ -40,7 +40,7 @@ export const getCtx = cache(async (locale = "fr"): Promise<Ctx> => {
     where p.id = ${userId} order by (m.organization_id = p.active_organization_id) desc limit 1`;
   if (!row) redirect(`/${locale}/login?error=no_agency`);
   const caps = await withUser({ userId, orgId: row.org_id }, async (tx) =>
-    (await tx`select c.cap from unnest(array['contacts.read_all','contacts.write','contacts.write_all','contacts.delete','properties.write','properties.write_all','properties.delete','members.manage','org.manage','brand.manage','audit.read','deals.write','tasks.write','shares.send','ai.use']) c(cap) where app.has_capability(c.cap)`).map((r) => r.cap as string),
+    (await tx`select c.cap from unnest(array['contacts.read_all','contacts.write','contacts.write_all','contacts.delete','properties.write','properties.write_all','properties.delete','members.manage','org.manage','brand.manage','audit.read','deals.write','tasks.write','shares.send','ai.use','posters.create']) c(cap) where app.has_capability(c.cap)`).map((r) => r.cap as string),
   );
   return { userId, orgId: row.org_id, role: row.role, fullName: row.full_name ?? "", orgName: { fr: row.name_fr, he: row.name_he, en: row.name_en }, orgSlug: row.slug, locale, caps: new Set(caps) };
 });

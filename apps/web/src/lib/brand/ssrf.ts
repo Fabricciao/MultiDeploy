@@ -18,18 +18,22 @@ export function isPrivateIp(ip: string): boolean {
   return a === 0 || a === 10 || a === 127 || (a === 100 && b >= 64 && b <= 127) || (a === 169 && b === 254) || (a === 172 && b >= 16 && b <= 31) || (a === 192 && b === 168) || (a === 192 && b === 0) || (a === 198 && (b === 18 || b === 19)) || a >= 224;
 }
 
-const allowPrivate = () => process.env.NODE_ENV !== "production" && process.env.BRAND_FETCH_ALLOW_PRIVATE === "1";
+/** Mode test (hors production uniquement) : autorise SEULEMENT le loopback ; métadonnées cloud, réseaux privés et link-local restent bloqués. */
+const allowLoopback = () => process.env.NODE_ENV !== "production" && process.env.BRAND_FETCH_ALLOW_PRIVATE === "1";
+const isLoopback = (ip: string) => ip === "::1" || ip.startsWith("127.");
 
 export async function assertPublicUrl(raw: string): Promise<URL> {
   let u: URL;
   try { u = new URL(raw); } catch { throw new FetchError("invalid_url"); }
   if (u.protocol !== "http:" && u.protocol !== "https:") throw new FetchError("invalid_url");
   if (u.username || u.password) throw new FetchError("invalid_url");
-  if (u.port && !["80", "443", ...(allowPrivate() ? [u.port] : [])].includes(u.port)) throw new FetchError("blocked");
   const host = u.hostname.replace(/^\[|\]$/g, "");
-  if (host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) { if (!allowPrivate()) throw new FetchError("blocked"); }
+  const loopLiteral = allowLoopback() && (host === "localhost" || (isIP(host) !== 0 && isLoopback(host)));
+  if (u.port && !["80", "443"].includes(u.port) && !loopLiteral) throw new FetchError("blocked"); // avant toute résolution DNS
+  if ((host === "localhost" || host.endsWith(".local") || host.endsWith(".internal")) && !loopLiteral) throw new FetchError("blocked");
   const addrs = isIP(host) ? [{ address: host }] : await lookup(host, { all: true }).catch(() => { throw new FetchError("failed"); });
-  if (!allowPrivate() && addrs.some((a) => isPrivateIp(a.address))) throw new FetchError("blocked");
+  const loop = allowLoopback() && addrs.every((a) => isLoopback(a.address));
+  if (!loop && addrs.some((a) => isPrivateIp(a.address))) throw new FetchError("blocked");
   return u;
 }
 

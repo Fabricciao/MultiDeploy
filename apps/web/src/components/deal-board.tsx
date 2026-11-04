@@ -15,7 +15,9 @@ export function DealBoard({ stages, deals, canMove }: { stages: BoardStage[]; de
   const [optimistic, setOptimistic] = useOptimistic(deals, (state, m: { id: string; stageId: string }) => state.map((d) => (d.id === m.id ? { ...d, stageId: m.stageId } : d)));
   const [over, setOver] = useState<string | null>(null);
   const [error, setError] = useState(false);
-  const fmt = (v: number) => new Intl.NumberFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { style: "currency", currency: "ILS", maximumFractionDigits: v >= 1_000_000 ? 1 : 0, notation: v >= 1_000_000 ? "compact" : "standard" }).format(v);
+  // Formatage volontairement sans « notation: compact » : les données ICU de Node et du navigateur diffèrent (erreur d'hydratation).
+  const nf = (o: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", o);
+  const fmt = (v: number) => (v >= 1_000_000 ? `${nf({ maximumFractionDigits: 1 }).format(v / 1_000_000)} M ₪` : nf({ style: "currency", currency: "ILS", maximumFractionDigits: 0 }).format(v));
   const move = (id: string, stageId: string) => {
     const cur = optimistic.find((d) => d.id === id);
     if (!cur || cur.stageId === stageId) return;

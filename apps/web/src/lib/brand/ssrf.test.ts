@@ -35,11 +35,11 @@ describe("safeFetch + analyzeSite (serveur local, mode test autorisant le loopba
     expect(a.colors.primary).toBe("#0f766e"); expect(a.colors.accent).toBe("#d99a2b"); expect(a.fonts.latin).toBe("Rubik");
     expect(a.logo?.bytes.length).toBeGreaterThan(100); expect(a.siteName).toBe("Demo Agency");
   });
-  it("une redirection vers une IP interne est refusée (même si la 1re URL est autorisée)", async () => {
-    delete process.env.BRAND_FETCH_ALLOW_PRIVATE;
-    // en production-like : le loopback est bloqué dès la 1re requête
+  it("une redirection d'un site autorisé vers les métadonnées cloud (169.254.169.254) est refusée", async () => {
     await expect(safeFetch(`${base}/redir`, { maxBytes: 1000, types: /./ })).rejects.toMatchObject({ code: "blocked" });
-    process.env.BRAND_FETCH_ALLOW_PRIVATE = "1";
+  });
+  it("le mode test n'autorise QUE le loopback : réseaux privés et link-local restent bloqués", async () => {
+    for (const u of ["http://169.254.169.254/", "http://10.0.0.5/", "http://192.168.1.1/", "http://[fd00::1]/"]) await expect(assertPublicUrl(u)).rejects.toMatchObject({ code: "blocked" });
   });
   it("taille plafonnée", async () => { await expect(safeFetch(`${base}/big`, { maxBytes: 100_000, types: /html/ })).rejects.toMatchObject({ code: "too_large" }); });
   it("type de contenu contrôlé", async () => { await expect(safeFetch(`${base}/json`, { maxBytes: 1000, types: /html/ })).rejects.toMatchObject({ code: "bad_type" }); });
