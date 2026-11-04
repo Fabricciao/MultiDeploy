@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Pencil, Archive, Target } from "lucide-react";
+import { Pencil, Archive, Sparkles, Target } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { getProperty } from "@/lib/data/properties";
@@ -47,6 +47,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
         <Badge tone={p.status === "active" ? "ok" : p.status === "under_offer" ? "warn" : ""}><i className="dot" />{t(`status.${p.status}`)}</Badge>
         <span className="badge"><span className="ltr tab">{p.reference}</span></span>
         {days !== null && days >= 0 && days <= 30 && <Badge tone="warn">{t("mandate.expiresIn", { days })}</Badge>}
+        {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><Sparkles size={14} aria-hidden />{t("poster")}</Link>}
         {canEdit && <Link href={`/properties/${id}/edit`} className="btn"><Pencil size={14} aria-hidden />{tc("edit")}</Link>}
       </PageHeader>
 

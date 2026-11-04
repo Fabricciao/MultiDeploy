@@ -11,7 +11,7 @@ const ITEMS = [
   { key: "agenda", href: "/agenda", icon: CalendarDays, ready: false },
   { key: "marketing", href: "/marketing", icon: Megaphone, ready: false },
   { key: "reports", href: "/reports", icon: ChartNoAxesColumn, ready: false },
-  { key: "settings", href: "/settings", icon: Settings, ready: false },
+  { key: "settings", href: "/settings", icon: Settings, ready: true },
 ] as const;
 
 export function Sidebar({ orgName, userName, roleLabel, counts }: { orgName: string; userName: string; roleLabel: string; counts: { properties: number; clients: number } }) {

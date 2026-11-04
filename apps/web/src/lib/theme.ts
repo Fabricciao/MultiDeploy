@@ -30,11 +30,11 @@ export function accentStep(scale: Record<number, string>): number {
 }
 
 /** CSS à injecter côté serveur dans <head> : aucune bascule visible au chargement. */
-export function themeCss(brandHex: string, radius = 6): string {
+export function themeCss(brandHex: string, radius = 6, density: "comfortable" | "standard" | "compact" = "standard"): string {
   const scale = brandScale(brandHex);
   const step = accentStep(scale);
   const vars = STEPS.map((s) => `--brand-${s}:${scale[s]};`).join("");
-  return `:root{${vars}--accent:${scale[step]};--accent-hover:${scale[Math.min(step + 100, 950) as 950]};--accent-soft:${scale[100]};--accent-text:${scale[Math.min(step + 100, 900) as 900]};--radius:${radius}px;}`;
+  return `:root{${vars}--accent:${scale[step]};--accent-hover:${scale[Math.min(step + 100, 950) as 950]};--accent-soft:${scale[100]};--accent-text:${scale[Math.min(step + 100, 900) as 900]};--radius:${radius}px;--row-h:${{ comfortable: 40, standard: 36, compact: 30 }[density]}px;}`;
 }
 
 const HEX = /^#[0-9a-fA-F]{6}$/;

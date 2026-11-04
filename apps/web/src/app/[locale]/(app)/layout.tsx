@@ -6,6 +6,8 @@ import { DevUserSwitcher } from "@/components/dev-user-switcher";
 import { NewMenu } from "@/components/new-menu";
 import { getCtx, db } from "@/lib/session";
 import { pickName } from "@/lib/data/types";
+import { getBrandKit } from "@/lib/data/brand";
+import { themeCss } from "@/lib/theme";
 
 export const dynamic = "force-dynamic";
 
@@ -18,8 +20,10 @@ export default async function AppLayout({ children, params }: { children: React.
     const [r] = await tx`select (select count(*) from public.properties where deleted_at is null) as p, (select count(*) from public.contacts where deleted_at is null) as c`;
     return { properties: Number(r!.p), clients: Number(r!.c) };
   });
+  const brand = await getBrandKit(ctx);
   return (
     <div className="app">
+      <style dangerouslySetInnerHTML={{ __html: themeCss(brand.colors.primary, brand.style.radius, brand.style.density) }} />
       <Sidebar orgName={pickName(ctx.orgName, locale) || "—"} userName={ctx.fullName} roleLabel={t(`roles.${ctx.role}`)} counts={counts} />
       <div className="main">
         <header className="top">

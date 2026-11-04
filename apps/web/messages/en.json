@@ -306,7 +306,8 @@
       "agent": "Agent",
       "mandate": "Mandate",
       "sort": "Sort"
-    }
+    },
+    "poster": "Create a poster"
   },
   "clients": {
     "kind": {
@@ -411,6 +412,116 @@
       "limit": "25-photo limit reached",
       "failed": "processing failed",
       "none": "No valid file or insufficient rights."
+    }
+  },
+  "brand": {
+    "title": "Brand identity",
+    "sub": "Applied to the agency's interface, posters and emails.",
+    "forbidden": "Administrators only.",
+    "analyzeTitle": "Import from your website",
+    "url": "Website address",
+    "analyze": "Analyze",
+    "analyzing": "Analyzing…",
+    "analyzed": "Analysis complete: {name}",
+    "logoFound": "logo found",
+    "analyzeHint": "We read your home page (theme colour, CSS variables, fonts, logo). You can adjust everything before applying.",
+    "colors": "Colors",
+    "primary": "Primary",
+    "secondary": "Secondary",
+    "accent": "Accent",
+    "adjusted": "To stay readable (AA contrast), the interface will use {color} (contrast {ratio}:1).",
+    "radius": "Corner radius",
+    "density": "Density",
+    "densities": {
+      "comfortable": "Comfortable",
+      "standard": "Standard",
+      "compact": "Compact"
+    },
+    "logoFonts": "Logo and fonts",
+    "logo": "Logo",
+    "fontLatin": "Latin font",
+    "fontHebrew": "Hebrew font",
+    "legalContact": "Legal notice and contact",
+    "legal": "Legal notice",
+    "legalHint": "Printed on every poster (broker licence no., terms…). Have it validated by your counsel.",
+    "phone": "Phone",
+    "website": "Website",
+    "apply": "Apply brand",
+    "saved": "Brand applied.",
+    "version": "Version {v}",
+    "preview": "Live preview",
+    "previewNote": "Status colours (success, warning, error) stay fixed for readability.",
+    "sampleAgency": "Your agency",
+    "sampleButton": "New property",
+    "sampleChip": "Sale",
+    "sampleChip2": "Ra'anana",
+    "sampleRow": "Apartment {n}",
+    "sampleStatus": "Active",
+    "errors": {
+      "forbidden": "Insufficient rights.",
+      "url_required": "Enter your website address.",
+      "invalid_url": "Invalid address.",
+      "blocked": "This address is not allowed.",
+      "timeout": "The site took too long to respond.",
+      "too_large": "Page too large.",
+      "bad_type": "Not a web page.",
+      "http": "The site returned an error.",
+      "failed": "Could not read this site.",
+      "invalid_color": "Invalid colour (#rrggbb format).",
+      "logo_too_large": "Logo too large (3 MB max).",
+      "logo_invalid": "Unreadable logo."
+    }
+  },
+  "poster": {
+    "title": "Create a poster",
+    "formats": "Formats",
+    "formatsHint": "Up to 3 formats at once.",
+    "facebook": "Facebook · link",
+    "a4": "Printable A4",
+    "language": "Language",
+    "layout": "Layout",
+    "layouts": {
+      "A": "Full photo",
+      "B": "Colour band",
+      "C": "Editorial"
+    },
+    "level": "AI intervention level",
+    "levels": {
+      "faithful": "Faithful",
+      "enhanced": "Enhanced",
+      "creative": "Creative"
+    },
+    "levelsHint": {
+      "faithful": "Your photo, dressed in your brand. Instant.",
+      "enhanced": "Light, sky and sharpness retouched (with a “retouched image” notice).",
+      "creative": "Background and mood generated around your photo."
+    },
+    "providerMissing": "AI image provider not configured.",
+    "free": "Free",
+    "credits": "{n} credits",
+    "balance": "Balance: {n} credits",
+    "headline": "Headline (optional)",
+    "headlinePlaceholder": "Replaces the property title",
+    "showPrice": "Show price",
+    "showAddress": "Show street (never the number)",
+    "showContact": "Show agent contact",
+    "showQr": "QR to the property page",
+    "generate": "Generate",
+    "generating": "Generating…",
+    "result": "Generated posters",
+    "download": "Download",
+    "history": "History",
+    "historyEmpty": "No poster for this property.",
+    "noPhotoNote": "No photo: the poster will use a brand background. Add photos on the property page.",
+    "errors": {
+      "no_legal": "First fill in the agency legal notice (Settings → Brand).",
+      "forbidden": "Insufficient rights.",
+      "not_found": "Property not found.",
+      "not_active": "Only active or under-offer properties can have a poster.",
+      "insufficient_credits": "Not enough AI credits.",
+      "provider_missing": "This level requires an AI image provider.",
+      "render_failed": "Rendering failed. Credits were refunded.",
+      "no_format": "Choose at least one format."
     }
   }
 }

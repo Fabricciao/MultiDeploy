@@ -4,7 +4,7 @@ import { routing } from "./i18n/routing";
 import { refreshSession } from "./lib/supabase/proxy";
 
 const intl = createIntlMiddleware(routing);
-const PUBLIC = [/^\/(fr|he|en)\/(login|design)(\/|$)/, /^\/(fr|he|en)\/p\//, /^\/(fr|he|en)\/unsubscribe\//];
+const PUBLIC = [/^\/(fr|he|en)\/(login|design)(\/|$)/, /^\/(fr|he|en)\/(p|l)\//, /^\/(fr|he|en)\/unsubscribe\//];
 
 export default async function proxy(req: NextRequest) {
   const res = intl(req);

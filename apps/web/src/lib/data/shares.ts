@@ -106,3 +106,19 @@ export async function unsubscribeByToken(token: string) {
   if (rows[0]) await sql`insert into public.activities (organization_id, kind, contact_id, summary) values (${rows[0].organization_id}, 'system', ${rows[0].id}, 'unsubscribed')`;
   return rows.length > 0;
 }
+
+/** Page publique d'un bien (lien du QR des affiches) : uniquement les biens actifs, champs publics. */
+export async function getPublicListing(token: string) {
+  if (!/^[0-9a-f]{24}$/.test(token)) return null;
+  const [p] = await sql`select p.id, p.organization_id, p.agent_id from public.properties p join public.organizations o on o.id = p.organization_id and o.status = 'active' where p.public_token = ${token} and p.deleted_at is null and p.status = 'active'`;
+  if (!p) return null;
+  const [m] = await sql`select o.name_fr, o.name_he, o.name_en, b.colors, ag.full_name as agent_name, ag.phone as agent_phone from public.organizations o left join public.brand_kits b on b.organization_id = o.id left join public.profiles ag on ag.id = ${p.agent_id} where o.id = ${p.organization_id}`;
+  const props = await sql`
+    select p.id, p.reference, p.price, p.currency, p.rooms, p.area_built, p.floor, p.floors_total, p.mamad, p.parking_count, p.elevator, p.sukkah_balcony, p.storage, p.ac, p.arnona_monthly, p.vaad_bayit_monthly,
+      case p.address_visibility when 'hidden' then null when 'neighborhood' then null else p.street end as street, case p.address_visibility when 'exact' then p.house_number else null end as house_number,
+      g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
+      coalesce((select jsonb_object_agg(t.locale, jsonb_build_object('title', t.title, 'description', t.description)) from public.property_translations t where t.property_id = p.id), '{}') as tr,
+      coalesce((select jsonb_agg(pm.id order by pm.is_cover desc, pm.position) from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' and pm.visibility = 'public'), '[]') as photo_ids
+    from public.properties p left join public.geo_places g on g.id = p.city_id where p.id = ${p.id}`;
+  return { share: { ...m, locale: "fr" } as Record<string, any>, props: props as unknown as Record<string, any>[], agentPhone: m?.agent_phone ? formatPhone(m.agent_phone) : null };
+}

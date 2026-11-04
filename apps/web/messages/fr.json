@@ -306,7 +306,8 @@
       "agent": "Agent",
       "mandate": "Mandat",
       "sort": "Tri"
-    }
+    },
+    "poster": "Créer une affiche"
   },
   "clients": {
     "kind": {
@@ -411,6 +412,116 @@
       "limit": "limite de 25 photos atteinte",
       "failed": "échec du traitement",
       "none": "Aucun fichier valide ou droits insuffisants."
+    }
+  },
+  "brand": {
+    "title": "Charte graphique",
+    "sub": "Appliquée à l'interface, aux affiches et aux e-mails de l'agence.",
+    "forbidden": "Réservé aux administrateurs.",
+    "analyzeTitle": "Importer depuis votre site",
+    "url": "Adresse du site",
+    "analyze": "Analyser",
+    "analyzing": "Analyse…",
+    "analyzed": "Analyse terminée : {name}",
+    "logoFound": "logo détecté",
+    "analyzeHint": "Nous lisons la page d'accueil (couleur du thème, variables CSS, polices, logo). Vous pouvez tout ajuster avant d'appliquer.",
+    "colors": "Couleurs",
+    "primary": "Primaire",
+    "secondary": "Secondaire",
+    "accent": "Accent",
+    "adjusted": "Pour rester lisible (contraste AA), l'interface utilisera {color} (contraste {ratio}:1).",
+    "radius": "Arrondi",
+    "density": "Densité",
+    "densities": {
+      "comfortable": "Confortable",
+      "standard": "Standard",
+      "compact": "Compacte"
+    },
+    "logoFonts": "Logo et polices",
+    "logo": "Logo",
+    "fontLatin": "Police latine",
+    "fontHebrew": "Police hébraïque",
+    "legalContact": "Mentions légales et contact",
+    "legal": "Mention légale",
+    "legalHint": "Apposée sur chaque affiche (n° de licence de courtier, conditions…). À faire valider par votre conseil.",
+    "phone": "Téléphone",
+    "website": "Site web",
+    "apply": "Appliquer la charte",
+    "saved": "Charte appliquée.",
+    "version": "Version {v}",
+    "preview": "Aperçu en direct",
+    "previewNote": "Les couleurs de statut (succès, alerte, erreur) restent fixes pour la lisibilité.",
+    "sampleAgency": "Votre agence",
+    "sampleButton": "Nouveau bien",
+    "sampleChip": "Vente",
+    "sampleChip2": "Raanana",
+    "sampleRow": "Appartement {n}",
+    "sampleStatus": "Actif",
+    "errors": {
+      "forbidden": "Droits insuffisants.",
+      "url_required": "Saisissez l'adresse de votre site.",
+      "invalid_url": "Adresse invalide.",
+      "blocked": "Cette adresse n'est pas autorisée.",
+      "timeout": "Le site met trop de temps à répondre.",
+      "too_large": "Page trop volumineuse.",
+      "bad_type": "Ce n'est pas une page web.",
+      "http": "Le site a répondu par une erreur.",
+      "failed": "Impossible de lire ce site.",
+      "invalid_color": "Couleur invalide (format #rrggbb).",
+      "logo_too_large": "Logo trop lourd (3 Mo max).",
+      "logo_invalid": "Logo illisible."
+    }
+  },
+  "poster": {
+    "title": "Créer une affiche",
+    "formats": "Formats",
+    "formatsHint": "Jusqu'à 3 formats générés d'un coup.",
+    "facebook": "Facebook · lien",
+    "a4": "A4 imprimable",
+    "language": "Langue",
+    "layout": "Mise en page",
+    "layouts": {
+      "A": "Plein cadre",
+      "B": "Bandeau couleur",
+      "C": "Éditorial"
+    },
+    "level": "Niveau d'intervention IA",
+    "levels": {
+      "faithful": "Fidèle",
+      "enhanced": "Amélioré",
+      "creative": "Créatif"
+    },
+    "levelsHint": {
+      "faithful": "Votre photo, habillée à la charte. Instantané.",
+      "enhanced": "Lumière, ciel et netteté retouchés (mention « image retouchée »).",
+      "creative": "Fond et ambiance générés autour de votre photo."
+    },
+    "providerMissing": "Fournisseur d'images IA non configuré.",
+    "free": "Gratuit",
+    "credits": "{n} crédits",
+    "balance": "Solde : {n} crédits",
+    "headline": "Accroche (optionnelle)",
+    "headlinePlaceholder": "Remplace le titre du bien",
+    "showPrice": "Afficher le prix",
+    "showAddress": "Afficher la rue (jamais le numéro)",
+    "showContact": "Afficher le contact de l'agent",
+    "showQr": "QR vers la page du bien",
+    "generate": "Générer",
+    "generating": "Génération…",
+    "result": "Affiches générées",
+    "download": "Télécharger",
+    "history": "Historique",
+    "historyEmpty": "Aucune affiche pour ce bien.",
+    "noPhotoNote": "Aucune photo : l'affiche utilisera un fond de marque. Ajoutez des photos sur la fiche du bien.",
+    "errors": {
+      "no_legal": "Renseignez d'abord la mention légale de l'agence (Paramètres → Charte graphique).",
+      "forbidden": "Droits insuffisants.",
+      "not_found": "Bien introuvable.",
+      "not_active": "Seuls les biens actifs ou sous offre peuvent avoir une affiche.",
+      "insufficient_credits": "Crédits IA insuffisants.",
+      "provider_missing": "Ce niveau nécessite un fournisseur d'images IA.",
+      "render_failed": "Le rendu a échoué. Les crédits ont été restitués.",
+      "no_format": "Choisissez au moins un format."
     }
   }
 }
