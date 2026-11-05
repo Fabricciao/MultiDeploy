@@ -546,6 +546,18 @@
       "provider_missing": "Ce niveau nécessite un fournisseur d'images IA.",
       "render_failed": "Le rendu a échoué. Les crédits ont été restitués.",
       "no_format": "Choisissez au moins un format."
+    },
+    "captionPlaceholder": "Légende (facultatif)",
+    "caption": "Légende",
+    "publishFacebook": "Publier sur Facebook",
+    "publishInstagram": "Publier sur Instagram",
+    "publishing": "Publication…",
+    "published": "Publié ✓",
+    "publishErrors": {
+      "forbidden": "Droits insuffisants.",
+      "not_found": "Affiche introuvable.",
+      "not_connected": "Service non connecté.",
+      "publish_failed": "Échec de la publication."
     }
   },
   "intake": {
@@ -612,7 +624,8 @@
       "plan": "Plan & facturation",
       "integrations": "Intégrations",
       "audit": "Journal d'audit",
-      "data": "Données"
+      "data": "Données",
+      "connections": "Connexions"
     }
   },
   "team": {
@@ -993,5 +1006,33 @@
     "visits30": "Visites (30 j)",
     "wonValue": "Valeur conclue",
     "scope": "{n} agents dans le périmètre. Les agents ne voient que ce que leurs droits permettent."
+  },
+  "connections": {
+    "title": "Connexions",
+    "sub": "Reliez WhatsApp Business, Facebook, Instagram et Google Agenda. Les identifiants sont chiffrés et jamais réaffichés.",
+    "forbidden": "Réservé aux administrateurs.",
+    "connected": "Connecté",
+    "error": "Erreur",
+    "disconnect": "Déconnecter",
+    "replace": "Remplacer",
+    "connect": "Connecter",
+    "saved": "Enregistré.",
+    "waHint": "WhatsApp Cloud API : envoi de sélections depuis votre numéro Business. Option du plan : {feature}.",
+    "planOk": "incluse",
+    "planNo": "non incluse",
+    "waTemplate": "Modèle approuvé (optionnel, requis hors fenêtre 24 h)",
+    "waLang": "Langue du modèle",
+    "waDisplay": "Libellé affiché",
+    "fbHint": "Publier les affiches sur la page Facebook de l'agence.",
+    "igHint": "Publier les affiches sur le compte Instagram professionnel (l'image doit être en JPEG public).",
+    "gHint": "Ajoute vos visites à votre Google Agenda personnel.",
+    "gNotConfigured": "Google n'est pas configuré sur cette installation.",
+    "googleOk": "Google Agenda connecté.",
+    "googleFail": "Connexion Google échouée.",
+    "errors": {
+      "no_key": "Clé de chiffrement absente : configurez INTEGRATIONS_KEY avant de connecter un service.",
+      "forbidden": "Droits insuffisants.",
+      "invalid": "Identifiants invalides."
+    }
   }
 }

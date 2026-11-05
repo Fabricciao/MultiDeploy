@@ -95,12 +95,16 @@ select public.purge_trash() as purged \gset
 select tests.assert(:purged >= 1 and not exists (select 1 from public.contacts where id = '00000000-0000-0000-0000-0000000d0001') and exists (select 1 from public.contacts where id = '00000000-0000-0000-0000-0000000d0002'), 'corbeille : purge > 30 j, garde les récents');
 begin;
 select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
+insert into public.activities (organization_id, kind, contact_id, summary, payload) values (:'org_a', 'whatsapp', '00000000-0000-0000-0000-00000000a001', 'Bonjour je cherche un 4 pièces', '{"wa_id":"x1"}');
 select public.anonymize_contact('00000000-0000-0000-0000-00000000a001');
+select tests.assert((select summary is null and payload is null from public.activities where kind = 'whatsapp' and contact_id = '00000000-0000-0000-0000-00000000a001' limit 1), 'effacement : messages WhatsApp entrants purgés');
 select tests.assert((select first_name is null and phones = '[]'::jsonb and do_not_contact and notes is null from public.contacts where id = '00000000-0000-0000-0000-00000000a001') is not false, 'effacement : données personnelles supprimées');
 rollback;
 begin;
 select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
 select tests.throws($$select public.anonymize_contact('00000000-0000-0000-0000-00000000a001')$$, 'effacement : impossible sur le contact d''une autre agence');
+select app.scrub_contact_activities('00000000-0000-0000-0000-00000000a001');
+select tests.assert((select count(*) from public.activities where contact_id = '00000000-0000-0000-0000-00000000a001') = 0, 'effacement : le nettoyage direct ne touche pas une autre agence');
 rollback;
 select tests.assert(app.org_feature(:'org_a', 'api') = false and app.org_feature(:'org_t', 'custom_domain') = false, 'fonctionnalités par plan : starter sans API');
 update public.organizations set plan = 'agency_plus' where id = :'org_a';

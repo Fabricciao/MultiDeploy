@@ -546,6 +546,18 @@
       "provider_missing": "רמה זו דורשת ספק תמונות AI.",
       "render_failed": "היצירה נכשלה. הקרדיטים הוחזרו.",
       "no_format": "בחרו לפחות פורמט אחד."
+    },
+    "captionPlaceholder": "כיתוב (אופציונלי)",
+    "caption": "כיתוב",
+    "publishFacebook": "פרסום בפייסבוק",
+    "publishInstagram": "פרסום באינסטגרם",
+    "publishing": "מפרסם…",
+    "published": "פורסם ✓",
+    "publishErrors": {
+      "forbidden": "אין הרשאה.",
+      "not_found": "המודעה לא נמצאה.",
+      "not_connected": "השירות לא מחובר.",
+      "publish_failed": "הפרסום נכשל."
     }
   },
   "intake": {
@@ -612,7 +624,8 @@
       "plan": "תוכנית וחיוב",
       "integrations": "אינטגרציות",
       "audit": "יומן ביקורת",
-      "data": "נתונים"
+      "data": "נתונים",
+      "connections": "חיבורים"
     }
   },
   "team": {
@@ -993,5 +1006,33 @@
     "visits30": "ביקורים (30 ימים)",
     "wonValue": "ערך שנסגר",
     "scope": "{n} סוכנים בטווח. סוכנים רואים רק מה שהרשאותיהם מאפשרות."
+  },
+  "connections": {
+    "title": "חיבורים",
+    "sub": "חברו WhatsApp Business, פייסבוק, אינסטגרם ו-Google Calendar. הפרטים מוצפנים ולא יוצגו שוב.",
+    "forbidden": "למנהלים בלבד.",
+    "connected": "מחובר",
+    "error": "שגיאה",
+    "disconnect": "נתק",
+    "replace": "החלף",
+    "connect": "חבר",
+    "saved": "נשמר.",
+    "waHint": "WhatsApp Cloud API: שליחת בחירות נכסים מהמספר העסקי שלכם. אפשרות בחבילה: {feature}.",
+    "planOk": "כלולה",
+    "planNo": "לא כלולה",
+    "waTemplate": "תבנית מאושרת (אופציונלי, נדרש מחוץ לחלון 24 שעות)",
+    "waLang": "שפת התבנית",
+    "waDisplay": "שם לתצוגה",
+    "fbHint": "פרסום המודעות בדף הפייסבוק של הסוכנות.",
+    "igHint": "פרסום המודעות בחשבון האינסטגרם העסקי (התמונה חייבת להיות JPEG ציבורי).",
+    "gHint": "הוספת הביקורים ליומן Google האישי שלך.",
+    "gNotConfigured": "Google אינו מוגדר בהתקנה זו.",
+    "googleOk": "Google Calendar חובר.",
+    "googleFail": "החיבור ל-Google נכשל.",
+    "errors": {
+      "no_key": "מפתח ההצפנה חסר: הגדירו INTEGRATIONS_KEY לפני חיבור שירות.",
+      "forbidden": "אין הרשאה.",
+      "invalid": "פרטים לא תקינים."
+    }
   }
 }

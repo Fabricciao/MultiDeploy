@@ -546,6 +546,18 @@
       "provider_missing": "This level requires an AI image provider.",
       "render_failed": "Rendering failed. Credits were refunded.",
       "no_format": "Choose at least one format."
+    },
+    "captionPlaceholder": "Caption (optional)",
+    "caption": "Caption",
+    "publishFacebook": "Publish to Facebook",
+    "publishInstagram": "Publish to Instagram",
+    "publishing": "Publishing…",
+    "published": "Published ✓",
+    "publishErrors": {
+      "forbidden": "Insufficient rights.",
+      "not_found": "Poster not found.",
+      "not_connected": "Service not connected.",
+      "publish_failed": "Publishing failed."
     }
   },
   "intake": {
@@ -612,7 +624,8 @@
       "plan": "Plan & billing",
       "integrations": "Integrations",
       "audit": "Audit log",
-      "data": "Data"
+      "data": "Data",
+      "connections": "Connections"
     }
   },
   "team": {
@@ -993,5 +1006,33 @@
     "visits30": "Viewings (30 d)",
     "wonValue": "Won value",
     "scope": "{n} agents in scope. Agents only see what their rights allow."
+  },
+  "connections": {
+    "title": "Connections",
+    "sub": "Connect WhatsApp Business, Facebook, Instagram and Google Calendar. Credentials are encrypted and never shown again.",
+    "forbidden": "Administrators only.",
+    "connected": "Connected",
+    "error": "Error",
+    "disconnect": "Disconnect",
+    "replace": "Replace",
+    "connect": "Connect",
+    "saved": "Saved.",
+    "waHint": "WhatsApp Cloud API: send selections from your Business number. Plan option: {feature}.",
+    "planOk": "included",
+    "planNo": "not included",
+    "waTemplate": "Approved template (optional, required outside the 24 h window)",
+    "waLang": "Template language",
+    "waDisplay": "Display label",
+    "fbHint": "Publish posters to the agency's Facebook page.",
+    "igHint": "Publish posters to the professional Instagram account (image must be a public JPEG).",
+    "gHint": "Add your visits to your personal Google Calendar.",
+    "gNotConfigured": "Google is not configured on this installation.",
+    "googleOk": "Google Calendar connected.",
+    "googleFail": "Google connection failed.",
+    "errors": {
+      "no_key": "Encryption key missing: set INTEGRATIONS_KEY before connecting a service.",
+      "forbidden": "Insufficient rights.",
+      "invalid": "Invalid credentials."
+    }
   }
 }

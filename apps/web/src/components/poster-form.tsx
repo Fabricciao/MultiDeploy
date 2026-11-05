@@ -2,11 +2,12 @@
 import { useActionState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Download, Sparkles } from "lucide-react";
+import { PosterPublish } from "@/components/poster-publish";
 import { generatePosterAction, type PosterState } from "@/app/[locale]/(app)/properties/[id]/poster/actions";
 
 export type PosterHistory = { id: string; key: string; format: string; locale: string; level: string; width: number; height: number; when: string };
 
-export function PosterForm({ propertyId, balance, available, costs, hasLegal, hasPhoto, history }: { propertyId: string; balance: number; available: Record<string, boolean>; costs: Record<string, number>; hasLegal: boolean; hasPhoto: boolean; history: PosterHistory[] }) {
+export function PosterForm({ propertyId, balance, available, costs, hasLegal, hasPhoto, history, social = { facebook: false, instagram: false } }: { propertyId: string; balance: number; available: Record<string, boolean>; costs: Record<string, number>; hasLegal: boolean; hasPhoto: boolean; history: PosterHistory[]; social?: { facebook: boolean; instagram: boolean } }) {
   const t = useTranslations("poster");
   const locale = useLocale();
   const [state, action, pending] = useActionState<PosterState, FormData>(generatePosterAction.bind(null, propertyId), null);
@@ -44,7 +45,7 @@ export function PosterForm({ propertyId, balance, available, costs, hasLegal, ha
 
       <div className="col" style={{ gap: 16 }}>
         {ok.length > 0 && <div className="card"><h2>{t("result")}</h2><div className="card-b" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(220px,1fr))", gap: 14 }}>
-          {ok.map((r) => <div key={r.id} className="col" style={{ gap: 8 }}><img src={`/api/files/${r.key}`} alt="" style={{ width: "100%", height: "auto", borderRadius: 6, border: "1px solid var(--line)" }} /><a className="btn sm" href={`/api/files/${r.key}`} download={`affiche-${r.format}.png`}><Download size={14} aria-hidden />{t("download")} {r.format}</a></div>)}
+          {ok.map((r) => <div key={r.id} className="col" style={{ gap: 8 }}><img src={`/api/files/${r.key}`} alt="" style={{ width: "100%", height: "auto", borderRadius: 6, border: "1px solid var(--line)" }} /><a className="btn sm" href={`/api/files/${r.key}`} download={`affiche-${r.format}.png`}><Download size={14} aria-hidden />{t("download")} {r.format}</a>{social.facebook && <PosterPublish posterId={r.id} target="facebook" />}{social.instagram && <PosterPublish posterId={r.id} target="instagram" />}</div>)}
         </div></div>}
         <div className="card"><h2>{t("history")}<span className="badge">{history.length}</span></h2>
           {history.length === 0 ? <p className="muted card-b">{t("historyEmpty")}</p> : <div className="card-b" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(140px,1fr))", gap: 12 }}>
