@@ -6,7 +6,7 @@ const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 const prod = process.env.NODE_ENV === "production";
 // CSP globale (production). 'unsafe-inline' reste nécessaire pour l'hydratation de Next sans nonce ; voir docs/SECURITY.md pour le durcissement par nonce.
 const CSP = ["default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data: blob: https:", "font-src 'self' data:", "media-src 'self' blob:",
-  "connect-src 'self' https://*.supabase.co wss://*.supabase.co", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'"].join("; ");
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co", "object-src 'none'", "base-uri 'self'", "form-action 'self' https://*.supabase.co https://accounts.google.com", "frame-ancestors 'none'"].join("; ");
 
 const config: NextConfig = {
   reactStrictMode: true,
