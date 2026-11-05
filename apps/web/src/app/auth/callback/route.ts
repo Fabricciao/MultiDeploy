@@ -8,6 +8,13 @@ export async function GET(req: NextRequest) {
   const rawNext = searchParams.get("next") ?? "/fr";
   // Anti open-redirect : uniquement des chemins relatifs internes
   const next = rawNext.startsWith("/") && !rawNext.startsWith("//") ? rawNext : "/fr";
+  // Lien à usage unique (token_hash) : connexion de secours générée par l'administrateur, sans e-mail ni PKCE.
+  const tokenHash = searchParams.get("token_hash"), type = searchParams.get("type");
+  if (tokenHash && (type === "magiclink" || type === "email" || type === "invite" || type === "recovery")) {
+    const supabase = await createClient();
+    const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type });
+    if (!error) return NextResponse.redirect(`${origin}${next}`);
+  }
   if (code) {
     const supabase = await createClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
