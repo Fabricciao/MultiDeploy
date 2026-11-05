@@ -1,0 +1,5 @@
+# Sécurité — état et limites
+
+**En place (testé)** : RLS sur toutes les tables, membership revérifié en base à chaque requête, 139 assertions SQL d'isolation ; capacités par rôle ; impersonation plateforme en lecture seule ; jetons API hachés ; webhooks signés HMAC + anti-SSRF ; secrets d'intégration chiffrés AES-256-GCM (colonne jamais lisible côté client) ; liens signés à durée limitée (bon de visite, affiches) ; signature IP hachée ; limitation de débit (login, signature, API, webhook) ; réponse de connexion identique que le compte existe ou non ; effacement RGPD (contacts + messages WhatsApp) ; en-têtes CSP/HSTS/X-Frame en production (sans violation constatée sur la page de connexion).
+
+**Limites connues** : CSP avec `'unsafe-inline'` pour les scripts (durcissement par nonce possible plus tard) ; limiteurs de débit en mémoire (par instance : migrer vers Redis/Upstash si plusieurs instances) ; signature manuscrite = signature électronique « simple » ; Supabase Auth, Stripe, Meta, Google, OpenAI/Anthropic, Resend **non testés en réel** (adaptateurs vérifiés avec requêtes simulées) ; audit externe non réalisé — à faire avant la vente à des tiers.

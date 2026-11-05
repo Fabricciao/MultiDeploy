@@ -1,0 +1,3 @@
+# Modèles juridiques — À FAIRE VALIDER PAR UN AVOCAT (droit israélien + RGPD le cas échéant)
+
+Brouillons de structure uniquement, sans valeur juridique. Points à couvrir : CGU/contrat SaaS (durée, SLA, responsabilité, résiliation, export des données), politique de confidentialité, accord de traitement (DPA : l'agence est responsable de traitement, MultiDeploy sous-traitant ; sous-traitants ultérieurs : Supabase, Vercel, Resend, fournisseurs IA, Meta, Stripe), registre des traitements, loi israélienne sur la protection de la vie privée (Amendement 13) et obligations des courtiers (mentions légales sur les affiches, bon de visite, commission). Le texte du bon de visite est dans `apps/web/src/lib/visit-sheet/html.ts`.
