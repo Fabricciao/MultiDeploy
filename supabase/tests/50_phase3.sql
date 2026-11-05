@@ -152,3 +152,21 @@ select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
 select tests.assert((select count(*) from public.webhook_deliveries) = 0, 'livraisons : invisibles pour une autre agence');
 rollback;
 \echo '=== LIVRAISONS OK ==='
+
+-- ---------- connexions externes : secrets chiffrés inaccessibles au client ----------
+insert into public.org_integrations (organization_id, provider, config_enc, public_meta) values (:'org_a', 'whatsapp', 'v1.fake.fake.fake', '{"phone_number_id":"123"}');
+begin;
+select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
+select tests.throws($$select config_enc from public.org_integrations$$, 'le client ne peut pas lire la colonne chiffrée (config_enc)');
+select tests.assert((select count(*) from public.org_integrations_meta) = 1, 'métadonnées non secrètes lisibles par l''admin');
+select tests.throws($$update public.org_integrations set status = 'error'$$, 'aucune écriture directe par le client');
+rollback;
+begin;
+select tests.login('a0000000-0000-0000-0000-000000000002', :'org_a');
+select tests.assert((select count(*) from public.org_integrations_meta) = 0, 'un agent ne voit pas les connexions de l''agence');
+rollback;
+begin;
+select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
+select tests.assert((select count(*) from public.org_integrations_meta) = 0, 'autre agence : connexions invisibles');
+rollback;
+\echo '=== CONNEXIONS OK ==='

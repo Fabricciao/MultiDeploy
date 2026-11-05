@@ -156,7 +156,8 @@
     "selected": "Selected properties",
     "noneSelected": "No active property selected. Go back to the list and tick properties.",
     "recipient": "Recipient",
-    "searchClient": "Find a client…"
+    "searchClient": "Find a client…",
+    "whatsappApi": "WhatsApp (API)"
   },
   "form": {
     "errors": {

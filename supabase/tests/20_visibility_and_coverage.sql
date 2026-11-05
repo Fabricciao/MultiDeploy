@@ -84,14 +84,14 @@ select tests.assert(not exists (
 select tests.assert(not exists (
   select 1 from information_schema.tables t
   where t.table_schema='public' and t.table_type='BASE TABLE'
-    and t.table_name not in ('organizations','profiles','platform_admins','geo_places','plans','billing_events','webhook_deliveries')
+    and t.table_name not in ('organizations','profiles','platform_admins','geo_places','plans','billing_events','webhook_deliveries','user_integrations')
     and not exists (select 1 from information_schema.columns c
       where c.table_schema='public' and c.table_name=t.table_name and c.column_name='organization_id')
     and t.table_name <> 'contact_shares'),
   'toute table métier porte organization_id');
 select tests.assert(not exists (
   select 1 from information_schema.columns c
-  where c.table_schema='public' and c.column_name='organization_id' and c.is_nullable='YES'
+  where c.table_schema='public' and c.column_name='organization_id' and c.is_nullable='YES' and c.table_name in (select table_name from information_schema.tables where table_schema='public' and table_type='BASE TABLE')
     and c.table_name not in ('role_capabilities','audit_log','platform_audit_log')),
   'organization_id est NOT NULL partout (sauf défauts globaux et audit)');
 select tests.assert(not has_table_privilege('anon','public.contacts','select'), 'anon sans privilège sur contacts');

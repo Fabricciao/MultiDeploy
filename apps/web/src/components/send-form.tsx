@@ -8,7 +8,7 @@ import { Ring } from "@/components/ui";
 export type SendItem = { id: string; label: string; sub: string; score: number; warn?: string };
 
 /** Envoi d'une sélection. mode=property : un bien → plusieurs clients ; mode=contact : un client → plusieurs biens. */
-export function SendForm({ mode, fixedId, items }: { mode: "property" | "contact"; fixedId: string; items: SendItem[] }) {
+export function SendForm({ mode, fixedId, items, waApi = false }: { mode: "property" | "contact"; fixedId: string; items: SendItem[]; waApi?: boolean }) {
   const t = useTranslations("send");
   const locale = useLocale();
   const [state, action, pending] = useActionState<SendState, FormData>(sendSelection, null);
@@ -38,6 +38,7 @@ export function SendForm({ mode, fixedId, items }: { mode: "property" | "contact
           <div className="seg" style={{ display: "flex" }}>
             <label className="grow" style={{ cursor: "pointer" }}><input type="radio" name="channel" value="email" defaultChecked hidden className="peer" /><span className="seg-opt"><Mail size={14} aria-hidden />{t("email")}</span></label>
             <label className="grow" style={{ cursor: "pointer" }}><input type="radio" name="channel" value="whatsapp_link" hidden className="peer" /><span className="seg-opt"><MessageCircle size={14} aria-hidden />WhatsApp</span></label>
+            {waApi && <label className="grow" style={{ cursor: "pointer" }}><input type="radio" name="channel" value="whatsapp_api" hidden className="peer" /><span className="seg-opt"><MessageCircle size={14} aria-hidden />{t("whatsappApi")}</span></label>}
           </div>
           <textarea name="message" className="input" placeholder={t("messagePlaceholder")} maxLength={600} />
           <button className="btn pri" disabled={pending}><Send size={15} aria-hidden />{pending ? t("sending") : t("send")}</button>

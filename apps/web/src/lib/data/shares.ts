@@ -4,8 +4,10 @@ import { sql } from "../db";
 import { sendEmail } from "../email";
 import { renderShareEmail, type EmailLocale } from "../email-templates";
 import { formatPhone } from "../phone";
+import { getConnectionConfig, type WhatsAppCfg } from "./connections";
+import { sendWhatsAppTemplate, sendWhatsAppText } from "../integrations/meta";
 
-export type ShareChannel = "email" | "whatsapp_link";
+export type ShareChannel = "email" | "whatsapp_link" | "whatsapp_api";
 export type ShareResult = { contactId: string; status: "sent" | "dry_run" | "failed" | "blocked_consent" | "blocked_no_contact_info" | "link"; waUrl?: string; error?: string };
 
 const loc = (l: string): EmailLocale => (l === "he" || l === "en" ? l : "fr");
@@ -32,7 +34,7 @@ export async function sendShares(ctx: Ctx, input: { contactIds: string[]; proper
       const email = (c.emails as { email?: string }[])[0]?.email;
       const phone = (c.phones as { e164?: string }[])[0]?.e164;
       if (c.do_not_contact || (input.channel === "email" && !consent)) { out.push({ contact: c, shareId: null, token: null, result: { contactId: c.id, status: "blocked_consent" } }); continue; }
-      if ((input.channel === "email" && !email) || (input.channel === "whatsapp_link" && !phone)) { out.push({ contact: c, shareId: null, token: null, result: { contactId: c.id, status: "blocked_no_contact_info" } }); continue; }
+      if ((input.channel === "email" && !email) || ((input.channel === "whatsapp_link" || input.channel === "whatsapp_api") && !phone)) { out.push({ contact: c, shareId: null, token: null, result: { contactId: c.id, status: "blocked_no_contact_info" } }); continue; }
       const l = loc(c.preferred_locale);
       const [s] = await tx`insert into public.shares (organization_id, contact_id, sender_id, channel, property_ids, locale, message, status)
         values (${ctx.orgId}, ${c.id}, ${ctx.userId}, ${input.channel}, ${props.map((p) => p.id)}::uuid[], ${l}, ${input.message ?? null}, 'queued') returning id, token`;
@@ -62,6 +64,16 @@ export async function sendShares(ctx: Ctx, input: { contactIds: string[]; proper
       const to = (c.emails as { email: string }[])[0]!.email;
       const r = await sendEmail({ to, ...mail });
       status = r.status; providerId = r.providerId; error = r.error;
+    } else if (input.channel === "whatsapp_api") {
+      const cfg = await getConnectionConfig<WhatsAppCfg>(ctx.orgId, "whatsapp");
+      const to = (c.phones as { e164: string }[])[0]!.e164;
+      if (!cfg || !ctx.features.has("whatsapp_api")) { status = "failed"; error = "whatsapp_not_connected"; }
+      else try {
+        const hello = l === "he" ? `שלום ${nameOf(c, l)}, ` : l === "en" ? `Hello ${nameOf(c, l)}, ` : `Bonjour ${nameOf(c, l)}, `;
+        if (cfg.template) await sendWhatsAppTemplate(cfg, to, cfg.template, cfg.lang ?? l, [nameOf(c, l), selectionUrl]);
+        else await sendWhatsAppText(cfg, to, `${hello}${input.message?.trim() || (l === "he" ? "הנה בחירת נכסים עבורך:" : l === "en" ? "here is a selection for you:" : "voici une sélection pour vous :")} ${selectionUrl}`);
+        status = "sent";
+      } catch (e) { status = "failed"; error = (e as Error).message?.slice(0, 200); }
     } else {
       const digits = ((c.phones as { e164: string }[])[0]!.e164).replace(/\D/g, "");
       const hello = l === "he" ? `שלום ${nameOf(c, l)}, ` : l === "en" ? `Hello ${nameOf(c, l)}, ` : `Bonjour ${nameOf(c, l)}, `;

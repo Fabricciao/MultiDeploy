@@ -10,6 +10,7 @@ import { dateShort, dateTime, initials, money, num } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
+import { hasWhatsApp } from "@/lib/data/connections";
 import { addNoteAction, addTaskAction, anonymizeAction, openDealAction, toggleTaskAction } from "../actions";
 
 export default async function ClientPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -72,7 +73,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
           </div></div>
 
           <div className="card"><h2><Target size={15} aria-hidden />{ts("matchingProperties")}<span className="badge acc">{items.length}</span></h2>
-            <SendForm mode="contact" fixedId={id} items={items} /></div>
+            <SendForm mode="contact" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /></div>
 
           <div className="card"><h2>{t("shares")}</h2><div className="card-b col" style={{ gap: 8 }}>
             {data.shares.length === 0 ? <p className="muted">{t("noShares")}</p> : data.shares.map((s) => (

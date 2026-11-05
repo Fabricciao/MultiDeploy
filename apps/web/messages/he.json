@@ -156,7 +156,8 @@
     "selected": "נכסים שנבחרו",
     "noneSelected": "לא נבחרו נכסים פעילים. חזרו לרשימה וסמנו נכסים.",
     "recipient": "נמען",
-    "searchClient": "חיפוש לקוח…"
+    "searchClient": "חיפוש לקוח…",
+    "whatsappApi": "WhatsApp (API)"
   },
   "form": {
     "errors": {

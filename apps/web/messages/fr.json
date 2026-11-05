@@ -156,7 +156,8 @@
     "selected": "Biens sélectionnés",
     "noneSelected": "Aucun bien actif sélectionné. Retournez à la liste et cochez des biens.",
     "recipient": "Destinataire",
-    "searchClient": "Chercher un client…"
+    "searchClient": "Chercher un client…",
+    "whatsappApi": "WhatsApp (API)"
   },
   "form": {
     "errors": {

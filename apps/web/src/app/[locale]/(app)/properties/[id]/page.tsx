@@ -10,6 +10,7 @@ import { dateTime, initials, money, num, relDays } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader, Photo } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
+import { hasWhatsApp } from "@/lib/data/connections";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { listMedia } from "@/lib/data/media";
 import { archivePropertyAction } from "../actions";
@@ -84,7 +85,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
           </div></div>
 
           <div className="card"><h2><Target size={15} aria-hidden />{ts("matchingClients")}<span className="badge acc">{items.length}</span></h2>
-            {p.status === "active" ? <SendForm mode="property" fixedId={id} items={items} /> : <p className="muted card-b">{ts("onlyActive")}</p>}
+            {p.status === "active" ? <SendForm mode="property" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /> : <p className="muted card-b">{ts("onlyActive")}</p>}
           </div>
 
           {data.visits.length > 0 && <div className="card"><h2>{t("visits")}</h2><div className="card-b col" style={{ gap: 8 }}>{data.visits.map((v) => <div key={v.id} className="row"><span className="grow">{dateTime(locale, v.starts_at)}</span><span className="note">{v.first_name ?? ""} {v.last_name ?? ""}</span></div>)}</div></div>}

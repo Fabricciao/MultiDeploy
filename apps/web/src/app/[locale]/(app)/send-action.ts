@@ -14,7 +14,7 @@ export async function sendSelection(_prev: SendState, fd: FormData): Promise<Sen
   if (!ctx.caps.has("shares.send")) return { error: "forbidden" };
   const contactIds = fd.getAll("contact").map(String).filter((x) => uuid.test(x)).slice(0, 30);
   const propertyIds = fd.getAll("property").map(String).filter((x) => uuid.test(x)).slice(0, 10);
-  const channel = fd.get("channel") === "whatsapp_link" ? "whatsapp_link" : "email";
+  const channel = fd.get("channel") === "whatsapp_link" ? "whatsapp_link" : fd.get("channel") === "whatsapp_api" ? "whatsapp_api" : "email";
   const message = String(fd.get("message") ?? "").trim().slice(0, 600) || undefined;
   if (!contactIds.length || !propertyIds.length) return { error: "nothing_selected" };
   const h = await headers();
