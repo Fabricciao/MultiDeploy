@@ -1,0 +1,31 @@
+# Application + rendu + tâches planifiées. Supabase (base, auth, stockage) est déployé à part (voir docs/DEPLOY-VPS.md).
+# Les variables viennent du fichier d'environnement du panneau (Dokploy / Coolify) ou de deploy/.env.
+services:
+  web:
+    build: { context: .., dockerfile: apps/web/Dockerfile, args: { NEXT_PUBLIC_SUPABASE_URL: "${NEXT_PUBLIC_SUPABASE_URL}", NEXT_PUBLIC_SUPABASE_ANON_KEY: "${NEXT_PUBLIC_SUPABASE_ANON_KEY}", NEXT_PUBLIC_SITE_URL: "${NEXT_PUBLIC_SITE_URL}" } }
+    restart: unless-stopped
+    env_file: .env
+    environment: { POSTER_RENDER_URL: "http://renderer:8080/", POSTER_RENDER_TOKEN: "${RENDER_TOKEN}", BILLING_MODE: "manual" }
+    depends_on: [renderer]
+    expose: ["3000"]
+  renderer:
+    build: { context: ../apps/renderer }
+    restart: unless-stopped
+    environment: { RENDER_TOKEN: "${RENDER_TOKEN}", RENDER_CONCURRENCY: "2" }
+    mem_limit: 1g
+    expose: ["8080"]
+  cron:
+    # Tâches planifiées (crédits mensuels, purge de la corbeille, webhooks sortants) : appelle les routes protégées par CRON_SECRET.
+    image: curlimages/curl:8.10.1
+    restart: unless-stopped
+    environment: { CRON_SECRET: "${CRON_SECRET}" }
+    entrypoint: ["/bin/sh", "-c"]
+    command:
+      - |
+        n=0
+        while true; do
+          sleep 60; n=$$((n+1))
+          if [ $$((n % 5)) -eq 0 ]; then curl -fsS -H "Authorization: Bearer $$CRON_SECRET" http://web:3000/api/cron/webhooks >/dev/null || echo "cron webhooks failed"; fi
+          if [ $$((n % 1440)) -eq 0 ]; then curl -fsS -H "Authorization: Bearer $$CRON_SECRET" http://web:3000/api/cron/daily >/dev/null || echo "cron daily failed"; fi
+        done
+    depends_on: [web]

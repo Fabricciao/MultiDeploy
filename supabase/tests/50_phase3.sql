@@ -174,3 +174,16 @@ select tests.login('b0000000-0000-0000-0000-000000000001', :'org_b');
 select tests.assert((select count(*) from public.org_integrations_meta) = 0, 'autre agence : connexions invisibles');
 rollback;
 \echo '=== CONNEXIONS OK ==='
+
+-- ───── facturation manuelle : un propriétaire ne peut pas s'auto-attribuer un plan ─────
+update public.organizations set plan = 'starter', status = 'active' where id = :'org_a';
+begin;
+select tests.login('a0000000-0000-0000-0000-000000000001', :'org_a');
+select tests.throws($$update public.organizations set plan = 'pro' where id = app.org_id()$$, 'facturation : un propriétaire ne peut pas changer son plan');
+select tests.throws($$update public.organizations set paid_until = current_date + 365 where id = app.org_id()$$, 'facturation : ni son échéance');
+select tests.throws($$update public.organizations set settings = settings || '{"features":{"api":true}}' where id = app.org_id()$$, 'facturation : ni ses options de plan');
+select tests.throws($$update public.organizations set status = 'suspended' where id = app.org_id()$$, 'facturation : ni son statut');
+rollback;
+update public.organizations set plan = 'pro', paid_until = current_date + 30 where id = :'org_a';
+select tests.assert((select paid_until = current_date + 30 from public.organizations where id = :'org_a'), 'facturation : la plateforme (rôle serveur) peut fixer plan et échéance');
+select '=== FACTURATION MANUELLE OK ===' as ok;

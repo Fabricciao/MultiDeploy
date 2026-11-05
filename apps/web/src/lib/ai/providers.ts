@@ -1,5 +1,5 @@
 import "server-only";
-import { aiConfig } from "./config";
+import { aiConfig, type LlmCfg } from "./config";
 
 /** Interfaces de fournisseurs interchangeables. Les adaptateurs ci-dessous suivent les API HTTP publiques ; NON TESTÉS sans clés. */
 export type Transcript = { text: string; language?: string };
@@ -12,7 +12,7 @@ export async function transcribe(audio: Buffer, mime: string, hint?: string): Pr
   fd.append("model", c.model);
   if (hint && ["fr", "he", "en"].includes(hint)) fd.append("language", hint);
   fd.append("prompt", "Immobilier en Israël : mamad, tabou, arnona, va'ad bayit, soukka, Raanana, Kfar Saba, Herzliya, Netanya, Modiin. ממ״ד, טאבו, ארנונה, ועד בית, מרפסת סוכה."); // vocabulaire du domaine
-  const r = await fetch("https://api.openai.com/v1/audio/transcriptions", { method: "POST", headers: { Authorization: `Bearer ${c.key}` }, body: fd });
+  const r = await fetch(`${c.baseUrl}/audio/transcriptions`, { method: "POST", headers: c.key ? { Authorization: `Bearer ${c.key}` } : {}, body: fd });
   if (!r.ok) throw new Error(`stt_failed_${r.status}`);
   const j = (await r.json()) as { text?: string; language?: string };
   return { text: (j.text ?? "").trim(), language: j.language };
@@ -35,22 +35,40 @@ const SCHEMAS: Record<ExtractKind, object> = {
 };
 const SYSTEM = "Tu extrais des champs structurés d'une dictée ou d'un document manuscrit d'une agence immobilière en Israël (français, hébreu, anglais, souvent mélangés). RÈGLES : n'invente jamais — si l'information n'est pas dite, mets null ou une liste vide. Ne déduis pas un budget d'un quartier. Nombres en chiffres (« quatre millions » → 4000000). Pièces avec demi-pièces (3.5). Pour chaque champ rempli, cite dans `evidence` l'extrait exact (même langue que la source) qui le justifie.";
 
-/** Extraction structurée par LLM (Anthropic, appel d'outil forcé). `image` = base64 JPEG pour les papiers manuscrits. */
+/** Appel LLM générique : renvoie un objet JSON conforme (à vérifier ensuite par normalize). Deux protocoles : Anthropic (outil forcé) et « chat/completions » compatible OpenAI (mode JSON). */
+async function callJson(cfg: LlmCfg, system: string, user: string, schema: object, imageB64?: string): Promise<Record<string, any>> {
+  if (cfg.provider === "anthropic") {
+    const content: unknown[] = [];
+    if (imageB64) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: imageB64 } });
+    content.push({ type: "text", text: user });
+    const r = await fetch(`${cfg.baseUrl}/v1/messages`, {
+      method: "POST", headers: { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+      body: JSON.stringify({ model: cfg.model, max_tokens: 1500, system, tools: [{ name: "record_fields", description: "Enregistre les champs extraits", input_schema: schema }], tool_choice: { type: "tool", name: "record_fields" }, messages: [{ role: "user", content }] }),
+    });
+    if (!r.ok) throw new Error(`llm_failed_${r.status}`);
+    const j = (await r.json()) as { content?: { type: string; input?: Record<string, any> }[] };
+    const tool = j.content?.find((x) => x.type === "tool_use");
+    if (!tool?.input) throw new Error("llm_no_output");
+    return tool.input;
+  }
+  const userContent: unknown = imageB64 ? [{ type: "image_url", image_url: { url: `data:image/jpeg;base64,${imageB64}` } }, { type: "text", text: user }] : user;
+  const r = await fetch(`${cfg.baseUrl}/chat/completions`, {
+    method: "POST", headers: { "content-type": "application/json", ...(cfg.key ? { authorization: `Bearer ${cfg.key}` } : {}) },
+    body: JSON.stringify({ model: cfg.model, max_tokens: 1500, temperature: 0, response_format: { type: "json_object" },
+      messages: [{ role: "system", content: `${system}\n\nRéponds UNIQUEMENT par un objet JSON valide respectant ce schéma JSON :\n${JSON.stringify(schema)}` }, { role: "user", content: userContent }] }),
+  });
+  if (!r.ok) throw new Error(`llm_failed_${r.status}`);
+  const j = (await r.json()) as { choices?: { message?: { content?: string } }[] };
+  const txt = j.choices?.[0]?.message?.content ?? "";
+  try { const o = JSON.parse(txt.replace(/^```(?:json)?\s*|\s*```$/g, "").trim()); if (o && typeof o === "object" && !Array.isArray(o)) return o; } catch { /* ci-dessous */ }
+  throw new Error("llm_no_output");
+}
+
+/** Extraction structurée par LLM. `image` = base64 JPEG pour les papiers manuscrits. */
 export async function llmExtract(kind: ExtractKind, input: { text?: string; imageB64?: string }): Promise<Record<string, any>> {
   const cfg = input.imageB64 ? aiConfig().vision : aiConfig().extract;
   if (!cfg) throw new Error("llm_not_configured");
-  const content: unknown[] = [];
-  if (input.imageB64) content.push({ type: "image", source: { type: "base64", media_type: "image/jpeg", data: input.imageB64 } });
-  content.push({ type: "text", text: input.text ? `Texte à analyser :\n"""${input.text.slice(0, 8000)}"""` : "Analyse le document ci-joint." });
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST", headers: { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: cfg.model, max_tokens: 1500, system: SYSTEM, tools: [{ name: "record_fields", description: "Enregistre les champs extraits", input_schema: SCHEMAS[kind] }], tool_choice: { type: "tool", name: "record_fields" }, messages: [{ role: "user", content }] }),
-  });
-  if (!r.ok) throw new Error(`llm_failed_${r.status}`);
-  const j = (await r.json()) as { content?: { type: string; input?: Record<string, any> }[] };
-  const tool = j.content?.find((b) => b.type === "tool_use");
-  if (!tool?.input) throw new Error("llm_no_output");
-  return tool.input;
+  return callJson(cfg, SYSTEM, input.text ? `Texte à analyser :\n"""${input.text.slice(0, 8000)}"""` : "Analyse le document ci-joint.", SCHEMAS[kind], input.imageB64);
 }
 
 /** Retouche d'une photo (niveau « amélioré »). */
@@ -68,20 +86,14 @@ export async function enhancePhoto(photo: Buffer, prompt: string): Promise<Buffe
   return Buffer.from(b64, "base64");
 }
 
-/** Traduction d'une annonce (Anthropic). Ne renvoie que le texte traduit ; chiffres, noms propres et unités sont conservés. NON TESTÉ sans clé. */
+/** Traduction d'une annonce. Chiffres, noms propres et unités sont conservés. NON TESTÉ sans clé (protocoles vérifiés avec des réponses simulées). */
 export async function llmTranslate(text: string, from: "fr" | "he" | "en", to: "fr" | "he" | "en"): Promise<string> {
   const cfg = aiConfig().extract;
   if (!cfg) throw new Error("llm_not_configured");
   const names = { fr: "français", he: "hébreu", en: "anglais" } as const;
-  const r = await fetch("https://api.anthropic.com/v1/messages", {
-    method: "POST", headers: { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
-    body: JSON.stringify({ model: cfg.model, max_tokens: 1200,
-      system: `Tu traduis des annonces immobilières d'Israël du ${names[from]} vers le ${names[to]}. RÈGLES : conserve exactement chiffres, prix, surfaces, étages et noms propres ; n'ajoute aucune information ni argument commercial absent du texte ; garde le même ordre et la même mise en forme ; réponds uniquement par la traduction, sans commentaire.`,
-      messages: [{ role: "user", content: text.slice(0, 4000) }] }),
-  });
-  if (!r.ok) throw new Error(`llm_failed_${r.status}`);
-  const j = (await r.json()) as { content?: { type: string; text?: string }[] };
-  const out = (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("").trim();
-  if (!out) throw new Error("llm_empty");
-  return out;
+  const system = `Tu traduis des annonces immobilières d'Israël du ${names[from]} vers le ${names[to]}. RÈGLES : conserve exactement chiffres, prix, surfaces, étages et noms propres ; n'ajoute aucune information ni argument commercial absent du texte ; garde le même ordre et la même mise en forme.`;
+  const schema = { type: "object", properties: { translation: { type: "string" } }, required: ["translation"] };
+  const out = (await callJson(cfg, system, text.slice(0, 4000), schema)).translation;
+  if (typeof out !== "string" || !out.trim()) throw new Error("llm_empty");
+  return out.trim();
 }

@@ -30,6 +30,11 @@ export const orgByWhatsAppNumber = async (phoneNumberId: string) => (await sql`s
 export async function hasWhatsApp(ctx: Ctx) { return ctx.features.has("whatsapp_api") && (await getConnectionConfig<WhatsAppCfg>(ctx.orgId, "whatsapp")) !== null; }
 
 import type { Tokens } from "../integrations/google";
-export async function saveGoogle(userId: string, t: Tokens) { await sql`insert into public.user_integrations (user_id, provider, config_enc) values (${userId}, 'google_calendar', ${encryptJson(t, `${userId}:google_calendar`)}) on conflict (user_id, provider) do update set config_enc = excluded.config_enc, updated_at = now()`; }
-export async function getGoogle(userId: string): Promise<Tokens | null> { const [r] = await sql`select config_enc from public.user_integrations where user_id = ${userId} and provider = 'google_calendar'`; if (!r) return null; try { return decryptJson<Tokens>(r.config_enc, `${userId}:google_calendar`); } catch { return null; } }
-export const removeGoogle = (userId: string) => sql`delete from public.user_integrations where user_id = ${userId} and provider = 'google_calendar'`;
+export type UserProvider = "google_calendar" | "gmail";
+export async function saveUserTokens(userId: string, provider: UserProvider, t: Tokens) { await sql`insert into public.user_integrations (user_id, provider, config_enc) values (${userId}, ${provider}, ${encryptJson(t, `${userId}:${provider}`)}) on conflict (user_id, provider) do update set config_enc = excluded.config_enc, updated_at = now()`; }
+export async function getUserTokens(userId: string, provider: UserProvider): Promise<Tokens | null> { const [r] = await sql`select config_enc from public.user_integrations where user_id = ${userId} and provider = ${provider}`; if (!r) return null; try { return decryptJson<Tokens>(r.config_enc, `${userId}:${provider}`); } catch { return null; } }
+export const removeUserTokens = (userId: string, provider: UserProvider) => sql`delete from public.user_integrations where user_id = ${userId} and provider = ${provider}`;
+// compatibilité (agenda)
+export const saveGoogle = (userId: string, t: Tokens) => saveUserTokens(userId, "google_calendar", t);
+export const getGoogle = (userId: string) => getUserTokens(userId, "google_calendar");
+export const removeGoogle = (userId: string) => removeUserTokens(userId, "google_calendar");

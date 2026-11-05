@@ -22,7 +22,9 @@ export async function listOrgs() {
       app.org_limit(o.id, 'storage_mb') as storage_limit_mb,
       coalesce((select sum(l.delta) from public.ai_credit_ledger l where l.organization_id = o.id), 0)::float as credits,
       (select max(a.at) from public.audit_log a where a.organization_id = o.id) as last_activity,
-      s.status as sub_status
+      s.status as sub_status, o.paid_until, o.billing_note,
+      (select u.email from public.memberships m join auth.users u on u.id = m.user_id where m.organization_id = o.id and m.role = 'owner' and m.status = 'active' order by m.created_at limit 1) as owner_email,
+      (select coalesce(jsonb_object_agg(role, n), '{}'::jsonb) from (select role, count(*)::int n from public.memberships m where m.organization_id = o.id and m.status = 'active' group by role) r) as roles
     from public.organizations o left join public.subscriptions s on s.organization_id = o.id order by o.created_at desc`) as unknown as Record<string, any>[];
 }
 
@@ -84,5 +86,13 @@ export async function purgeAgency(adminId: string, id: string, confirmSlug: stri
   await sql`select public.purge_organization(${id}::uuid, ${adminId}::uuid)`;
   for (const f of files) { await storage.remove(f.storage_path); if (f.thumb_path) await storage.remove(f.thumb_path); }
   for (const p of posters) await storage.remove(p.output_path);
+  return true;
+}
+
+/** Facturation manuelle : échéance + note interne (visible de l'agence en lecture seule). */
+export async function setBilling(adminId: string, id: string, paidUntil: string | null, note: string | null): Promise<boolean> {
+  if (paidUntil !== null && !/^\d{4}-\d{2}-\d{2}$/.test(paidUntil)) return false;
+  await sql`update public.organizations set paid_until = ${paidUntil}, billing_note = ${note} where id = ${id}`;
+  await audit(adminId, "set_billing", id, { paid_until: paidUntil, note });
   return true;
 }

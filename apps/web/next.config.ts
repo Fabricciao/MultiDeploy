@@ -1,5 +1,6 @@
 import createNextIntlPlugin from "next-intl/plugin";
 import type { NextConfig } from "next";
+import { join } from "node:path";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
@@ -10,6 +11,9 @@ const CSP = ["default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-s
 
 const config: NextConfig = {
   reactStrictMode: true,
+  // Sortie autonome pour l'image Docker (auto-hébergement) ; sans effet sur Vercel.
+  output: "standalone",
+  outputFileTracingRoot: join(process.cwd(), "..", ".."),
   poweredByHeader: false,
   serverExternalPackages: ["sharp", "playwright-core"],
   experimental: { serverActions: { bodySizeLimit: "40mb" } },

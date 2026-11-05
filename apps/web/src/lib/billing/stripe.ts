@@ -48,7 +48,8 @@ export async function applyStripeEvent(evt: { id: string; type: string; data: { 
 }
 
 const form = (o: Record<string, string>) => new URLSearchParams(o).toString();
-export const stripeConfigured = () => !!process.env.STRIPE_SECRET_KEY;
+/** Stripe n'est actif que si BILLING_MODE=stripe (par défaut : facturation manuelle, l'agence ne paie pas dans le CRM). */
+export const stripeConfigured = () => process.env.BILLING_MODE === "stripe" && !!process.env.STRIPE_SECRET_KEY;
 
 export async function createCheckout(i: { orgId: string; plan: string; email: string; successUrl: string; cancelUrl: string; customerId?: string | null }): Promise<string> {
   const price = Object.entries(priceToPlan()).find(([, plan]) => plan === i.plan)?.[0];

@@ -2,7 +2,7 @@
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCtx } from "@/lib/session";
-import { removeConnection, removeGoogle, saveConnection, type Provider } from "@/lib/data/connections";
+import { removeConnection, removeUserTokens, saveConnection, type Provider } from "@/lib/data/connections";
 
 const loc = (fd: FormData) => (["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr");
 const s = (fd: FormData, k: string, max = 600) => String(fd.get(k) ?? "").trim().slice(0, max);
@@ -36,6 +36,6 @@ export async function removeConnectionAction(provider: Provider, fd: FormData) {
 }
 export async function removeGoogleAction(fd: FormData) {
   const locale = loc(fd); const ctx = await getCtx(locale);
-  if (!ctx.impersonating) await removeGoogle(ctx.userId);
+  if (!ctx.impersonating) await removeUserTokens(ctx.userId, fd.get("service") === "gmail" ? "gmail" : "google_calendar");
   revalidatePath(`/${locale}/settings/connections`); back(locale, "ok=1");
 }

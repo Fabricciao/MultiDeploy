@@ -3,7 +3,7 @@ import { db, type Ctx } from "../session";
 import { sql } from "../db";
 
 export async function getPlanOverview(ctx: Ctx) {
-  const [org] = await sql`select o.plan, p.name, p.seats, p.storage_mb, p.ai_credits_monthly, p.features, s.status as sub_status, s.provider, s.customer_id, s.current_period_end, s.cancel_at_period_end,
+  const [org] = await sql`select o.plan, o.paid_until, o.billing_note, p.name, p.seats, p.storage_mb, p.ai_credits_monthly, p.features, s.status as sub_status, s.provider, s.customer_id, s.current_period_end, s.cancel_at_period_end,
       app.org_limit(o.id, 'seats') as seat_limit, app.org_limit(o.id, 'storage_mb') as storage_limit
     from public.organizations o join public.plans p on p.key = o.plan left join public.subscriptions s on s.organization_id = o.id where o.id = ${ctx.orgId}`;
   const [u] = await sql`select (select count(*) from public.memberships where organization_id = ${ctx.orgId} and status = 'active')::int as seats,

@@ -3,6 +3,7 @@ import { Check, X } from "lucide-react";
 import { getCtx } from "@/lib/session";
 import { getPlanOverview } from "@/lib/data/plan";
 import { stripeConfigured } from "@/lib/billing/stripe";
+import { billingState } from "@/lib/billing/state";
 import { pickName } from "@/lib/data/types";
 import { dateShort, num } from "@/lib/format";
 import { Badge, PageHeader } from "@/components/ui";
@@ -18,6 +19,8 @@ export default async function PlanPage({ params, searchParams }: { params: Promi
   if (!ctx.caps.has("billing.manage")) return (<><PageHeader title={t("title")} /><SettingsNav active="plan" caps={[...ctx.caps]} /><p className="muted">{t("forbidden")}</p></>);
   const { org, usage, plans } = await getPlanOverview(ctx);
   const bar = (v: number, max: number) => <div className="bar" style={{ marginTop: 6 }}><i style={{ width: `${Math.min(100, (v / Math.max(1, max)) * 100)}%`, background: v / max > 0.9 ? "var(--warn)" : undefined }} /></div>;
+  const manual = !stripeConfigured();
+  const bs = billingState(org.plan, org.paid_until);
   const mb = Number(usage.storage_bytes) / 1048576;
   return (
     <>
@@ -29,8 +32,7 @@ export default async function PlanPage({ params, searchParams }: { params: Promi
         <div className="card card-b"><div className="note">{t("seats")}</div><div className="tab" style={{ fontSize: 22, fontWeight: 600 }}>{usage.seats} / {org.seat_limit}</div>{bar(usage.seats, org.seat_limit)}</div>
         <div className="card card-b"><div className="note">{t("storage")}</div><div className="tab" style={{ fontSize: 22, fontWeight: 600 }}>{num(locale, mb, 1)} / {org.storage_limit} MB</div>{bar(mb, org.storage_limit)}</div>
         <div className="card card-b"><div className="note">{t("credits")}</div><div className="tab" style={{ fontSize: 22, fontWeight: 600 }}>{num(locale, usage.credits, 0)}</div><div className="note">{t("monthly", { n: org.ai_credits_monthly })}</div></div>
-        <div className="card card-b"><div className="note">{t("subscription")}</div><div style={{ marginTop: 4 }}><Badge tone={org.sub_status === "active" ? "ok" : org.sub_status === "past_due" ? "bad" : "warn"}>{t(`subStatus.${org.sub_status ?? "trialing"}`)}</Badge></div>{org.current_period_end && <div className="note" style={{ marginTop: 6 }}>{t("renews", { date: dateShort(locale, org.current_period_end) })}</div>}
-          {org.customer_id && stripeConfigured() && <form action={portalAction} style={{ marginTop: 8 }}><input type="hidden" name="locale" value={locale} /><button className="btn sm">{t("manageBilling")}</button></form>}</div>
+        <div className="card card-b"><div className="note">{t("subscription")}</div><div style={{ marginTop: 4 }}>{manual ? <><Badge tone={bs === "paid" ? "ok" : bs === "overdue" ? "bad" : bs === "expiring" ? "warn" : ""}>{t(`billing.${bs}`)}</Badge>{org.paid_until && <div className="note" style={{ marginTop: 6 }}>{t("billing.until", { date: dateShort(locale, org.paid_until) })}</div>}{org.billing_note && <div className="note" style={{ marginTop: 6 }}>{org.billing_note}</div>}</> : <><Badge tone={org.sub_status === "active" ? "ok" : org.sub_status === "past_due" ? "bad" : "warn"}>{t(`subStatus.${org.sub_status ?? "none"}`)}</Badge>{org.customer_id && <form action={portalAction} style={{ marginTop: 8 }}><input type="hidden" name="locale" value={locale} /><button className="btn sm">{t("manageBilling")}</button></form>}</>}</div></div>
       </div>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 12 }}>
         {plans.filter((p) => p.key !== "trial").map((p) => (
@@ -41,10 +43,10 @@ export default async function PlanPage({ params, searchParams }: { params: Promi
               <li>{t("limitSeats", { n: p.seats })}</li><li>{t("limitStorage", { n: p.storage_mb / 1000 })}</li><li>{t("limitCredits", { n: p.ai_credits_monthly })}</li>
               {FEATURES.map((f) => <li key={f} className="row" style={{ gap: 6, opacity: p.features[f] ? 1 : 0.5 }}>{p.features[f] ? <Check size={14} color="var(--ok)" aria-hidden /> : <X size={14} aria-hidden />}{t(`features.${f}`)}</li>)}
             </ul>
-            {p.key !== org.plan && <form action={checkoutAction}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="plan" value={p.key} /><button className="btn pri" style={{ width: "100%" }}>{t("choose")}</button></form>}
+            {!manual && p.key !== org.plan && <form action={checkoutAction}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="plan" value={p.key} /><button className="btn pri" style={{ width: "100%" }}>{t("choose")}</button></form>}
           </div></div>))}
       </div>
-      {!stripeConfigured() && <p className="note" style={{ marginTop: 12 }}>{t("notConfigured")}</p>}
+      {manual && <p className="note" style={{ marginTop: 12 }}>{t("manualHint")}</p>}
     </>
   );
 }

@@ -38,7 +38,7 @@ const mock = http.createServer((req, res) => {
 
   // ── connexions ──
   await as(david); await p.goto(`${BASE}/fr/settings/connections`);
-  await p.waitForLoadState("networkidle"); ok(await p.locator("text=Réservé aux administrateurs").isVisible(), "connexions : un agent n'a pas accès");
+  await p.waitForLoadState("networkidle"); ok((await p.locator("h2:has-text('Gmail')").count()) === 1 && (await p.locator("h2:has-text('WhatsApp Business')").count()) === 0, "connexions : un agent ne voit que ses connexions personnelles (Gmail, Agenda), pas celles de l'agence");
   await as(yael); await p.goto(`${BASE}/fr/settings/connections`);
   const fill = async (card, data) => { await p.goto(`${BASE}/fr/settings/connections`); for (const [k, v] of Object.entries(data)) await p.locator(`section:has(h2:has-text("${card}")) input[name="${k}"]`).fill(v); await p.locator(`section:has(h2:has-text("${card}")) form button.pri`).click(); await p.waitForURL(/ok=1|err=/); };
   const SECRET = "EAAB-super-secret-token-123456";

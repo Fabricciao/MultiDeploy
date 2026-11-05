@@ -4,6 +4,7 @@ import { applyStripeEvent, verifyStripeSignature } from "@/lib/billing/stripe";
 export const dynamic = "force-dynamic";
 /** Webhook Stripe : corps BRUT vérifié par signature avant tout traitement ; idempotent. */
 export async function POST(req: NextRequest) {
+  if (process.env.BILLING_MODE !== "stripe") return NextResponse.json({ error: "not_found" }, { status: 404 });
   const secret = process.env.STRIPE_WEBHOOK_SECRET;
   if (!secret) return NextResponse.json({ error: "not_configured" }, { status: 503 });
   const raw = await req.text();

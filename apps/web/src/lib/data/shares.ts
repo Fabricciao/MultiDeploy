@@ -4,7 +4,8 @@ import { sql } from "../db";
 import { sendEmail } from "../email";
 import { renderShareEmail, type EmailLocale } from "../email-templates";
 import { formatPhone } from "../phone";
-import { getConnectionConfig, type WhatsAppCfg } from "./connections";
+import { getConnectionConfig, getUserTokens, saveUserTokens, type WhatsAppCfg } from "./connections";
+import { sendViaGmail } from "../integrations/gmail";
 import { sendWhatsAppTemplate, sendWhatsAppText } from "../integrations/meta";
 
 export type ShareChannel = "email" | "whatsapp_link" | "whatsapp_api";
@@ -62,8 +63,15 @@ export async function sendShares(ctx: Ctx, input: { contactIds: string[]; proper
     if (input.channel === "email") {
       const mail = renderShareEmail({ locale: l, orgName, contactName: nameOf(c, l), agentName: prepared.agent?.full_name ?? "", agentPhone: prepared.agent?.phone, message: input.message, properties, selectionUrl, unsubscribeUrl: `${siteUrl}/${l}/unsubscribe/${item.token}`, accent });
       const to = (c.emails as { email: string }[])[0]!.email;
-      const r = await sendEmail({ to, ...mail });
-      status = r.status; providerId = r.providerId; error = r.error;
+      const gm = await getUserTokens(ctx.userId, "gmail");
+      if (gm?.email) {
+        // Envoi depuis la boîte Gmail de l'agent (apparaît dans ses envois). Pas de repli silencieux sur une autre adresse : en cas d'échec, l'erreur est visible.
+        try { const g = await sendViaGmail(gm, { to, subject: mail.subject, html: mail.html, text: mail.text, fromName: prepared.agent?.full_name ?? undefined, fromEmail: gm.email, unsubscribeUrl: `${siteUrl}/${l}/unsubscribe/${item.token}` }); if (g.tokens.access_token !== gm.access_token) await saveUserTokens(ctx.userId, "gmail", g.tokens); status = "sent"; providerId = g.id; }
+        catch (e) { status = "failed"; error = (e as Error).message?.slice(0, 160); }
+      } else {
+        const r = await sendEmail({ to, ...mail });
+        status = r.status; providerId = r.providerId; error = r.error;
+      }
     } else if (input.channel === "whatsapp_api") {
       const cfg = await getConnectionConfig<WhatsAppCfg>(ctx.orgId, "whatsapp");
       const to = (c.phones as { e164: string }[])[0]!.e164;

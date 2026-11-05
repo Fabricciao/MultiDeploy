@@ -717,7 +717,16 @@
     "errors": {
       "forbidden": "Insufficient rights.",
       "billing_unavailable": "Online payment is currently unavailable."
-    }
+    },
+    "billing": {
+      "trial": "Trial period",
+      "paid": "Subscription active",
+      "expiring": "Expiring soon",
+      "overdue": "Past due",
+      "unset": "No end date set",
+      "until": "Valid until {date}"
+    },
+    "manualHint": "To change plan or renew, contact your account manager: the subscription is managed by the platform administrator."
   },
   "onboarding": {
     "title": "Get started with your agency",
@@ -767,7 +776,8 @@
       "invalid_name": "Enter at least one name.",
       "invalid_plan": "Unknown plan.",
       "invalid_amount": "Invalid amount.",
-      "confirm_mismatch": "Confirmation does not match the slug."
+      "confirm_mismatch": "Confirmation does not match the slug.",
+      "invalid_date": "Invalid date."
     },
     "ok": {
       "created": "Agency created. The owner received access.",
@@ -793,7 +803,25 @@
     "reactivate": "Reactivate agency",
     "danger": "Danger zone",
     "purgeHint": "Permanently deletes the agency, its data and files. Export first. Type “{slug}” to confirm.",
-    "purge": "Delete permanently"
+    "purge": "Delete permanently",
+    "search": "Search (name, slug, owner email)",
+    "filter": "Filter",
+    "allAgencies": "All agencies",
+    "apply": "Filter",
+    "billing": "Billing",
+    "owner": "Owner",
+    "billingTitle": "Manual billing",
+    "paidUntil": "Paid until",
+    "billingNote": "Note (visible to the agency)",
+    "billingNoteHint": "E.g. Paid by transfer on 03/11",
+    "billingHint": "No payment inside the CRM: you collect on your side, then update the end date here.",
+    "billingStates": {
+      "trial": "Trial",
+      "paid": "Up to date",
+      "expiring": "Expiring soon",
+      "overdue": "Overdue",
+      "unset": "No end date"
+    }
   },
   "support": {
     "banner": "Support mode — read-only — agency {name}",
@@ -1047,7 +1075,10 @@
       "no_key": "Encryption key missing: set INTEGRATIONS_KEY before connecting a service.",
       "forbidden": "Insufficient rights.",
       "invalid": "Invalid credentials."
-    }
+    },
+    "gmailOk": "Gmail connected: your property selections will be sent from your address.",
+    "gmailHint": "Emails to your clients are sent from your own Gmail address and appear in your Sent folder. Each agent connects their own.",
+    "gmailLimit": "Gmail limits sending (about 500 messages a day on a free account, more with Google Workspace). For large mailings, use the agency's domain."
   },
   "sign": {
     "invalid": "This link is invalid or has expired.",

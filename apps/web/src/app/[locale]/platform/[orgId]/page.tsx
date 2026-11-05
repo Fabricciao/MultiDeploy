@@ -3,6 +3,7 @@ import { getTranslations, setRequestLocale } from "next-intl/server";
 import { Eye } from "lucide-react";
 import { sql } from "@/lib/db";
 import { getOrg } from "@/lib/platform";
+import { billingState } from "@/lib/billing/state";
 import { pickName } from "@/lib/data/types";
 import { dateTime, num } from "@/lib/format";
 import { Badge, PageHeader } from "@/components/ui";
@@ -41,6 +42,11 @@ export default async function PlatformOrg({ params, searchParams }: { params: Pr
         <div className="col" style={{ gap: 16 }}>
           <form action={orgAction.bind(null, orgId)} className="card"><div className="card-b col" style={{ gap: 10 }}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="op" value="plan" />
             <div className="lbl">{t("plan")}</div><div className="row" style={{ gap: 8 }}><select name="plan" defaultValue={org.plan} className="input">{plans.map((p) => <option key={p.key} value={p.key}>{pickName(p.name, locale)}</option>)}</select><button className="btn">OK</button></div></div></form>
+          <form action={orgAction.bind(null, orgId)} className="card"><h2>{t("billingTitle")}</h2><div className="card-b col" style={{ gap: 10 }}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="op" value="billing" />
+            <div className="row" style={{ gap: 8 }}><Badge tone={(billingState(org.plan, org.paid_until) === "paid" ? "ok" : billingState(org.plan, org.paid_until) === "overdue" ? "bad" : "warn") as "ok"}>{t(`billingStates.${billingState(org.plan, org.paid_until)}`)}</Badge></div>
+            <label className="col" style={{ gap: 4 }}><span className="note">{t("paidUntil")}</span><input name="paid_until" type="date" className="input" defaultValue={org.paid_until ? new Date(org.paid_until).toISOString().slice(0, 10) : ""} /></label>
+            <label className="col" style={{ gap: 4 }}><span className="note">{t("billingNote")}</span><input name="billing_note" className="input" maxLength={300} defaultValue={org.billing_note ?? ""} placeholder={t("billingNoteHint")} /></label>
+            <button className="btn">{t("save")}</button><p className="note">{t("billingHint")}</p></div></form>
           <form action={orgAction.bind(null, orgId)} className="card"><div className="card-b col" style={{ gap: 10 }}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="op" value="credits" />
             <div className="lbl">{t("grantCredits")}</div><div className="row" style={{ gap: 8 }}><input name="amount" type="number" className="input" style={{ width: 90 }} defaultValue={20} /><input name="reason" className="input grow" placeholder={t("reason")} /><button className="btn">OK</button></div></div></form>
           <form action={orgAction.bind(null, orgId)} className="card"><h2>{t("overrides")}</h2><div className="card-b col" style={{ gap: 10 }}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="op" value="overrides" />

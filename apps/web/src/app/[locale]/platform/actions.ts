@@ -3,7 +3,7 @@ import { cookies, headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { IMPERSONATE_COOKIE, requirePlatformAdmin } from "@/lib/session";
-import { createAgency, grantCredits, logImpersonation, purgeAgency, setOverrides, setPlan, setStatus } from "@/lib/platform";
+import { setBilling, createAgency, grantCredits, logImpersonation, purgeAgency, setOverrides, setPlan, setStatus } from "@/lib/platform";
 
 const loc = (fd: FormData) => (["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr");
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -25,6 +25,7 @@ export async function orgAction(orgId: string, fd: FormData) {
   if (op === "suspend") await setStatus(admin.userId, orgId, "suspended");
   else if (op === "activate") await setStatus(admin.userId, orgId, "active");
   else if (op === "plan") { if (!(await setPlan(admin.userId, orgId, s(fd, "plan", 20)))) err = "invalid_plan"; }
+  else if (op === "billing") { if (!(await setBilling(admin.userId, orgId, s(fd, "paid_until", 10) || null, s(fd, "billing_note", 300) || null))) err = "invalid_date"; }
   else if (op === "credits") { if (!(await grantCredits(admin.userId, orgId, Number(fd.get("amount")), s(fd, "reason", 60) || "support"))) err = "invalid_amount"; }
   else if (op === "overrides") await setOverrides(admin.userId, orgId, { seats: Number(fd.get("seats")) || null, storage: Number(fd.get("storage")) || null, features: Object.fromEntries(["custom_domain", "white_label", "whatsapp_api", "api", "creative_posters"].map((k) => [k, fd.get(`f_${k}`) === "on"])) });
   else if (op === "purge") { if (!(await purgeAgency(admin.userId, orgId, s(fd, "confirm", 40)))) err = "confirm_mismatch"; else redirect(`/${locale}/platform?ok=purged`); }

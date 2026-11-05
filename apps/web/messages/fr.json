@@ -717,7 +717,16 @@
     "errors": {
       "forbidden": "Droits insuffisants.",
       "billing_unavailable": "Le paiement en ligne est indisponible pour le moment."
-    }
+    },
+    "billing": {
+      "trial": "Période d'essai",
+      "paid": "Abonnement à jour",
+      "expiring": "Expire bientôt",
+      "overdue": "Échéance dépassée",
+      "unset": "Échéance non renseignée",
+      "until": "Valable jusqu'au {date}"
+    },
+    "manualHint": "Pour changer de plan ou renouveler, contactez votre interlocuteur : l'abonnement est géré par l'administrateur de la plateforme."
   },
   "onboarding": {
     "title": "Démarrer avec votre agence",
@@ -767,7 +776,8 @@
       "invalid_name": "Saisissez au moins un nom.",
       "invalid_plan": "Plan inconnu.",
       "invalid_amount": "Montant invalide.",
-      "confirm_mismatch": "La confirmation ne correspond pas à l'identifiant."
+      "confirm_mismatch": "La confirmation ne correspond pas à l'identifiant.",
+      "invalid_date": "Date invalide."
     },
     "ok": {
       "created": "Agence créée. Le propriétaire a reçu son accès.",
@@ -793,7 +803,25 @@
     "reactivate": "Réactiver l'agence",
     "danger": "Zone dangereuse",
     "purgeHint": "Supprime définitivement l'agence, ses données et ses fichiers. Exportez-les d'abord. Saisissez « {slug} » pour confirmer.",
-    "purge": "Supprimer définitivement"
+    "purge": "Supprimer définitivement",
+    "search": "Rechercher (nom, adresse, e-mail du propriétaire)",
+    "filter": "Filtrer",
+    "allAgencies": "Toutes les agences",
+    "apply": "Filtrer",
+    "billing": "Facturation",
+    "owner": "Propriétaire",
+    "billingTitle": "Facturation manuelle",
+    "paidUntil": "Payé jusqu'au",
+    "billingNote": "Note (visible par l'agence)",
+    "billingNoteHint": "Ex. Payé par virement le 03/11",
+    "billingHint": "Aucun paiement dans le CRM : vous encaissez de votre côté, puis vous mettez à jour l'échéance ici.",
+    "billingStates": {
+      "trial": "Essai",
+      "paid": "À jour",
+      "expiring": "Expire bientôt",
+      "overdue": "En retard",
+      "unset": "Sans échéance"
+    }
   },
   "support": {
     "banner": "Mode support — lecture seule — agence {name}",
@@ -1047,7 +1075,10 @@
       "no_key": "Clé de chiffrement absente : configurez INTEGRATIONS_KEY avant de connecter un service.",
       "forbidden": "Droits insuffisants.",
       "invalid": "Identifiants invalides."
-    }
+    },
+    "gmailOk": "Gmail connecté : vos sélections de biens partiront de votre adresse.",
+    "gmailHint": "Les e-mails envoyés à vos clients partent de votre propre adresse Gmail et apparaissent dans vos messages envoyés. Chaque agent connecte la sienne.",
+    "gmailLimit": "Gmail limite l'envoi (environ 500 messages par jour pour un compte gratuit, davantage avec Google Workspace). Pour de gros envois, utilisez le domaine de l'agence."
   },
   "sign": {
     "invalid": "Ce lien n'est pas valide ou a expiré.",
