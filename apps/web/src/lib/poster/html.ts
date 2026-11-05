@@ -30,7 +30,7 @@ export function posterHtml(d: PosterData, fonts: { inter: string; heeboHe: strin
   const specs = d.specs.length ? `<div class="specs">${d.specs.map((s) => `<span>${esc(s)}</span>`).join('<i class="sep"></i>')}</div>` : "";
   const qr = d.qr ? `<img class="qr" src="${esc(d.qr)}">` : "";
   const foot = (color: string) => `<div class="foot" style="color:${color}"><div><div class="contact">${esc(d.agentName ?? "")}${d.agentName && phone ? " · " : ""}${phone}</div><div class="legal">${esc(d.legal)}${d.virtualStaging ? ` · ${esc(d.virtualStaging)}` : ""}</div></div>${qr}</div>`;
-  const photoBox = d.photo ? `<img class="photo" src="${esc(d.photo)}">` : `<div class="photo nophoto"><span>${esc(d.place)}</span></div>`;
+  const photoBox = d.photo ? `<img class="photo" src="${esc(d.photo)}">` : `<div class="photo nophoto"></div>`;
   const tag = (bg: string, fg: string) => `<span class="tag" style="background:${bg};color:${fg}">${esc(d.tag)}</span>`;
   const head = (color: string) => `<div class="title" style="color:${color}">${esc(d.headline || d.title)}</div>`;
   const price = (color: string, k = 10) => `<div class="price" style="color:${color};font-size:${px(k)}">${esc(d.price)}</div>`;
