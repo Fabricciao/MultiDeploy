@@ -8,9 +8,9 @@ const ITEMS = [
   { key: "properties", href: "/properties", icon: House, ready: true },
   { key: "clients", href: "/clients", icon: Users, ready: true },
   { key: "deals", href: "/deals", icon: Handshake, ready: true },
-  { key: "agenda", href: "/agenda", icon: CalendarDays, ready: false },
+  { key: "agenda", href: "/agenda", icon: CalendarDays, ready: true },
   { key: "marketing", href: "/marketing", icon: Megaphone, ready: false },
-  { key: "reports", href: "/reports", icon: ChartNoAxesColumn, ready: false },
+  { key: "reports", href: "/reports", icon: ChartNoAxesColumn, ready: true },
   { key: "settings", href: "/settings", icon: Settings, ready: true },
 ] as const;
 

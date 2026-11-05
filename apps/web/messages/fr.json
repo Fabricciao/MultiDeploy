@@ -150,7 +150,13 @@
     "errors": {
       "forbidden": "Vous n'avez pas le droit d'envoyer.",
       "nothing_selected": "Sélectionnez au moins un destinataire."
-    }
+    },
+    "bulkTitle": "Envoi groupé",
+    "bulkSub": "{count, plural, one {# bien sélectionné} other {# biens sélectionnés}}",
+    "selected": "Biens sélectionnés",
+    "noneSelected": "Aucun bien actif sélectionné. Retournez à la liste et cochez des biens.",
+    "recipient": "Destinataire",
+    "searchClient": "Chercher un client…"
   },
   "form": {
     "errors": {
@@ -311,7 +317,10 @@
       "mandate": "Mandat",
       "sort": "Tri"
     },
-    "poster": "Créer une affiche"
+    "poster": "Créer une affiche",
+    "import": "Importer",
+    "bulkSend": "Envoyer la sélection à un client",
+    "bulkHint": "Cochez des biens dans le tableau, puis cliquez ici."
   },
   "clients": {
     "kind": {
@@ -334,7 +343,8 @@
       "created": "Fiche créée",
       "unsubscribed": "Désinscrit des envois",
       "share": "Sélection envoyée ({channel})",
-      "stage_change": "Affaire déplacée d'étape"
+      "stage_change": "Affaire déplacée d'étape",
+      "visit_planned": "Visite planifiée"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -404,7 +414,8 @@
       "confirm": "Je confirme l'effacement définitif des données personnelles de ce client",
       "erase": "Effacer les données personnelles",
       "hint": "Droit d'accès et d'effacement : l'effacement est irréversible ; l'historique commercial est conservé sans donnée personnelle."
-    }
+    },
+    "import": "Importer"
   },
   "media": {
     "empty": "Aucune photo. Ajoutez-en pour enrichir la fiche, les envois et les affiches.",
@@ -824,5 +835,162 @@
     "detail": "Détail",
     "all": "Tout",
     "filter": "Filtrer"
+  },
+  "palette": {
+    "title": "Recherche et actions",
+    "placeholder": "Rechercher un bien, un client, une action… ou décrire : « 4 pièces Raanana < 3,5 M »",
+    "none": "Aucun résultat.",
+    "nl": "Appliquer cette recherche aux biens",
+    "groups": {
+      "actions": "Actions",
+      "properties": "Biens",
+      "clients": "Clients",
+      "smart": "Recherche intelligente"
+    },
+    "actions": {
+      "newClient": "Nouveau client",
+      "newProperty": "Nouveau bien",
+      "dictate": "Dicter un client",
+      "scan": "Scanner un papier"
+    }
+  },
+  "views": {
+    "save": "Enregistrer la vue",
+    "name": "Nom de la vue",
+    "share": "Partager avec l'agence",
+    "delete": "Supprimer la vue"
+  },
+  "agenda": {
+    "title": "Agenda",
+    "today": "Aujourd'hui",
+    "prev": "Semaine précédente",
+    "next": "Semaine suivante",
+    "ics": "Exporter (.ics)",
+    "noVisits": "Aucune visite.",
+    "newVisit": "Planifier une visite",
+    "property": "Bien",
+    "client": "Client (optionnel)",
+    "when": "Date et heure (Jérusalem)",
+    "duration": "Durée",
+    "plan": "Planifier",
+    "created": "Visite planifiée.",
+    "markDone": "Effectuée",
+    "cancel": "Annuler",
+    "status": {
+      "planned": "Prévue",
+      "done": "Effectuée",
+      "cancelled": "Annulée",
+      "no_show": "Absent"
+    },
+    "quiet": {
+      "shabbat": "Chabbat",
+      "holiday": "Jour férié",
+      "eve": "Veille de Chabbat ou de fête (après 14 h)",
+      "force": "Planifier malgré tout"
+    },
+    "holidays": {
+      "rosh_hashana": "Roch Hachana",
+      "yom_kippur": "Yom Kippour",
+      "sukkot": "Soukkot",
+      "shemini_atzeret": "Chemini Atseret",
+      "pesach": "Pessah",
+      "pesach_last": "Pessah (dernier jour)",
+      "shavuot": "Chavouot",
+      "shabbat": "Chabbat"
+    },
+    "errors": {
+      "conflict": "Vous avez déjà une visite sur ce créneau.",
+      "invalid": "Données invalides.",
+      "forbidden": "Droits insuffisants.",
+      "past": "Date passée."
+    }
+  },
+  "import": {
+    "title": "Importer des données",
+    "sub": "Depuis Excel / Google Sheets (CSV). Vous vérifiez la correspondance des colonnes avant d'importer.",
+    "target": "Type de données",
+    "contacts": "Clients",
+    "properties": "Biens",
+    "file": "Fichier CSV",
+    "preview": "Aperçu",
+    "reading": "Lecture…",
+    "hint": "CSV (UTF-8) jusqu'à 1,5 Mo / 1 000 lignes. Séparateurs , ; ou tabulation. Les clients déjà connus (même téléphone) sont ignorés ; les biens importés sont créés en brouillon.",
+    "mapping": "Correspondance des colonnes",
+    "rows": "{count, plural, one {# ligne} other {# lignes}}",
+    "truncated": "Fichier tronqué aux 1 000 premières lignes.",
+    "ignore": "— Ignorer —",
+    "run": "Importer {count} lignes",
+    "importing": "Import…",
+    "report": "Résultat de l'import",
+    "created": "{count} créés",
+    "duplicates": "{count} doublons ignorés",
+    "errorsCount": "{count} erreurs",
+    "line": "Ligne {n}",
+    "errors": {
+      "no_file": "Choisissez un fichier.",
+      "too_large": "Fichier trop volumineux.",
+      "empty": "Aucune ligne exploitable.",
+      "forbidden": "Droits insuffisants."
+    },
+    "rowErrors": {
+      "empty": "ligne vide",
+      "invalid_phone": "téléphone invalide",
+      "invalid_email": "e-mail invalide",
+      "failed": "échec d'enregistrement",
+      "price_required": "prix manquant ou invalide",
+      "city_unknown": "ville inconnue",
+      "invalid_rooms": "nombre de pièces invalide"
+    },
+    "fields": {
+      "first_name": "Prénom",
+      "last_name": "Nom",
+      "first_name_he": "Prénom (hébreu)",
+      "last_name_he": "Nom (hébreu)",
+      "phone": "Téléphone",
+      "email": "E-mail",
+      "preferred_locale": "Langue",
+      "budget_max": "Budget max",
+      "notes": "Notes",
+      "kind": "Type de contact",
+      "transaction": "Transaction",
+      "property_type": "Type de bien",
+      "city": "Ville",
+      "street": "Rue",
+      "house_number": "Numéro",
+      "price": "Prix",
+      "rooms": "Pièces",
+      "area_built": "Surface",
+      "floor": "Étage",
+      "floors_total": "Étages (total)",
+      "mamad": "Mamad",
+      "parking_count": "Parkings",
+      "elevator": "Ascenseur",
+      "title": "Titre",
+      "description": "Description"
+    }
+  },
+  "reports": {
+    "title": "Rapports",
+    "sub": "Vue d'ensemble de l'activité de l'agence.",
+    "funnel": "Entonnoir des affaires",
+    "sources": "Origine des nouveaux clients (90 j)",
+    "empty": "Pas encore de données.",
+    "propsByStatus": "Biens par statut",
+    "listingAge": "Ancienneté des biens actifs",
+    "age": {
+      "0": "< 15 jours",
+      "1": "15 – 30 jours",
+      "2": "30 – 60 jours",
+      "3": "60 – 90 jours",
+      "4": "> 90 jours"
+    },
+    "agents": "Performance par agent",
+    "agent": "Agent",
+    "activeProps": "Biens actifs",
+    "clients": "Clients",
+    "openDeals": "Affaires ouvertes",
+    "visits30": "Visites (30 j)",
+    "wonValue": "Valeur conclue",
+    "scope": "{n} agents dans le périmètre. Les agents ne voient que ce que leurs droits permettent."
   }
 }

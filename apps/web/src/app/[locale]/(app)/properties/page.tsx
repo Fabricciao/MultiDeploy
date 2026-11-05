@@ -7,6 +7,8 @@ import { listAgents, listCities, cityName } from "@/lib/data/geo";
 import { MUST_HAVE, PAGE_SIZE, parsePropertyFilters, toQuery, type SP } from "@/lib/data/filters";
 import { dateShort, initials, money, num } from "@/lib/format";
 import { Badge, Avatar, PageHeader, Photo } from "@/components/ui";
+import { SavedViews } from "@/components/saved-views";
+import { listViews } from "@/lib/data/views";
 
 const STATUS_TONE: Record<string, "ok" | "warn" | "acc" | ""> = { active: "ok", under_offer: "warn", sold: "acc", rented: "acc", draft: "" };
 
@@ -18,7 +20,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
   const ctx = await getCtx(locale);
   const t = await getTranslations("props");
   const tc = await getTranslations("common");
-  const [{ rows, total }, cities, agents] = await Promise.all([listProperties(ctx, f), listCities(ctx), listAgents(ctx)]);
+  const [{ rows, total }, cities, agents, views] = await Promise.all([listProperties(ctx, f), listCities(ctx), listAgents(ctx), listViews(ctx, "properties")]);
 
   const base = { q: f.q, tx: f.transaction, status: f.status, city: f.cityIds, rmin: f.roomsMin, rmax: f.roomsMax, pmin: f.priceMin, pmax: f.priceMax, has: f.has, agent: f.agent, mandate: f.mandate, sort: f.sort === "recent" ? undefined : f.sort };
   const without = (...keys: (keyof typeof base)[]) => toQuery({ ...base, ...Object.fromEntries(keys.map((k) => [k, undefined])) });
@@ -39,9 +41,11 @@ export default async function PropertiesPage({ params, searchParams }: { params:
   return (
     <>
       <PageHeader title={t("title")} sub={t("count", { count: total })}>
+        <Link href="/import?target=properties" className="btn">{t("import")}</Link>
         <Link href="/properties/new" className="btn pri"><Plus size={15} aria-hidden />{t("new")}</Link>
       </PageHeader>
 
+      <SavedViews scope="properties" views={views} currentQs={toQuery({ ...base, page: undefined }).replace(/^\?/, "")} locale={locale} canShare={ctx.caps.has("org.manage")} />
       <form method="get" className="row wrap" style={{ marginBottom: 10 }}>
         {f.sort !== "recent" && <input type="hidden" name="sort" value={f.sort} />}
         <input name="q" defaultValue={f.q} placeholder={t("filters.q")} className="input" style={{ width: 220 }} aria-label={t("filters.q")} />
@@ -104,13 +108,14 @@ export default async function PropertiesPage({ params, searchParams }: { params:
           <div style={{ overflowX: "auto" }}>
             <table className="tbl">
               <thead><tr>
-                <th>{t("property")}</th><th>{t("city")}</th><th>{t("rooms")}</th><th>{t("area")}</th><th>{t("floor")}</th><th>{t("price")}</th><th>{t("statusLabel")}</th><th>{t("mandateLabel")}</th><th>{t("agent")}</th>
+                <th style={{ width: 30 }}></th><th>{t("property")}</th><th>{t("city")}</th><th>{t("rooms")}</th><th>{t("area")}</th><th>{t("floor")}</th><th>{t("price")}</th><th>{t("statusLabel")}</th><th>{t("mandateLabel")}</th><th>{t("agent")}</th>
               </tr></thead>
               <tbody>
                 {rows.map((p) => {
                   const days = p.mandate?.type === "exclusive" && p.mandate.end ? Math.round((new Date(p.mandate.end).getTime() - Date.now()) / 86_400_000) : null;
                   return (
                     <tr key={p.id}>
+                      <td><input type="checkbox" className="ck" name="p" value={p.id} form="bulk" aria-label={p.reference} /></td>
                       <td>
                         <Link href={`/properties/${p.id}`} className="row" style={{ gap: 12 }}>
                           <div className="thumb">{p.cover_thumb ? <img src={`/api/files/${p.cover_thumb}`} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Photo seed={p.id} label="" />}</div>
@@ -133,6 +138,8 @@ export default async function PropertiesPage({ params, searchParams }: { params:
           </div>
         )}
       </div>
+
+      <form id="bulk" action={`/${locale}/properties/send`} method="get" className="row" style={{ marginTop: 12, gap: 8 }}><button className="btn sm">{t("bulkSend")}</button><span className="note">{t("bulkHint")}</span></form>
 
       {pages > 1 && (
         <div className="row" style={{ justifyContent: "center", marginTop: 16 }}>

@@ -52,5 +52,6 @@ jobs:
           node apps/web/e2e/phase2.cjs
           node apps/web/e2e/phase3.cjs
           node apps/web/e2e/phase4a.cjs
+          node apps/web/e2e/phase4b.cjs
       - if: failure()
         run: tail -80 dev.log

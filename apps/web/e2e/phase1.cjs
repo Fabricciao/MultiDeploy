@@ -22,7 +22,7 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   const rowsOk = await sql`select count(*)::int n from properties where transaction in ('sale','commercial_sale') and rooms >= 4 and price <= 4000000 and mamad and deleted_at is null`;
   ok(filtered === rowsOk[0].n, `la liste filtrée = le résultat SQL attendu (${rowsOk[0].n})`);
   await p.goto(`${BASE}/fr/properties?sort=price_desc&tx=sale`);
-  const prices = await p.locator("tbody tr td:nth-child(6)").allInnerTexts();
+  const prices = await p.locator("tbody tr td:nth-child(7)").allInnerTexts();
   const nums = prices.map((t) => Number(t.replace(/[^\d]/g, "")));
   ok(nums.every((v, i) => i === 0 || nums[i - 1] >= v), "tri par prix décroissant");
 

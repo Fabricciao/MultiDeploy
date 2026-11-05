@@ -150,7 +150,13 @@
     "errors": {
       "forbidden": "You are not allowed to send.",
       "nothing_selected": "Select at least one recipient."
-    }
+    },
+    "bulkTitle": "Bulk send",
+    "bulkSub": "{count, plural, one {# property selected} other {# properties selected}}",
+    "selected": "Selected properties",
+    "noneSelected": "No active property selected. Go back to the list and tick properties.",
+    "recipient": "Recipient",
+    "searchClient": "Find a client…"
   },
   "form": {
     "errors": {
@@ -311,7 +317,10 @@
       "mandate": "Mandate",
       "sort": "Sort"
     },
-    "poster": "Create a poster"
+    "poster": "Create a poster",
+    "import": "Import",
+    "bulkSend": "Send selection to a client",
+    "bulkHint": "Tick properties in the table, then click here."
   },
   "clients": {
     "kind": {
@@ -334,7 +343,8 @@
       "created": "Record created",
       "unsubscribed": "Unsubscribed from mailings",
       "share": "Selection sent ({channel})",
-      "stage_change": "Deal moved to another stage"
+      "stage_change": "Deal moved to another stage",
+      "visit_planned": "Viewing scheduled"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -404,7 +414,8 @@
       "confirm": "I confirm permanent erasure of this client's personal data",
       "erase": "Erase personal data",
       "hint": "Right of access and erasure: erasure is irreversible; commercial history is kept without personal data."
-    }
+    },
+    "import": "Import"
   },
   "media": {
     "empty": "No photos. Add some to enrich the listing, shares and posters.",
@@ -824,5 +835,162 @@
     "detail": "Detail",
     "all": "All",
     "filter": "Filter"
+  },
+  "palette": {
+    "title": "Search and actions",
+    "placeholder": "Search a property, client, action… or describe: “4 rooms Ra'anana < 3.5M”",
+    "none": "No results.",
+    "nl": "Apply this search to properties",
+    "groups": {
+      "actions": "Actions",
+      "properties": "Properties",
+      "clients": "Clients",
+      "smart": "Smart search"
+    },
+    "actions": {
+      "newClient": "New client",
+      "newProperty": "New property",
+      "dictate": "Dictate a client",
+      "scan": "Scan a paper"
+    }
+  },
+  "views": {
+    "save": "Save view",
+    "name": "View name",
+    "share": "Share with the agency",
+    "delete": "Delete view"
+  },
+  "agenda": {
+    "title": "Calendar",
+    "today": "Today",
+    "prev": "Previous week",
+    "next": "Next week",
+    "ics": "Export (.ics)",
+    "noVisits": "No viewings.",
+    "newVisit": "Schedule a viewing",
+    "property": "Property",
+    "client": "Client (optional)",
+    "when": "Date and time (Jerusalem)",
+    "duration": "Duration",
+    "plan": "Schedule",
+    "created": "Viewing scheduled.",
+    "markDone": "Done",
+    "cancel": "Cancel",
+    "status": {
+      "planned": "Planned",
+      "done": "Done",
+      "cancelled": "Cancelled",
+      "no_show": "No-show"
+    },
+    "quiet": {
+      "shabbat": "Shabbat",
+      "holiday": "Holiday",
+      "eve": "Eve of Shabbat or a holiday (after 2 pm)",
+      "force": "Schedule anyway"
+    },
+    "holidays": {
+      "rosh_hashana": "Rosh Hashanah",
+      "yom_kippur": "Yom Kippur",
+      "sukkot": "Sukkot",
+      "shemini_atzeret": "Shemini Atzeret",
+      "pesach": "Pesach",
+      "pesach_last": "Pesach (last day)",
+      "shavuot": "Shavuot",
+      "shabbat": "Shabbat"
+    },
+    "errors": {
+      "conflict": "You already have a viewing at that time.",
+      "invalid": "Invalid data.",
+      "forbidden": "Insufficient rights.",
+      "past": "Date in the past."
+    }
+  },
+  "import": {
+    "title": "Import data",
+    "sub": "From Excel / Google Sheets (CSV). You check the column mapping before importing.",
+    "target": "Data type",
+    "contacts": "Clients",
+    "properties": "Properties",
+    "file": "CSV file",
+    "preview": "Preview",
+    "reading": "Reading…",
+    "hint": "CSV (UTF-8) up to 1.5 MB / 1,000 rows. Separators , ; or tab. Known clients (same phone) are skipped; imported properties are created as drafts.",
+    "mapping": "Column mapping",
+    "rows": "{count, plural, one {# row} other {# rows}}",
+    "truncated": "File truncated to the first 1,000 rows.",
+    "ignore": "— Ignore —",
+    "run": "Import {count} rows",
+    "importing": "Importing…",
+    "report": "Import result",
+    "created": "{count} created",
+    "duplicates": "{count} duplicates skipped",
+    "errorsCount": "{count} errors",
+    "line": "Row {n}",
+    "errors": {
+      "no_file": "Choose a file.",
+      "too_large": "File too large.",
+      "empty": "No usable rows.",
+      "forbidden": "Insufficient rights."
+    },
+    "rowErrors": {
+      "empty": "empty row",
+      "invalid_phone": "invalid phone",
+      "invalid_email": "invalid email",
+      "failed": "save failed",
+      "price_required": "missing or invalid price",
+      "city_unknown": "unknown city",
+      "invalid_rooms": "invalid rooms"
+    },
+    "fields": {
+      "first_name": "First name",
+      "last_name": "Last name",
+      "first_name_he": "First name (Hebrew)",
+      "last_name_he": "Last name (Hebrew)",
+      "phone": "Phone",
+      "email": "Email",
+      "preferred_locale": "Language",
+      "budget_max": "Max budget",
+      "notes": "Notes",
+      "kind": "Contact type",
+      "transaction": "Transaction",
+      "property_type": "Property type",
+      "city": "City",
+      "street": "Street",
+      "house_number": "Number",
+      "price": "Price",
+      "rooms": "Rooms",
+      "area_built": "Area",
+      "floor": "Floor",
+      "floors_total": "Total floors",
+      "mamad": "Safe room",
+      "parking_count": "Parking",
+      "elevator": "Elevator",
+      "title": "Title",
+      "description": "Description"
+    }
+  },
+  "reports": {
+    "title": "Reports",
+    "sub": "Overview of the agency's activity.",
+    "funnel": "Deal funnel",
+    "sources": "Source of new clients (90 d)",
+    "empty": "No data yet.",
+    "propsByStatus": "Properties by status",
+    "listingAge": "Age of active listings",
+    "age": {
+      "0": "< 15 days",
+      "1": "15 – 30 days",
+      "2": "30 – 60 days",
+      "3": "60 – 90 days",
+      "4": "> 90 days"
+    },
+    "agents": "Performance by agent",
+    "agent": "Agent",
+    "activeProps": "Active properties",
+    "clients": "Clients",
+    "openDeals": "Open deals",
+    "visits30": "Viewings (30 d)",
+    "wonValue": "Won value",
+    "scope": "{n} agents in scope. Agents only see what their rights allow."
   }
 }

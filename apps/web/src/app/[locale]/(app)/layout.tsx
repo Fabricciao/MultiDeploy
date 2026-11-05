@@ -1,9 +1,9 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Search } from "lucide-react";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { Sidebar } from "@/components/sidebar";
 import { DevUserSwitcher } from "@/components/dev-user-switcher";
 import { NewMenu } from "@/components/new-menu";
+import { CommandPalette, PaletteButton } from "@/components/command-palette";
 import { getCtx, db } from "@/lib/session";
 import { pickName } from "@/lib/data/types";
 import { getBrandKit } from "@/lib/data/brand";
@@ -33,10 +33,7 @@ export default async function AppLayout({ children, params }: { children: React.
           </form>
         )}
         <header className="top">
-          <form action={`/${locale}/properties`} className="search" role="search">
-            <Search size={14} aria-hidden />
-            <input name="q" placeholder={t("common.search")} aria-label={t("common.search")} className="grow" style={{ border: 0, outline: 0, background: "transparent", minWidth: 0 }} />
-          </form>
+          <PaletteButton label={t("common.search")} />
           <div className="sp row" style={{ gap: 12 }}>
             <DevUserSwitcher current={ctx.userId} />
             <LocaleSwitcher />
@@ -44,6 +41,7 @@ export default async function AppLayout({ children, params }: { children: React.
           </div>
         </header>
         <main className="page">{children}</main>
+        <CommandPalette />
       </div>
     </div>
   );

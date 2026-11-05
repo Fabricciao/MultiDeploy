@@ -8,6 +8,8 @@ import { KINDS, PAGE_SIZE, parseContactFilters, toQuery, type SP } from "@/lib/d
 import { dateShort, initials, money } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader } from "@/components/ui";
+import { SavedViews } from "@/components/saved-views";
+import { listViews } from "@/lib/data/views";
 
 export default async function ClientsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<SP> }) {
   const { locale } = await params;
@@ -16,14 +18,16 @@ export default async function ClientsPage({ params, searchParams }: { params: Pr
   const ctx = await getCtx(locale);
   const t = await getTranslations("clients");
   const tc = await getTranslations("common");
-  const [{ rows, total }, agents] = await Promise.all([listContacts(ctx, f), listAgents(ctx)]);
+  const [{ rows, total }, agents, views] = await Promise.all([listContacts(ctx, f), listAgents(ctx), listViews(ctx, "contacts")]);
   const base = { q: f.q, kind: f.kind, owner: f.owner };
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   return (
     <>
       <PageHeader title={t("title")} sub={t("count", { count: total })}>
+        <Link href="/import?target=contacts" className="btn">{t("import")}</Link>
         <Link href="/clients/new" className="btn pri"><Plus size={15} aria-hidden />{t("new")}</Link>
       </PageHeader>
+      <SavedViews scope="contacts" views={views} currentQs={toQuery({ ...base, page: undefined }).replace(/^\?/, "")} locale={locale} canShare={ctx.caps.has("org.manage")} />
       <form method="get" className="row wrap" style={{ marginBottom: 12 }}>
         <input name="q" defaultValue={f.q} placeholder={t("filters.q")} className="input" style={{ width: 260 }} aria-label={t("filters.q")} />
         <select name="kind" defaultValue={f.kind ?? ""} className="input" style={{ width: 160 }} aria-label={t("filters.kind")}><option value="">{t("filters.allKinds")}</option>{KINDS.map((k) => <option key={k} value={k}>{t(`kind.${k}`)}</option>)}</select>
