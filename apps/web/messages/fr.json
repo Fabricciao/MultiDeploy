@@ -276,7 +276,16 @@
       "internalNotes": "Notes internes",
       "description": "Description",
       "title": "Titre",
-      "descriptionPlaceholder": "Description (optionnelle)"
+      "descriptionPlaceholder": "Description (optionnelle)",
+      "suggest": "Générer depuis les champs",
+      "translate": "Traduire (1 crédit)",
+      "suggestHint": "Un modèle de texte est proposé à partir des champs saisis ; relisez-le avant d'enregistrer.",
+      "suggestErrors": {
+        "forbidden": "Droits insuffisants.",
+        "empty": "Rédigez d'abord une description dans une autre langue.",
+        "insufficient_credits": "Crédits IA insuffisants.",
+        "unavailable": "Traduction indisponible."
+      }
     },
     "title": "Biens",
     "count": "{count, plural, one {# bien} other {# biens}}",

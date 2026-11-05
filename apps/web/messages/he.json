@@ -276,7 +276,16 @@
       "internalNotes": "הערות פנימיות",
       "description": "תיאור",
       "title": "כותרת",
-      "descriptionPlaceholder": "תיאור (אופציונלי)"
+      "descriptionPlaceholder": "תיאור (אופציונלי)",
+      "suggest": "יצירה מהשדות",
+      "translate": "תרגום (קרדיט אחד)",
+      "suggestHint": "מוצעת תבנית טקסט לפי השדות שמולאו; קראו אותה לפני השמירה.",
+      "suggestErrors": {
+        "forbidden": "אין הרשאה.",
+        "empty": "כתבו קודם תיאור בשפה אחרת.",
+        "insufficient_credits": "אין מספיק קרדיטים.",
+        "unavailable": "התרגום אינו זמין."
+      }
     },
     "title": "נכסים",
     "count": "{count, plural, one {נכס #} two {# נכסים} other {# נכסים}}",

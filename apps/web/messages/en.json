@@ -276,7 +276,16 @@
       "internalNotes": "Internal notes",
       "description": "Description",
       "title": "Title",
-      "descriptionPlaceholder": "Description (optional)"
+      "descriptionPlaceholder": "Description (optional)",
+      "suggest": "Generate from fields",
+      "translate": "Translate (1 credit)",
+      "suggestHint": "A text template is proposed from the fields entered; review it before saving.",
+      "suggestErrors": {
+        "forbidden": "Insufficient rights.",
+        "empty": "Write a description in another language first.",
+        "insufficient_credits": "Not enough AI credits.",
+        "unavailable": "Translation unavailable."
+      }
     },
     "title": "Properties",
     "count": "{count, plural, one {# property} other {# properties}}",

@@ -1,26 +1,35 @@
 "use client";
-import { useActionState } from "react";
+import { useActionState, useRef, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Field } from "@/components/ui";
 import type { FormState } from "@/app/[locale]/(app)/properties/actions";
 import { PROPERTY_TYPES } from "@/lib/data/forms";
+import { suggestTextAction } from "@/app/[locale]/(app)/properties/suggest-action";
 
 type City = { id: string; label: string };
 export type PropertyDefaults = Record<string, any>;
 
-export function PropertyForm({ action, cities, d = {}, missing, hints }: { action: (s: FormState, fd: FormData) => Promise<FormState>; cities: City[]; d?: PropertyDefaults; missing?: string[]; hints?: Record<string, { confidence: number; evidence?: string }> }) {
+export function PropertyForm({ action, cities, d = {}, missing, hints, canTranslate = false }: { canTranslate?: boolean } & { action: (s: FormState, fd: FormData) => Promise<FormState>; cities: City[]; d?: PropertyDefaults; missing?: string[]; hints?: Record<string, { confidence: number; evidence?: string }> }) {
   const ti = useTranslations("intake");
   const t = useTranslations("props");
   const tf = useTranslations("form");
   const tc = useTranslations("common");
   const locale = useLocale();
   const [state, formAction, pending] = useActionState(action, null);
+  const formRef = useRef<HTMLFormElement>(null);
+  const [busy, startBusy] = useTransition();
+  const [sugErr, setSugErr] = useState<string | null>(null);
+  const form = () => formRef.current!;
+  const val = (n: string) => (form().elements.namedItem(n) as HTMLInputElement | HTMLTextAreaElement | null);
+  const fill = (l: string, r: { title?: string; description: string }) => { const ti_ = val(`title_${l}`), de = val(`desc_${l}`); if (r.title !== undefined && ti_) ti_.value = r.title; if (de) de.value = r.description; };
+  const suggest = (l: string) => { setSugErr(null); const fd = new FormData(form()); const v: Record<string, string> = {}; fd.forEach((x, k) => { if (typeof x === "string") v[k] = x; }); startBusy(async () => { const r = await suggestTextAction({ mode: "template", target: l, v }); if (r.ok) fill(l, r); else setSugErr(r.error); }); };
+  const translate = (l: string) => { setSugErr(null); const src = (["fr", "en", "he"] as const).find((x) => x !== l && (val(`desc_${x}`)?.value ?? "").trim()); if (!src) { setSugErr("empty"); return; } startBusy(async () => { const r = await suggestTextAction({ mode: "translate", target: l, source: src, v: {}, text: val(`desc_${src}`)!.value }); if (r.ok) { const tt = val(`title_${src}`)?.value.trim(); fill(l, { description: r.description }); void tt; } else setSugErr(r.error); }); };
   const e = (k: string) => (state?.errors?.[k] ? tf(`errors.${state.errors[k]}`) : undefined);
   const chk = (k: string, label: string) => <label className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name={k} defaultChecked={!!d[k]} />{label}</label>;
   const mandate = (d.mandate ?? {}) as { type?: string; end?: string };
   const tr = (d.translations ?? {}) as Record<string, { title?: string; description?: string }>;
   return (
-    <form action={formAction} className="col" style={{ gap: 16, maxWidth: 920 }}>
+    <form ref={formRef} action={formAction} className="col" style={{ gap: 16, maxWidth: 920 }}>
       <input type="hidden" name="locale" value={locale} />
       {missing && missing.length > 0 && <div role="alert" className="card card-b" style={{ borderColor: "var(--bad)", background: "var(--bad-soft)" }}><b>{ti("missing", { fields: missing.map((m) => ti(`fields.${m}`)).join(", ") })}</b></div>}
       {hints && Object.values(hints).some((h) => h.confidence < 0.7) && <div className="card card-b note">{ti("propertyVerify")}</div>}
@@ -62,11 +71,13 @@ export function PropertyForm({ action, cities, d = {}, missing, hints }: { actio
       <section className="card"><h2>{t("form.description")}</h2><div className="card-b col" style={{ gap: 14 }}>
         {(["fr", "he", "en"] as const).map((l) => (
           <div key={l} className="col" style={{ gap: 8 }} dir={l === "he" ? "rtl" : "ltr"} lang={l}>
-            <div className="lbl">{l === "fr" ? "Français" : l === "he" ? "עברית" : "English"}</div>
+            <div className="row" style={{ gap: 8 }}><div className="lbl grow">{l === "fr" ? "Français" : l === "he" ? "עברית" : "English"}</div><button type="button" className="btn sm ghost" disabled={busy} onClick={() => suggest(l)}>{t("form.suggest")}</button>{canTranslate && <button type="button" className="btn sm ghost" disabled={busy} onClick={() => translate(l)}>{t("form.translate")}</button>}</div>
             <input name={`title_${l}`} className="input" placeholder={t("form.title")} defaultValue={tr[l]?.title ?? ""} />
             <textarea name={`desc_${l}`} className="input" placeholder={t("form.descriptionPlaceholder")} defaultValue={tr[l]?.description ?? ""} />
           </div>
         ))}
+        {sugErr && <p role="alert" className="err note">{t(`form.suggestErrors.${sugErr}`)}</p>}
+        <p className="note">{t("form.suggestHint")}</p>
       </div></section>
 
       <div className="row" style={{ gap: 10 }}><button className="btn pri" disabled={pending}>{pending ? tc("saving") : tc("save")}</button></div>

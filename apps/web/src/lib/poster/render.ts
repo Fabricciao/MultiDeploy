@@ -29,9 +29,17 @@ async function slot<T>(fn: () => Promise<T>): Promise<T> {
   try { return await fn(); } finally { active--; waiters.shift()?.(); }
 }
 
+/** Rendu délégué à un service séparé (apps/renderer) : Vercel n'embarque pas Chromium de façon fiable. Authentifié par jeton partagé. */
+async function remote(body: { kind: "png" | "pdf"; html: string; width?: number; height?: number }): Promise<Buffer> {
+  const r = await fetch(process.env.POSTER_RENDER_URL!, { method: "POST", headers: { "content-type": "application/json", authorization: `Bearer ${process.env.POSTER_RENDER_TOKEN ?? ""}` }, body: JSON.stringify(body), signal: AbortSignal.timeout(45_000) });
+  if (!r.ok) throw new Error(`renderer_${r.status}`);
+  return Buffer.from(await r.arrayBuffer());
+}
+
 /** Rend un HTML autonome en PNG. JavaScript désactivé et toute requête réseau bloquée (le HTML ne contient que des data: URI). */
 export async function renderPoster(html: string, format: PosterFormat): Promise<Buffer> {
   const { w, h } = FORMATS[format];
+  if (process.env.POSTER_RENDER_URL) return remote({ kind: "png", html, width: w, height: h });
   return slot(async () => {
     const b = await browser();
     const ctx = await b.newContext({ viewport: { width: w, height: h }, deviceScaleFactor: 1, javaScriptEnabled: false });
@@ -47,6 +55,7 @@ export async function renderPoster(html: string, format: PosterFormat): Promise<
 
 /** Rend un HTML autonome en PDF A4 (bon de visite signé). Mêmes garde-fous que renderPoster : pas de JavaScript, réseau bloqué. */
 export async function renderPdf(html: string): Promise<Buffer> {
+  if (process.env.POSTER_RENDER_URL) return remote({ kind: "pdf", html });
   return slot(async () => {
     const b = await browser();
     const ctx = await b.newContext({ javaScriptEnabled: false });

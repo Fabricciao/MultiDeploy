@@ -67,3 +67,21 @@ export async function enhancePhoto(photo: Buffer, prompt: string): Promise<Buffe
   if (!b64) throw new Error("image_no_output");
   return Buffer.from(b64, "base64");
 }
+
+/** Traduction d'une annonce (Anthropic). Ne renvoie que le texte traduit ; chiffres, noms propres et unités sont conservés. NON TESTÉ sans clé. */
+export async function llmTranslate(text: string, from: "fr" | "he" | "en", to: "fr" | "he" | "en"): Promise<string> {
+  const cfg = aiConfig().extract;
+  if (!cfg) throw new Error("llm_not_configured");
+  const names = { fr: "français", he: "hébreu", en: "anglais" } as const;
+  const r = await fetch("https://api.anthropic.com/v1/messages", {
+    method: "POST", headers: { "x-api-key": cfg.key, "anthropic-version": "2023-06-01", "content-type": "application/json" },
+    body: JSON.stringify({ model: cfg.model, max_tokens: 1200,
+      system: `Tu traduis des annonces immobilières d'Israël du ${names[from]} vers le ${names[to]}. RÈGLES : conserve exactement chiffres, prix, surfaces, étages et noms propres ; n'ajoute aucune information ni argument commercial absent du texte ; garde le même ordre et la même mise en forme ; réponds uniquement par la traduction, sans commentaire.`,
+      messages: [{ role: "user", content: text.slice(0, 4000) }] }),
+  });
+  if (!r.ok) throw new Error(`llm_failed_${r.status}`);
+  const j = (await r.json()) as { content?: { type: string; text?: string }[] };
+  const out = (j.content ?? []).filter((c) => c.type === "text").map((c) => c.text ?? "").join("").trim();
+  if (!out) throw new Error("llm_empty");
+  return out;
+}

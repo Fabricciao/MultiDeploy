@@ -1,3 +1,4 @@
+import { aiConfig } from "@/lib/ai/config";
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { getCtx } from "@/lib/session";
@@ -17,5 +18,5 @@ export default async function EditPropertyPage({ params }: { params: Promise<{ l
   if (!data) notFound();
   const cities = (await listCities(ctx)).map((c) => ({ id: c.id, label: cityName(c, locale) }));
   const translations = Object.fromEntries(data.translations.map((x) => [x.locale, x]));
-  return (<><PageHeader title={t("editTitle")} /><PropertyForm action={saveProperty.bind(null, id)} cities={cities} d={{ ...data.p, translations }} /></>);
+  return (<><PageHeader title={t("editTitle")} /><PropertyForm canTranslate={!!aiConfig().extract && ctx.caps.has("ai.use")} action={saveProperty.bind(null, id)} cities={cities} d={{ ...data.p, translations }} /></>);
 }
