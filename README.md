@@ -1,6 +1,6 @@
 # MultiDeploy — CRM immobilier multi-agences (FR / HE / EN)
 
-Spec complet : [`docs/spec/`](docs/spec/README.md). Résultats : [phase 0](docs/spec/07-phase0-resultats.md) · [phase 1](docs/spec/08-phase1-resultats.md) · [phases 3-5](docs/spec/10-phases-3-4-5-resultats.md) · [déploiement](docs/DEPLOY.md) · [clés à fournir](docs/KEYS.md) · [sécurité](docs/SECURITY.md). Maquettes : [`docs/mockups/`](docs/mockups/README.md).
+Spec complet : [`docs/spec/`](docs/spec/README.md). Résultats : [phase 0](docs/spec/07-phase0-resultats.md) · [phase 1](docs/spec/08-phase1-resultats.md) · [phases 3-5](docs/spec/10-phases-3-4-5-resultats.md) · [déploiement VPS](docs/DEPLOY-VPS.md) · [Vercel/Supabase](docs/DEPLOY.md) · [clés à fournir](docs/KEYS.md) · [sécurité](docs/SECURITY.md). Maquettes : [`docs/mockups/`](docs/mockups/README.md).
 
 ## Démarrer (sans Docker ni compte Supabase)
 ```bash

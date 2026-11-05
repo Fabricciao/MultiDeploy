@@ -8,7 +8,10 @@ export INTEGRATIONS_KEY=$(head -c 32 /dev/urandom | base64) APP_SECRET=app_secre
   META_APP_SECRET=meta_secret_e2e WHATSAPP_VERIFY_TOKEN=verify_e2e META_GRAPH_BASE=http://127.0.0.1:3199 \
   CRON_SECRET=cron_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e APP_DOMAINS=multideploy.test BRAND_FETCH_ALLOW_PRIVATE=1
 pnpm --filter @multideploy/web dev -p 3120 &      # ces variables n'ont d'effet que hors production
+export BILLING_MODE=stripe STRIPE_SECRET_KEY=sk_test_e2e   # phases 1 à 5 testent aussi l'ancien mode Stripe
 for n in 1 2 3 4a 4b 5; do node apps/web/e2e/phase$n.cjs; done
+# phase 6 (facturation manuelle, mode par défaut) : redémarrer le serveur SANS BILLING_MODE puis
+node apps/web/e2e/phase6.cjs
 ```
 Redémarrer le serveur entre deux passes complètes (limiteurs de débit en mémoire). Chaque suite doit rester sous ~2 minutes.
 Si le mode dev boucle en rechargement (« Fast Refresh rebuilding »), supprimer `apps/web/.next` et relancer.

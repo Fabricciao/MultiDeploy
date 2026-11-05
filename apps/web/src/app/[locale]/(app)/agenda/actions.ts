@@ -5,6 +5,9 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createVisit, setVisitStatus } from "@/lib/data/visits";
 import { visitSignLink } from "@/lib/data/signature";
+import { getUserTokens, saveUserTokens } from "@/lib/data/connections";
+import { insertEvent } from "@/lib/integrations/google";
+import { db } from "@/lib/session";
 import { jerusalemToDate } from "@/lib/calendar/week";
 import { quietReason } from "@/lib/calendar/jewish";
 
@@ -21,6 +24,16 @@ export async function createVisitAction(_p: VisitState, fd: FormData): Promise<V
   if (quiet && fd.get("force") !== "on") return { warning: quiet }; // Chabbat / fête / veille : confirmation explicite requise
   const r = await createVisit(ctx, { propertyId: property, contactId: contact || null, startsAt, minutes: Number(fd.get("minutes")) || 30 });
   if (r.error) return { error: r.error };
+  // Agenda Google personnel (si connecté) : copie « au mieux », un échec n'empêche jamais la visite d'exister.
+  try {
+    const tokens = await getUserTokens(ctx.userId, "google_calendar");
+    if (tokens && r.id) {
+      const [v] = await db(ctx, (tx) => tx`select p.reference, p.street, coalesce((select t.title from public.property_translations t where t.property_id = p.id order by (t.locale = ${locale}) desc limit 1), p.reference) as title from public.properties p where p.id = ${property}`);
+      const { freshTokens } = await import("@/lib/integrations/google");
+      const t2 = await freshTokens(tokens); if (t2.access_token !== tokens.access_token) await saveUserTokens(ctx.userId, "google_calendar", t2);
+      await insertEvent(t2, { summary: `Visite · ${v?.title ?? ""}`, location: v?.street ?? undefined, start: startsAt, end: new Date(startsAt.getTime() + (Number(fd.get("minutes")) || 30) * 60_000) });
+    }
+  } catch { /* connexion Google expirée ou indisponible */ }
   revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`);
   return { ok: true };
 }

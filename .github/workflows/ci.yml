@@ -45,7 +45,7 @@ jobs:
           export NODE_PATH="$(npm root -g):$PWD/apps/web/node_modules"
           export CHROMIUM_PATH="$(node -e "console.log(require('playwright').chromium.executablePath())")"
           export BRAND_FETCH_ALLOW_PRIVATE=1   # autorise UNIQUEMENT le loopback (serveur de fixtures) hors production
-          export CRON_SECRET=cron_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e APP_DOMAINS=multideploy.test
+          export BILLING_MODE=stripe STRIPE_SECRET_KEY=sk_test_e2e CRON_SECRET=cron_e2e STRIPE_WEBHOOK_SECRET=whsec_e2e APP_DOMAINS=multideploy.test
           export INTEGRATIONS_KEY="$(head -c 32 /dev/urandom | base64)" APP_SECRET=app_secret_e2e_0123456789abcdef META_APP_SECRET=meta_secret_e2e WHATSAPP_VERIFY_TOKEN=verify_e2e META_GRAPH_BASE=http://127.0.0.1:3199
           (pnpm --filter @multideploy/web dev -p 3120 > dev.log 2>&1 &)
           for i in $(seq 1 60); do curl -sf http://localhost:3120/fr/login >/dev/null && break; sleep 2; done
@@ -55,5 +55,10 @@ jobs:
           node apps/web/e2e/phase4a.cjs
           node apps/web/e2e/phase4b.cjs
           node apps/web/e2e/phase5.cjs
+          # phase 6 : facturation manuelle (mode par défaut) → redémarrer le serveur sans BILLING_MODE
+          pkill -f "next dev" || true; sleep 2; unset BILLING_MODE STRIPE_SECRET_KEY
+          (pnpm --filter @multideploy/web dev -p 3120 > dev6.log 2>&1 &)
+          for i in $(seq 1 60); do curl -sf http://localhost:3120/fr/login >/dev/null && break; sleep 2; done
+          node apps/web/e2e/phase6.cjs
       - if: failure()
         run: tail -80 dev.log

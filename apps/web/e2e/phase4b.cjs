@@ -67,7 +67,7 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   ok((await sql`select count(*)::int n from shares`)[0].n === before + 1 && (await sql`select cardinality(property_ids) n from shares order by created_at desc limit 1`)[0].n === 2, "un envoi regroupant 2 biens créé pour le client");
 
   // ── agenda : planification, conflits, Chabbat, ICS ──
-  const props = await sql`select id from properties where organization_id = ${eliezer} and status = 'active' limit 2`;
+  const props = await sql`select id from properties p where organization_id = ${eliezer} and status = 'active' and not exists (select 1 from visits v where v.property_id = p.id and v.agent_id = ${yael}) order by id limit 2`;
   const next = (dow, hh) => { const d = new Date(); for (let i = 1; i < 14; i++) { const t = new Date(d.getTime() + i * 86400000); const w = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", weekday: "short" }).format(t); if (w === dow) { const [y, m, dd] = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(t).split("-"); return `${y}-${m}-${dd}T${hh}`; } } };
   await p.goto(`${BASE}/fr/agenda`);
   const tue = next("Tue", "10:00");

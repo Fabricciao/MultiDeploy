@@ -91,7 +91,7 @@ const mock = http.createServer((req, res) => {
     ?? (await sql`select id from properties where organization_id = ${eliezer} and status = 'active' limit 1`)[0];
   await sql`update brand_kits set legal_footer = jsonb_build_object('fr','Eliezer.immo · Courtier agréé','he','אליעזר נדל״ן · מתווך מורשה','en','Eliezer.immo · Licensed broker') where organization_id = ${eliezer}`;
   await p.goto(`${BASE}/fr/properties/${prop.id}/poster`); await p.waitForLoadState("networkidle");
-  await p.click('button:has-text("Générer")'); await p.waitForSelector('img[src^="/api/files/"]', { timeout: 60000 });
+  await p.click('button:has-text("Générer")'); await p.waitForSelector('h2:has-text("Affiches générées")', { timeout: 60000 });
   ok(await p.locator('button:has-text("Publier sur Facebook")').first().isVisible() && await p.locator('button:has-text("Publier sur Instagram")').first().isVisible(), "boutons de publication Facebook / Instagram visibles");
   let before = calls.length; await p.locator('button:has-text("Publier sur Facebook")').first().click(); await p.waitForSelector('button:has-text("Publié")', { timeout: 20000 });
   const fb = calls.slice(before).find((x) => /\/page_42\/photos$/.test(x.url));
