@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/origin";
 import type { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { guard, json, preflight } from "@/lib/api/http";
@@ -14,5 +15,5 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
       coalesce((select jsonb_agg(pm.id order by pm.is_cover desc, pm.position) from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' and pm.visibility = 'public'), '[]') as photo_ids
     from public.properties p left join public.geo_places g on g.id = p.city_id where p.public_token = ${id} and p.organization_id = ${g.auth.orgId} and p.deleted_at is null and p.status = 'active'`;
   if (!r) return json({ error: "not_found" }, 404);
-  return json({ data: { ...r, photos: (r.photo_ids as string[]).map((pid) => `${req.nextUrl.origin}/api/public/photo/${r.id}/${pid}`), photo_ids: undefined } });
+  return json({ data: { ...r, photos: (r.photo_ids as string[]).map((pid) => `${publicOrigin(req)}/api/public/photo/${r.id}/${pid}`), photo_ids: undefined } });
 }

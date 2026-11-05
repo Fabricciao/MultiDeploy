@@ -1,3 +1,4 @@
+import { publicOrigin } from "@/lib/origin";
 import type { NextRequest } from "next/server";
 import { sql } from "@/lib/db";
 import { guard, json, preflight } from "@/lib/api/http";
@@ -22,6 +23,6 @@ export async function GET(req: NextRequest) {
       and (${city}::text is null or ${city} in (g.name_fr, g.name_he, g.name_en))
       and (${num("rooms_min")}::numeric is null or p.rooms >= ${num("rooms_min")}) and (${num("price_max")}::numeric is null or p.price <= ${num("price_max")})
     order by p.published_at desc nulls last, p.id limit ${limit} offset ${offset}`;
-  const base = req.nextUrl.origin;
+  const base = publicOrigin(req);
   return json({ data: rows.map((r) => ({ ...r, photos: (r.photo_ids as string[]).map((pid) => `${base}/api/public/photo/${r.id}/${pid}`), photo_ids: undefined })), limit, offset });
 }

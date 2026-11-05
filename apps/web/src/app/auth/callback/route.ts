@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { createClient } from "@/lib/supabase/server";
+import { publicOrigin } from "@/lib/origin";
 
 /** Retour OAuth / magic link : échange le code contre une session puis redirige. */
 export async function GET(req: NextRequest) {
-  const { searchParams, origin } = new URL(req.url);
+  const { searchParams } = new URL(req.url);
+  const origin = publicOrigin(req);
   const code = searchParams.get("code");
   const rawNext = searchParams.get("next") ?? "/fr";
   // Anti open-redirect : uniquement des chemins relatifs internes
