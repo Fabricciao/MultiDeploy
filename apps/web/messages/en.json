@@ -87,7 +87,8 @@
       "magic": "Could not send the link. Make sure you have been invited.",
       "auth": "Could not sign in. Please try again.",
       "no_agency": "Your account is not linked to an active agency. Ask for an invitation.",
-      "unknown_tenant": "This address does not match any agency."
+      "unknown_tenant": "This address does not match any agency.",
+      "rate": "Too many attempts. Try again in a few minutes."
     }
   },
   "design": {
@@ -917,7 +918,11 @@
       "invalid": "Invalid data.",
       "forbidden": "Insufficient rights.",
       "past": "Date in the past."
-    }
+    },
+    "signLink": "Viewing sheet link",
+    "signedDoc": "Signed document",
+    "signReady": "Signing link ready — send it to the visitor (valid 7 days).",
+    "signHint": "The visitor signs on their phone; a time-stamped PDF is archived on the visit."
   },
   "import": {
     "title": "Import data",
@@ -1033,6 +1038,25 @@
       "no_key": "Encryption key missing: set INTEGRATIONS_KEY before connecting a service.",
       "forbidden": "Insufficient rights.",
       "invalid": "Invalid credentials."
+    }
+  },
+  "sign": {
+    "invalid": "This link is invalid or has expired.",
+    "thanks": "Thank you, your signature is saved.",
+    "thanksSub": "A copy is archived by {org}.",
+    "fullName": "Full name",
+    "consent": "I agree to sign this document electronically and that my name, signature and connection fingerprint are kept by the agency.",
+    "submit": "Sign",
+    "pad": "Signature area",
+    "hint": "Sign here with your finger or mouse",
+    "clear": "Clear",
+    "errors": {
+      "rate": "Too many attempts, try again later.",
+      "invalid_name": "Enter your full name.",
+      "invalid_signature": "Signature missing or invalid.",
+      "no_consent": "You must agree to sign.",
+      "already_signed": "This document is already signed.",
+      "invalid_token": "This link is invalid or has expired."
     }
   }
 }

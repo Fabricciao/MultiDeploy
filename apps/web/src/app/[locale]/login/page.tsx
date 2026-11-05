@@ -22,7 +22,7 @@ export default async function LoginPage({ params, searchParams }: { params: Prom
         <p className="mb-6 mt-1 text-muted">{t("subtitle")}</p>
 
         {!configured && <p role="status" className="mb-4 rounded-ui border border-line bg-sunken p-3 text-[13px]">{t("notConfigured")}</p>}
-        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth", "no_agency", "unknown_tenant"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
+        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth", "no_agency", "unknown_tenant", "rate"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
         {sp.sent && <p role="status" className="mb-4 text-[13px] text-success">{t("sent")}</p>}
 
         <form action={signInWithGoogle}>

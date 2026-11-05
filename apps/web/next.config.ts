@@ -3,6 +3,11 @@ import type { NextConfig } from "next";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
+const prod = process.env.NODE_ENV === "production";
+// CSP globale (production). 'unsafe-inline' reste nécessaire pour l'hydratation de Next sans nonce ; voir docs/SECURITY.md pour le durcissement par nonce.
+const CSP = ["default-src 'self'", "script-src 'self' 'unsafe-inline'", "style-src 'self' 'unsafe-inline'", "img-src 'self' data: blob: https:", "font-src 'self' data:", "media-src 'self' blob:",
+  "connect-src 'self' https://*.supabase.co wss://*.supabase.co", "object-src 'none'", "base-uri 'self'", "form-action 'self'", "frame-ancestors 'none'"].join("; ");
+
 const config: NextConfig = {
   reactStrictMode: true,
   poweredByHeader: false,
@@ -22,8 +27,10 @@ const config: NextConfig = {
           { key: "X-Frame-Options", value: "DENY" },
           { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
           { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(self)" },
+          ...(prod ? [{ key: "Content-Security-Policy", value: CSP }, { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" }] : []),
         ],
       },
+      { source: "/sw.js", headers: [{ key: "Cache-Control", value: "no-cache, no-store, must-revalidate" }, { key: "Content-Type", value: "application/javascript; charset=utf-8" }] },
     ];
   },
 };

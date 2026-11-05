@@ -87,7 +87,8 @@
       "magic": "Impossible d'envoyer le lien. Vérifiez que vous avez été invité.",
       "auth": "Connexion impossible. Réessayez.",
       "no_agency": "Votre compte n'est rattaché à aucune agence active. Demandez une invitation.",
-      "unknown_tenant": "Cette adresse ne correspond à aucune agence."
+      "unknown_tenant": "Cette adresse ne correspond à aucune agence.",
+      "rate": "Trop de tentatives. Réessayez dans quelques minutes."
     }
   },
   "design": {
@@ -917,7 +918,11 @@
       "invalid": "Données invalides.",
       "forbidden": "Droits insuffisants.",
       "past": "Date passée."
-    }
+    },
+    "signLink": "Lien du bon de visite",
+    "signedDoc": "Document signé",
+    "signReady": "Lien de signature prêt — envoyez-le au visiteur (valable 7 jours).",
+    "signHint": "Le visiteur signe sur son téléphone ; un PDF horodaté est archivé sur la visite."
   },
   "import": {
     "title": "Importer des données",
@@ -1033,6 +1038,25 @@
       "no_key": "Clé de chiffrement absente : configurez INTEGRATIONS_KEY avant de connecter un service.",
       "forbidden": "Droits insuffisants.",
       "invalid": "Identifiants invalides."
+    }
+  },
+  "sign": {
+    "invalid": "Ce lien n'est pas valide ou a expiré.",
+    "thanks": "Merci, votre signature est enregistrée.",
+    "thanksSub": "Une copie est archivée par {org}.",
+    "fullName": "Nom complet",
+    "consent": "J'accepte de signer électroniquement ce document et que mon nom, ma signature et l'empreinte de ma connexion soient conservés par l'agence.",
+    "submit": "Signer",
+    "pad": "Zone de signature",
+    "hint": "Signez ici avec le doigt ou la souris",
+    "clear": "Effacer",
+    "errors": {
+      "rate": "Trop d'essais, réessayez plus tard.",
+      "invalid_name": "Indiquez votre nom complet.",
+      "invalid_signature": "Signature manquante ou invalide.",
+      "no_consent": "Vous devez accepter pour signer.",
+      "already_signed": "Ce document est déjà signé.",
+      "invalid_token": "Ce lien n'est pas valide ou a expiré."
     }
   }
 }

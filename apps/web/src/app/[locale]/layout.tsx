@@ -4,6 +4,7 @@ import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isRtl, routing } from "@/i18n/routing";
 import { themeCss } from "@/lib/theme";
+import { SwRegister } from "@/components/sw-register";
 import "../globals.css";
 
 export const viewport: Viewport = { themeColor: "#1f4fd8", width: "device-width", initialScale: 1 };
@@ -15,7 +16,7 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Promise<{ locale: string }> }): Promise<Metadata> {
   const { locale } = await params;
   const t = await getTranslations({ locale, namespace: "meta" });
-  return { title: { default: t("title"), template: `%s · ${t("title")}` }, description: t("description"), robots: { index: false } };
+  return { title: { default: t("title"), template: `%s · ${t("title")}` }, description: t("description"), robots: { index: false }, manifest: "/manifest.webmanifest", icons: { icon: "/icons/icon-192.png", apple: "/icons/apple-touch-icon.png" }, appleWebApp: { capable: true, title: "MultiDeploy", statusBarStyle: "default" } };
 }
 
 export default async function LocaleLayout({ children, params }: { children: React.ReactNode; params: Promise<{ locale: string }> }) {
@@ -31,6 +32,7 @@ export default async function LocaleLayout({ children, params }: { children: Rea
       </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <SwRegister />
       </body>
     </html>
   );

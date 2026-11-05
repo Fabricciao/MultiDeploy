@@ -44,3 +44,18 @@ export async function renderPoster(html: string, format: PosterFormat): Promise<
     } finally { await ctx.close(); }
   });
 }
+
+/** Rend un HTML autonome en PDF A4 (bon de visite signé). Mêmes garde-fous que renderPoster : pas de JavaScript, réseau bloqué. */
+export async function renderPdf(html: string): Promise<Buffer> {
+  return slot(async () => {
+    const b = await browser();
+    const ctx = await b.newContext({ javaScriptEnabled: false });
+    try {
+      const page = await ctx.newPage();
+      await page.route("**/*", (r) => (/^(data|about):/.test(r.request().url()) ? r.continue() : r.abort()));
+      await page.setContent(html, { waitUntil: "load", timeout: 15000 });
+      await page.evaluate("document.fonts.ready").catch(() => {});
+      return Buffer.from(await page.pdf({ format: "A4", printBackground: true, margin: { top: "18mm", bottom: "18mm", left: "16mm", right: "16mm" } }));
+    } finally { await ctx.close(); }
+  });
+}

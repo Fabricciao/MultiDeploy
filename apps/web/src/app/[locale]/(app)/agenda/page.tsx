@@ -10,9 +10,9 @@ import { quietReason } from "@/lib/calendar/jewish";
 import { intlLocale, timeOnly } from "@/lib/format";
 import { Badge, PageHeader } from "@/components/ui";
 import { VisitForm } from "@/components/visit-form";
-import { visitStatusAction } from "./actions";
+import { signLinkAction, visitStatusAction } from "./actions";
 
-export default async function AgendaPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ w?: string }> }) {
+export default async function AgendaPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ w?: string; sign?: string }> }) {
   const { locale } = await params; const sp = await searchParams;
   setRequestLocale(locale);
   const ctx = await getCtx(locale);
@@ -35,6 +35,7 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
         <Link href={`/agenda?w=${off + 1}`} className="btn icon" aria-label={t("next")}><span className="flip"><ChevronRight size={16} aria-hidden /></span></Link>
         <a href="/api/ics/agenda" className="btn"><Download size={14} aria-hidden />{t("ics")}</a>
       </PageHeader>
+      {sp.sign && /^https?:\/\/[^\s]+\/(fr|he|en)\/sign\/[\w%.-]+$/.test(sp.sign) && <div role="status" className="card card-b col" style={{ gap: 6, marginBottom: 12 }}><b style={{ fontWeight: 500 }}>{t("signReady")}</b><input readOnly className="input ltr" dir="ltr" value={sp.sign} aria-label={t("signLink")} /><span className="note">{t("signHint")}</span></div>}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 340px", gap: 20, alignItems: "start" }} className="split">
         <div className="col" style={{ gap: 12 }}>
           {days.map((d) => {
@@ -47,6 +48,7 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
                     <b className="tab" style={{ width: 52 }}>{timeOnly(locale, v.starts_at)}</b>
                     <div className="grow"><Link href={`/properties/${v.property_id}`} style={{ fontWeight: 500 }}>{v.title ?? v.street ?? v.reference}</Link><div className="note"><MapPin size={11} aria-hidden /> {cityName({ name_fr: v.city_fr, name_he: v.city_he, name_en: v.city_en }, locale)}{v.contact_id ? <> · <Link href={`/clients/${v.contact_id}`}>{contactName(v, locale)}</Link></> : null} · {v.agent_name}</div></div>
                     <Badge tone={v.status === "done" ? "ok" : v.status === "planned" ? "acc" : "bad"}>{t(`status.${v.status}`)}</Badge>
+                    {v.document_path ? <a href={`/api/files/${v.document_path}`} className="btn sm" target="_blank" rel="noreferrer">{t("signedDoc")}</a> : v.status !== "cancelled" && v.agent_id === ctx.userId ? <form action={signLinkAction.bind(null, v.id)}><input type="hidden" name="locale" value={locale} /><button className="btn sm ghost">{t("signLink")}</button></form> : null}
                     <a href={`/api/ics/visit/${v.id}`} className="btn sm ghost" aria-label={t("ics")}><Download size={13} aria-hidden /></a>
                     {v.status === "planned" && v.agent_id === ctx.userId && (<>
                       <form action={visitStatusAction.bind(null, v.id, "done")}><input type="hidden" name="locale" value={locale} /><button className="btn sm">{t("markDone")}</button></form>

@@ -1,7 +1,10 @@
 "use server";
 import { revalidatePath } from "next/cache";
 import { getCtx } from "@/lib/session";
+import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 import { createVisit, setVisitStatus } from "@/lib/data/visits";
+import { visitSignLink } from "@/lib/data/signature";
 import { jerusalemToDate } from "@/lib/calendar/week";
 import { quietReason } from "@/lib/calendar/jewish";
 
@@ -25,4 +28,12 @@ export async function visitStatusAction(id: string, status: "done" | "cancelled"
   const locale = loc(fd); const ctx = await getCtx(locale);
   if (uuid.test(id)) await setVisitStatus(ctx, id, status);
   revalidatePath(`/${locale}/agenda`);
+}
+
+export async function signLinkAction(visitId: string, fd: FormData) {
+  const locale = loc(fd); const ctx = await getCtx(locale);
+  if (!uuid.test(visitId)) redirect(`/${locale}/agenda`);
+  const h = await headers(); const base = process.env.NEXT_PUBLIC_SITE_URL ?? `${h.get("x-forwarded-proto") ?? "http"}://${h.get("host")}`;
+  const link = await visitSignLink(ctx, visitId, base);
+  redirect(`/${locale}/agenda${link ? `?sign=${encodeURIComponent(link)}` : ""}`);
 }
