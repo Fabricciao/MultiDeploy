@@ -46,6 +46,7 @@ class SupabaseStorage implements Storage {
 }
 
 declare global { var __storage: Storage | undefined }
-export const storage: Storage = (globalThis.__storage ??= process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL
+// STORAGE_DRIVER=local force le disque local même si la clé de service Supabase est présente (pile minimale : Auth + Postgres sans le service Storage).
+export const storage: Storage = (globalThis.__storage ??= process.env.STORAGE_DRIVER !== "local" && process.env.SUPABASE_SERVICE_ROLE_KEY && process.env.NEXT_PUBLIC_SUPABASE_URL
   ? new SupabaseStorage(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY, process.env.STORAGE_BUCKET ?? "agency-files")
   : new LocalStorage());
