@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "MultiDeploy",
+    "title": "NadlanHub",
     "description": "CRM immobilier multi-agences"
   },
   "common": {
@@ -21,11 +21,13 @@
     "save": "Enregistrer",
     "saving": "Enregistrement…",
     "dictate": "Dicter",
-    "scan": "Scanner un papier"
+    "scan": "Scanner un papier",
+    "toggleTheme": "Changer de thème",
+    "help": "Aide et raccourcis"
   },
   "nav": {
     "label": "Navigation principale",
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "soon": "Disponible dans une prochaine phase",
     "today": "Aujourd'hui",
     "properties": "Biens",
@@ -35,7 +37,21 @@
     "marketing": "Marketing",
     "reports": "Rapports",
     "settings": "Paramètres",
-    "profile": "Mon profil"
+    "profile": "Mon profil",
+    "groups": {
+      "portfolio": "Portefeuille",
+      "growth": "Croissance",
+      "views": "Mes vues"
+    },
+    "poweredBy": "Propulsé par NadlanHub",
+    "collapse": "Replier la barre latérale",
+    "expand": "Déplier la barre latérale",
+    "crumbs": "Fil d'Ariane",
+    "detail": "Fiche",
+    "poster": "Affiche",
+    "more": "Plus",
+    "intake": "Saisie assistée",
+    "import": "Import"
   },
   "today": {
     "title": "Aujourd'hui",
@@ -72,7 +88,7 @@
     }
   },
   "login": {
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "title": "Connexion",
     "subtitle": "Accédez à l'espace de votre agence.",
     "google": "Continuer avec Google",
@@ -1124,5 +1140,20 @@
       "already_signed": "Ce document est déjà signé.",
       "invalid_token": "Ce lien n'est pas valide ou a expiré."
     }
+  },
+  "shortcuts": {
+    "title": "Raccourcis clavier",
+    "go": "Aller à",
+    "general": "Général",
+    "list": "Dans une liste",
+    "search": "Rechercher",
+    "new": "Menu Nouveau",
+    "rail": "Replier la barre latérale",
+    "help": "Afficher cette aide",
+    "move": "Ligne suivante, précédente",
+    "open": "Ouvrir la fiche",
+    "peek": "Ouvrir en aperçu",
+    "select": "Sélectionner",
+    "space": "Espace"
   }
 }

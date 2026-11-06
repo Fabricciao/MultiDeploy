@@ -21,11 +21,11 @@ export function Photo({ seed, label = "" }: { seed: string; label?: string }) {
 }
 
 export const Avatar = ({ text, cls = "", src }: { text: string; cls?: string; src?: string | null }) => <span className={`avatar ${cls}`}>{src ? <img src={src} alt="" /> : text}</span>;
-export const Badge = ({ tone = "", children }: { tone?: "" | "ok" | "warn" | "bad" | "acc"; children: ReactNode }) => <span className={`badge ${tone}`}>{children}</span>;
+export const Badge = ({ tone = "", children }: { tone?: "" | "ok" | "warn" | "bad" | "acc" | "info" | "sig"; children: ReactNode }) => <span className={`badge ${tone}`}>{children}</span>;
 
 export function Ring({ value }: { value: number }) {
   return (
-    <span className="ring" style={{ background: `conic-gradient(var(--accent) ${value * 3.6}deg, var(--line) 0)` }} title={`${value}%`}>
+    <span className="ring" style={{ background: `conic-gradient(var(--signal) ${value * 3.6}deg, var(--surface-sunken) 0)` }} title={`${value}%`}>
       <span className="ring-in tab">{value}</span>
     </span>
   );

@@ -11,7 +11,7 @@ export function LocaleSwitcher() {
   const pathname = usePathname();
   const router = useRouter();
   return (
-    <div role="group" aria-label={t("language")} className="inline-flex rounded-ui border border-line bg-surface p-0.5">
+    <div role="group" aria-label={t("language")} className="seg">
       {locales.map((l) => (
         <button
           key={l}
@@ -19,9 +19,7 @@ export function LocaleSwitcher() {
           lang={l}
           aria-pressed={l === locale}
           onClick={() => router.replace(pathname, { locale: l })}
-          className={`h-7 min-w-9 rounded-[calc(var(--radius)-2px)] px-2 text-xs font-medium transition-colors ${
-            l === locale ? "bg-accent text-white" : "text-muted hover:text-ink"
-          }`}
+          className={l === locale ? "on" : ""}
         >
           {LABEL[l]}
         </button>

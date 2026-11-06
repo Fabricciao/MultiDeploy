@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "MultiDeploy",
+    "title": "NadlanHub",
     "description": "Multi-agency real estate CRM"
   },
   "common": {
@@ -21,11 +21,13 @@
     "save": "Save",
     "saving": "Saving…",
     "dictate": "Dictate",
-    "scan": "Scan a paper"
+    "scan": "Scan a paper",
+    "toggleTheme": "Switch theme",
+    "help": "Help and shortcuts"
   },
   "nav": {
     "label": "Main navigation",
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "soon": "Available in a later phase",
     "today": "Today",
     "properties": "Properties",
@@ -35,7 +37,21 @@
     "marketing": "Marketing",
     "reports": "Reports",
     "settings": "Settings",
-    "profile": "My profile"
+    "profile": "My profile",
+    "groups": {
+      "portfolio": "Portfolio",
+      "growth": "Growth",
+      "views": "My views"
+    },
+    "poweredBy": "Powered by NadlanHub",
+    "collapse": "Collapse sidebar",
+    "expand": "Expand sidebar",
+    "crumbs": "Breadcrumb",
+    "detail": "Details",
+    "poster": "Poster",
+    "more": "More",
+    "intake": "Assisted entry",
+    "import": "Import"
   },
   "today": {
     "title": "Today",
@@ -72,7 +88,7 @@
     }
   },
   "login": {
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "title": "Sign in",
     "subtitle": "Access your agency workspace.",
     "google": "Continue with Google",
@@ -1124,5 +1140,20 @@
       "already_signed": "This document is already signed.",
       "invalid_token": "This link is invalid or has expired."
     }
+  },
+  "shortcuts": {
+    "title": "Keyboard shortcuts",
+    "go": "Go to",
+    "general": "General",
+    "list": "In a list",
+    "search": "Search",
+    "new": "New menu",
+    "rail": "Collapse sidebar",
+    "help": "Show this help",
+    "move": "Next, previous row",
+    "open": "Open the record",
+    "peek": "Open preview",
+    "select": "Select",
+    "space": "Space"
   }
 }

@@ -1,6 +1,6 @@
 {
   "meta": {
-    "title": "MultiDeploy",
+    "title": "NadlanHub",
     "description": "CRM נדל״ן לריבוי סוכנויות"
   },
   "common": {
@@ -21,11 +21,13 @@
     "save": "שמירה",
     "saving": "שומר…",
     "dictate": "הכתבה",
-    "scan": "סריקת דף"
+    "scan": "סריקת דף",
+    "toggleTheme": "החלפת ערכת נושא",
+    "help": "עזרה וקיצורי מקלדת"
   },
   "nav": {
     "label": "ניווט ראשי",
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "soon": "יהיה זמין בשלב מאוחר יותר",
     "today": "היום",
     "properties": "נכסים",
@@ -35,7 +37,21 @@
     "marketing": "שיווק",
     "reports": "דוחות",
     "settings": "הגדרות",
-    "profile": "הפרופיל שלי"
+    "profile": "הפרופיל שלי",
+    "groups": {
+      "portfolio": "תיק נכסים",
+      "growth": "צמיחה",
+      "views": "התצוגות שלי"
+    },
+    "poweredBy": "מופעל על ידי NadlanHub",
+    "collapse": "כיווץ סרגל הצד",
+    "expand": "הרחבת סרגל הצד",
+    "crumbs": "פירורי לחם",
+    "detail": "כרטיס",
+    "poster": "מודעה",
+    "more": "עוד",
+    "intake": "הזנה מונחית",
+    "import": "ייבוא"
   },
   "today": {
     "title": "היום",
@@ -72,7 +88,7 @@
     }
   },
   "login": {
-    "brand": "MultiDeploy",
+    "brand": "NadlanHub",
     "title": "התחברות",
     "subtitle": "כניסה לסביבת העבודה של הסוכנות שלך.",
     "google": "המשך עם Google",
@@ -1124,5 +1140,20 @@
       "already_signed": "המסמך כבר חתום.",
       "invalid_token": "הקישור אינו תקף או שפג תוקפו."
     }
+  },
+  "shortcuts": {
+    "title": "קיצורי מקלדת",
+    "go": "מעבר אל",
+    "general": "כללי",
+    "list": "ברשימה",
+    "search": "חיפוש",
+    "new": "תפריט חדש",
+    "rail": "כיווץ סרגל הצד",
+    "help": "הצגת העזרה",
+    "move": "שורה הבאה, קודמת",
+    "open": "פתיחת הכרטיס",
+    "peek": "פתיחה בתצוגה מקדימה",
+    "select": "בחירה",
+    "space": "רווח"
   }
 }

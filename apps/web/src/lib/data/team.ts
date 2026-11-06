@@ -38,7 +38,7 @@ export async function inviteMember(ctx: Ctx, email: string, role: string, siteUr
   const [o] = await sql`select name_fr, name_he, name_en from public.organizations where id = ${ctx.orgId}`;
   const name = (locale === "he" ? o!.name_he : locale === "en" ? o!.name_en : o!.name_fr) ?? o!.name_fr;
   const link = `${siteUrl}/${locale}/invite/${token}`;
-  const T = { fr: [`Invitation à rejoindre ${name}`, `Vous êtes invité(e) à rejoindre ${name} sur MultiDeploy.`, "Accepter l'invitation"], he: [`הזמנה להצטרף ל-${name}`, `הוזמנת להצטרף ל-${name} ב-MultiDeploy.`, "אישור ההזמנה"], en: [`Invitation to join ${name}`, `You have been invited to join ${name} on MultiDeploy.`, "Accept the invitation"] }[locale as "fr" | "he" | "en"] ?? ["", "", ""];
+  const T = { fr: [`Invitation à rejoindre ${name}`, `Vous êtes invité(e) à rejoindre ${name} sur NadlanHub.`, "Accepter l'invitation"], he: [`הזמנה להצטרף ל-${name}`, `הוזמנת להצטרף ל-${name} ב-MultiDeploy.`, "אישור ההזמנה"], en: [`Invitation to join ${name}`, `You have been invited to join ${name} on MultiDeploy.`, "Accept the invitation"] }[locale as "fr" | "he" | "en"] ?? ["", "", ""];
   const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;" })[c]!);
   await sendEmail({ to: mail, subject: T[0]!, text: `${T[1]}\n${link}`, html: `<div dir="${locale === "he" ? "rtl" : "ltr"}" style="font-family:Arial,sans-serif"><p>${esc(T[1]!)}</p><p><a href="${esc(link)}" style="display:inline-block;background:#1f4fd8;color:#fff;padding:10px 18px;border-radius:8px;text-decoration:none">${esc(T[2]!)}</a></p></div>` });
   return {};

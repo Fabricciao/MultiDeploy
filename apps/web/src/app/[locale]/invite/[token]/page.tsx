@@ -26,7 +26,7 @@ export default async function InvitePage({ params, searchParams }: { params: Pro
   }
   return (
     <main style={{ maxWidth: 460, margin: "16vh auto", padding: 16 }}>
-      <div className="row" style={{ marginBottom: 20 }}><b>MultiDeploy</b><span className="sp"><LocaleSwitcher /></span></div>
+      <div className="row" style={{ marginBottom: 20 }}><b>NadlanHub</b><span className="sp"><LocaleSwitcher /></span></div>
       <h1 style={{ fontSize: 22, fontWeight: 600 }}>{t("acceptTitle", { name })}</h1>
       <p className="muted" style={{ margin: "6px 0 16px" }}>{t("acceptSub", { email: inv.email })}</p>
       {err && <div role="alert" className="err" style={{ marginBottom: 12 }}>{t(`acceptErrors.${["wrong_account", "seat_limit"].includes(err) ? err : "invalid"}`)}</div>}

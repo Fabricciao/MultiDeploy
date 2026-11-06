@@ -44,8 +44,8 @@ export function CommandPalette() {
   if (!open) return null;
   let last = "";
   return (
-    <div role="dialog" aria-modal="true" aria-label={t("title")} onClick={() => setOpen(false)} style={{ position: "fixed", inset: 0, background: "rgb(12 18 36/.45)", zIndex: 80, display: "grid", placeItems: "start center", paddingTop: "12vh" }}>
-      <div onClick={(e) => e.stopPropagation()} className="card" style={{ width: "min(620px, 92vw)", overflow: "hidden", boxShadow: "0 20px 60px -10px rgb(0 0 0/.4)" }}>
+    <div role="dialog" aria-modal="true" aria-label={t("title")} onClick={() => setOpen(false)} className="overlay">
+      <div onClick={(e) => e.stopPropagation()} className="palette">
         <div className="row" style={{ padding: "10px 14px", borderBottom: "1px solid var(--line)", gap: 10 }}>
           <Search size={16} aria-hidden />
           <input ref={input} value={q} onChange={(e) => setQ(e.target.value)} placeholder={t("placeholder")} aria-label={t("placeholder")} className="grow" style={{ border: 0, outline: 0, background: "transparent", fontSize: 15 }}
@@ -64,5 +64,5 @@ export function CommandPalette() {
   );
 }
 export function PaletteButton({ label }: { label: string }) {
-  return <button type="button" className="search" onClick={() => window.dispatchEvent(new Event("open-palette"))} style={{ cursor: "pointer", textAlign: "start" }}><Search size={14} aria-hidden /><span className="grow">{label}</span><span className="kbd ltr">Ctrl K</span></button>;
+  return <button type="button" className="search" onClick={() => window.dispatchEvent(new Event("open-palette"))} style={{ textAlign: "start" }}><Search size={14} aria-hidden /><span className="grow">{label}</span><span className="kbd ltr">⌘</span><span className="kbd ltr">K</span></button>;
 }
