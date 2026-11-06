@@ -14,7 +14,7 @@ const ITEMS = [
   { key: "settings", href: "/settings", icon: Settings, ready: true },
 ] as const;
 
-export function Sidebar({ orgName, userName, roleLabel, counts }: { orgName: string; userName: string; roleLabel: string; counts: { properties: number; clients: number } }) {
+export function Sidebar({ orgName, userName, avatarUrl, roleLabel, counts }: { orgName: string; userName: string; avatarUrl?: string | null; roleLabel: string; counts: { properties: number; clients: number } }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   return (
@@ -33,7 +33,7 @@ export function Sidebar({ orgName, userName, roleLabel, counts }: { orgName: str
           </span>
         );
       })}
-      <div className="side-foot"><span className="avatar">{userName.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span><div className="grow"><b style={{ fontWeight: 500, display: "block", lineHeight: 1.2 }}>{userName}</b></div></div>
+      <Link href="/settings/profile" className="side-foot" title={t("profile")}><span className="avatar">{avatarUrl ? <img src={avatarUrl} alt="" /> : userName.split(" ").map((w) => w[0]).slice(0, 2).join("")}</span><div className="grow"><b style={{ fontWeight: 500, display: "block", lineHeight: 1.2 }}>{userName}</b></div></Link>
     </aside>
   );
 }

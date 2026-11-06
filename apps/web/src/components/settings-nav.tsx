@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { Link } from "@/i18n/navigation";
 
 const TABS = [
+  { key: "profile", href: "/settings/profile", cap: "" },
   { key: "brand", href: "/settings/brand", cap: "brand.manage" },
   { key: "team", href: "/settings/team", cap: "members.manage" },
   { key: "plan", href: "/settings/plan", cap: "billing.manage" },

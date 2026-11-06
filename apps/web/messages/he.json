@@ -34,7 +34,8 @@
     "agenda": "יומן",
     "marketing": "שיווק",
     "reports": "דוחות",
-    "settings": "הגדרות"
+    "settings": "הגדרות",
+    "profile": "הפרופיל שלי"
   },
   "today": {
     "title": "היום",
@@ -639,7 +640,28 @@
       "integrations": "אינטגרציות",
       "audit": "יומן ביקורת",
       "data": "נתונים",
-      "connections": "חיבורים"
+      "connections": "חיבורים",
+      "profile": "הפרופיל שלי"
+    }
+  },
+  "profile": {
+    "title": "הפרופיל שלי",
+    "sub": "הפרטים האישיים שלכם, גלויים לצוות שלכם.",
+    "photo": "תמונת פרופיל",
+    "removePhoto": "הסרת התמונה",
+    "photoHint": "PNG, JPEG או WebP, עד 3MB. התמונה נחתכת לריבוע.",
+    "name": "שם פרטי ושם משפחה",
+    "phone": "טלפון",
+    "email": "כתובת אימייל",
+    "emailHint": "משמשת להתחברות ואי אפשר לשנות אותה כאן.",
+    "save": "שמירה",
+    "saved": "הפרופיל נשמר.",
+    "errors": {
+      "name_required": "יש להזין שם.",
+      "phone_invalid": "מספר טלפון לא תקין.",
+      "avatar_too_large": "התמונה כבדה מדי (עד 3MB).",
+      "avatar_invalid": "הקובץ אינו קריא: בחרו תמונת PNG, JPEG או WebP.",
+      "forbidden": "לא ניתן לבצע שינוי."
     }
   },
   "team": {

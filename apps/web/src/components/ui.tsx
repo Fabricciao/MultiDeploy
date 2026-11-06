@@ -20,7 +20,7 @@ export function Photo({ seed, label = "" }: { seed: string; label?: string }) {
   );
 }
 
-export const Avatar = ({ text, cls = "" }: { text: string; cls?: string }) => <span className={`avatar ${cls}`}>{text}</span>;
+export const Avatar = ({ text, cls = "", src }: { text: string; cls?: string; src?: string | null }) => <span className={`avatar ${cls}`}>{src ? <img src={src} alt="" /> : text}</span>;
 export const Badge = ({ tone = "", children }: { tone?: "" | "ok" | "warn" | "bad" | "acc"; children: ReactNode }) => <span className={`badge ${tone}`}>{children}</span>;
 
 export function Ring({ value }: { value: number }) {

@@ -45,7 +45,8 @@ export async function createTask(ctx: Ctx, title: string, dueAt: string | null, 
 export async function getOnboarding(ctx: Ctx) {
   if (!ctx.caps.has("org.manage") && !ctx.caps.has("brand.manage")) return null;
   const [r] = await db(ctx, (tx) => tx`select
-    (select coalesce(legal_footer->>'fr', legal_footer->>'he', legal_footer->>'en', '') <> '' from public.brand_kits where organization_id = ${ctx.orgId}) as brand,
+    (select version > 1 or logo_light_path is not null or source_url is not null or coalesce(legal_footer->>'fr', legal_footer->>'he', legal_footer->>'en', '') <> ''
+       from public.brand_kits where organization_id = ${ctx.orgId}) as brand,
     (select count(*) from public.memberships where organization_id = ${ctx.orgId} and status = 'active')::int > 1 as team,
     (select count(*) from public.properties where deleted_at is null)::int > 0 as property,
     (select count(*) from public.property_media)::int > 0 as photo,

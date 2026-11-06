@@ -34,7 +34,8 @@
     "agenda": "Agenda",
     "marketing": "Marketing",
     "reports": "Rapports",
-    "settings": "Paramètres"
+    "settings": "Paramètres",
+    "profile": "Mon profil"
   },
   "today": {
     "title": "Aujourd'hui",
@@ -639,7 +640,28 @@
       "integrations": "Intégrations",
       "audit": "Journal d'audit",
       "data": "Données",
-      "connections": "Connexions"
+      "connections": "Connexions",
+      "profile": "Mon profil"
+    }
+  },
+  "profile": {
+    "title": "Mon profil",
+    "sub": "Vos informations personnelles, visibles par votre équipe.",
+    "photo": "Photo de profil",
+    "removePhoto": "Supprimer la photo",
+    "photoHint": "PNG, JPEG ou WebP, 3 Mo maximum. Elle est recadrée en carré.",
+    "name": "Prénom et nom",
+    "phone": "Téléphone",
+    "email": "Adresse e-mail",
+    "emailHint": "Elle sert à vous connecter et ne peut pas être modifiée ici.",
+    "save": "Enregistrer",
+    "saved": "Profil enregistré.",
+    "errors": {
+      "name_required": "Le nom est obligatoire.",
+      "phone_invalid": "Numéro de téléphone invalide.",
+      "avatar_too_large": "Photo trop lourde (3 Mo maximum).",
+      "avatar_invalid": "Fichier illisible : choisissez une image PNG, JPEG ou WebP.",
+      "forbidden": "Modification impossible."
     }
   },
   "team": {
