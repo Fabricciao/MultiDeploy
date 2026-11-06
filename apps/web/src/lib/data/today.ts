@@ -9,7 +9,8 @@ export async function getToday(ctx: Ctx) {
       order by t.due_at limit 12`;
     const visits = await tx`
       select v.id, v.starts_at, v.property_id, p.reference, p.street, p.house_number, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
-        c.id as contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he
+        c.id as contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.phones,
+        (select pm.thumb_path from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb
       from public.visits v join public.properties p on p.id = v.property_id left join public.geo_places g on g.id = p.city_id left join public.contacts c on c.id = v.contact_id
       where v.status = 'planned' and v.starts_at >= date_trunc('day', now()) and v.starts_at < date_trunc('day', now()) + interval '7 days' and (v.agent_id = ${ctx.userId} or ${ctx.caps.has("properties.write_all")})
       order by v.starts_at limit 6`;
@@ -20,7 +21,8 @@ export async function getToday(ctx: Ctx) {
       order by (p.mandate->>'end')::date limit 6`;
     const fresh = await tx`
       select p.id, p.reference, p.street, p.rooms, p.price, p.currency, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
-        (select count(*) from public.match_contacts_for_property(p.id)) as n
+        (select count(*) from public.match_contacts_for_property(p.id)) as n,
+        (select pm.thumb_path from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb
       from public.properties p left join public.geo_places g on g.id = p.city_id
       where p.status = 'active' and p.deleted_at is null and p.created_at > now() - interval '45 days' order by p.created_at desc limit 12`;
     const kpi = await tx`

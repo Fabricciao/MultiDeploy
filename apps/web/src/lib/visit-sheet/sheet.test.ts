@@ -9,9 +9,9 @@ const base = { orgName: "Eliezer.immo", reference: "EI-0001", address: "Ahuza 10
 
 describe("bon de visite", () => {
   it("échappe les données et pose la direction", () => {
-    const h = visitSheetHtml({ ...base, locale: "he" }, { inter: "", heeboHe: "", heeboLatin: "" });
+    const h = visitSheetHtml({ ...base, locale: "he" }, { sans: "x", sansBold: "x", sansHe: "x", sansHeBold: "x", display: "x", displayHe: "x" });
     expect(h).toContain('dir="rtl"'); expect(h).not.toContain("<script>"); expect(h).toContain("&lt;script&gt;");
-    expect(visitSheetHtml({ ...base, locale: "fr" }, { inter: "", heeboHe: "", heeboLatin: "" })).toContain('dir="ltr"');
+    expect(visitSheetHtml({ ...base, locale: "fr" }, { sans: "x", sansBold: "x", sansHe: "x", sansHeBold: "x", display: "x", displayHe: "x" })).toContain('dir="ltr"');
   });
   it("trois langues, mêmes déclarations", () => { expect(TEXT.fr.declare.length).toBe(TEXT.he.declare.length); expect(TEXT.en.declare.length).toBe(3); });
   it.skipIf(!hasChromium)("génère un PDF valide", async () => {

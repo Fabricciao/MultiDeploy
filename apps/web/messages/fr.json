@@ -23,7 +23,10 @@
     "dictate": "Dicter",
     "scan": "Scanner un papier",
     "toggleTheme": "Changer de thème",
-    "help": "Aide et raccourcis"
+    "help": "Aide et raccourcis",
+    "close": "Fermer",
+    "openRecord": "Ouvrir la fiche",
+    "preview": "Aperçu"
   },
   "nav": {
     "label": "Navigation principale",
@@ -64,7 +67,8 @@
     },
     "visits": {
       "title": "Visites",
-      "empty": "Aucune visite aujourd'hui."
+      "empty": "Aucune visite aujourd'hui.",
+      "all": "Voir l'agenda"
     },
     "followups": {
       "title": "Relances en retard",
@@ -85,6 +89,11 @@
       "title": "Nouveaux biens avec clients intéressés",
       "empty": "Aucun nouveau bien ne correspond à un client pour l'instant.",
       "clients": "{count, plural, one {# client} other {# clients}}"
+    },
+    "next": {
+      "title": "Prochaine visite",
+      "route": "Itinéraire",
+      "call": "Appeler"
     }
   },
   "login": {
@@ -110,7 +119,8 @@
       "unknown_tenant": "Cette adresse ne correspond à aucune agence.",
       "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
       "code": "Code invalide ou expiré. Vérifiez-le ou demandez un nouveau lien."
-    }
+    },
+    "claim": "Chaque bien trouve son client"
   },
   "design": {
     "title": "Design system",
@@ -352,7 +362,11 @@
     "poster": "Créer une affiche",
     "import": "Importer",
     "bulkSend": "Envoyer la sélection à un client",
-    "bulkHint": "Cochez des biens dans le tableau, puis cliquez ici."
+    "bulkHint": "Cochez des biens dans le tableau, puis cliquez ici.",
+    "ground": "RDC",
+    "viewLabel": "Affichage",
+    "viewTable": "Tableau",
+    "viewGrid": "Grille"
   },
   "clients": {
     "kind": {
@@ -1001,7 +1015,10 @@
     "signLink": "Lien du bon de visite",
     "signedDoc": "Document signé",
     "signReady": "Lien de signature prêt — envoyez-le au visiteur (valable 7 jours).",
-    "signHint": "Le visiteur signe sur son téléphone ; un PDF horodaté est archivé sur la visite."
+    "signHint": "Le visiteur signe sur son téléphone ; un PDF horodaté est archivé sur la visite.",
+    "subline": "{n, plural, =0 {Aucune visite} one {# visite} other {# visites}} cette semaine",
+    "viewWeek": "Semaine",
+    "viewList": "Liste"
   },
   "import": {
     "title": "Importer des données",

@@ -1,6 +1,7 @@
 "use client";
 import { useOptimistic, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
+import { ArrowRightLeft } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Avatar } from "@/components/ui";
 import { moveDealAction } from "@/app/[locale]/(app)/deals/actions";
@@ -14,6 +15,7 @@ export function DealBoard({ stages, deals, canMove }: { stages: BoardStage[]; de
   const [, start] = useTransition();
   const [optimistic, setOptimistic] = useOptimistic(deals, (state, m: { id: string; stageId: string }) => state.map((d) => (d.id === m.id ? { ...d, stageId: m.stageId } : d)));
   const [over, setOver] = useState<string | null>(null);
+  const [drag, setDrag] = useState<string | null>(null);
   const [error, setError] = useState(false);
   // Formatage volontairement sans « notation: compact » : les données ICU de Node et du navigateur diffèrent (erreur d'hydratation).
   const nf = (o: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", o);
@@ -28,37 +30,45 @@ export function DealBoard({ stages, deals, canMove }: { stages: BoardStage[]; de
       if (!ok) setError(true);
     });
   };
+  const open = stages.filter((s) => s.kind === "open");
+  const stageColor = (s: BoardStage) => (s.kind === "won" ? "var(--success)" : `var(--stage-${Math.min(6, Math.round(((open.indexOf(s) + 1) / Math.max(1, open.length)) * 6))})`);
   return (
     <>
       {error && <div className="toast" role="alert">{t("moveFailed")}</div>}
-      <div style={{ display: "grid", gridTemplateColumns: `repeat(${stages.length}, minmax(165px, 1fr))`, gap: 12, overflowX: "auto", alignItems: "start", paddingBottom: 12 }}>
+      <div className="board" style={{ gridTemplateColumns: `repeat(${stages.length}, minmax(158px, 1fr))` }}>
         {stages.map((s) => {
           const list = optimistic.filter((d) => d.stageId === s.id);
           const sum = list.reduce((a, d) => a + (d.value ?? 0), 0);
           return (
-            <div key={s.id} className={`kcol col ${over === s.id ? "drop-on" : ""}`}
-              style={{ gap: 8, background: "var(--sunken)", borderRadius: 10, padding: 8, minHeight: 120 }}
+            <section key={s.id} className={`kcol ${over === s.id ? "drop-on" : ""}`} aria-label={s.name}
               onDragOver={canMove ? (e) => { e.preventDefault(); setOver(s.id); } : undefined}
               onDragLeave={() => setOver((o) => (o === s.id ? null : o))}
-              onDrop={canMove ? (e) => { e.preventDefault(); setOver(null); move(e.dataTransfer.getData("text/plain"), s.id); } : undefined}>
-              <div className="row" style={{ padding: "2px 4px 4px" }}>
-                <b style={{ fontWeight: 600 }}>{s.name}</b><span className="note tab">{list.length}</span>
-                <span className="sp note tab">{sum ? fmt(sum) : "—"}</span>
+              onDrop={canMove ? (e) => { e.preventDefault(); setOver(null); setDrag(null); move(e.dataTransfer.getData("text/plain"), s.id); } : undefined}>
+              <div className="kcol-h">
+                <div className="t"><i className="st" style={{ background: stageColor(s) }} /><span className="trunc">{s.name}</span><span className="sp cnt-b" style={{ background: "var(--surface)" }}>{list.length}</span></div>
+                <div className="s">{sum ? fmt(sum) : "—"}</div>
               </div>
               {list.map((d) => (
-                <div key={d.id} className="card" style={{ padding: "10px 11px", cursor: canMove ? "grab" : "default" }} draggable={canMove}
-                  onDragStart={(e) => e.dataTransfer.setData("text/plain", d.id)}>
-                  <Link href={`/clients/${d.contactId}`} style={{ fontWeight: 500, display: "block", marginBottom: 3 }}>{d.client}</Link>
-                  <div className="note" style={{ marginBottom: 8 }}>{d.sub}</div>
-                  <div className="row"><b className="tab" style={{ fontWeight: 600 }}>{d.value ? fmt(d.value) : "—"}</b><span className="sp"><Avatar text={d.agent} cls="sm" /></span></div>
-                  {canMove && (
-                    <select aria-label={t("moveTo")} className="input" style={{ height: 26, fontSize: 11.5, marginTop: 8 }} value={d.stageId} onChange={(e) => move(d.id, e.target.value)}>
-                      {stages.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
-                    </select>
-                  )}
-                </div>
+                <article key={d.id} className={`deal ${drag === d.id ? "drag" : ""}`} style={{ cursor: canMove ? "grab" : "default" }} draggable={canMove}
+                  onDragStart={(e) => { e.dataTransfer.setData("text/plain", d.id); setDrag(d.id); }} onDragEnd={() => setDrag(null)}>
+                  <Link href={`/clients/${d.contactId}`}><b>{d.client}</b></Link>
+                  <small className="tab">{d.sub}</small>
+                  <div className="f">
+                    <span className="price tab">{d.value ? fmt(d.value) : "—"}</span>
+                    <span className="row gap4">
+                      {canMove && (
+                        <span className="move" title={t("moveTo")}><ArrowRightLeft size={13} aria-hidden />
+                          <select aria-label={t("moveTo")} value={d.stageId} onChange={(e) => move(d.id, e.target.value)}>
+                            {stages.map((x) => <option key={x.id} value={x.id}>{x.name}</option>)}
+                          </select>
+                        </span>
+                      )}
+                      <Avatar text={d.agent} cls="sm" />
+                    </span>
+                  </div>
+                </article>
               ))}
-            </div>
+            </section>
           );
         })}
       </div>

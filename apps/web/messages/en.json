@@ -23,7 +23,10 @@
     "dictate": "Dictate",
     "scan": "Scan a paper",
     "toggleTheme": "Switch theme",
-    "help": "Help and shortcuts"
+    "help": "Help and shortcuts",
+    "close": "Close",
+    "openRecord": "Open record",
+    "preview": "Preview"
   },
   "nav": {
     "label": "Main navigation",
@@ -64,7 +67,8 @@
     },
     "visits": {
       "title": "Viewings",
-      "empty": "No viewings today."
+      "empty": "No viewings today.",
+      "all": "Open agenda"
     },
     "followups": {
       "title": "Overdue follow-ups",
@@ -85,6 +89,11 @@
       "title": "New properties with matching clients",
       "empty": "No new property matches a client yet.",
       "clients": "{count, plural, one {# client} other {# clients}}"
+    },
+    "next": {
+      "title": "Next visit",
+      "route": "Directions",
+      "call": "Call"
     }
   },
   "login": {
@@ -110,7 +119,8 @@
       "unknown_tenant": "This address does not match any agency.",
       "rate": "Too many attempts. Try again in a few minutes.",
       "code": "Invalid or expired code. Check it or request a new link."
-    }
+    },
+    "claim": "Every property finds its client"
   },
   "design": {
     "title": "Design system",
@@ -352,7 +362,11 @@
     "poster": "Create a poster",
     "import": "Import",
     "bulkSend": "Send selection to a client",
-    "bulkHint": "Tick properties in the table, then click here."
+    "bulkHint": "Tick properties in the table, then click here.",
+    "ground": "G",
+    "viewLabel": "View",
+    "viewTable": "Table",
+    "viewGrid": "Grid"
   },
   "clients": {
     "kind": {
@@ -1001,7 +1015,10 @@
     "signLink": "Viewing sheet link",
     "signedDoc": "Signed document",
     "signReady": "Signing link ready — send it to the visitor (valid 7 days).",
-    "signHint": "The visitor signs on their phone; a time-stamped PDF is archived on the visit."
+    "signHint": "The visitor signs on their phone; a time-stamped PDF is archived on the visit.",
+    "subline": "{n, plural, =0 {No visits} one {# visit} other {# visits}} this week",
+    "viewWeek": "Week",
+    "viewList": "List"
   },
   "import": {
     "title": "Import data",

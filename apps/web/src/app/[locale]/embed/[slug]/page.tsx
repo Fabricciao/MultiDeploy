@@ -36,7 +36,7 @@ export default async function EmbedPage({ params, searchParams }: { params: Prom
   }
   return (
     <>
-      <style dangerouslySetInnerHTML={{ __html: themeCss((o.colors as { primary?: string } | null)?.primary ?? "#1f4fd8") }} />
+      <style dangerouslySetInnerHTML={{ __html: themeCss((o.colors as { primary?: string } | null)?.primary) }} />
       <main style={{ padding: 16, maxWidth: 1100, margin: "0 auto" }}>
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 14 }}>
           {props.map((p) => (

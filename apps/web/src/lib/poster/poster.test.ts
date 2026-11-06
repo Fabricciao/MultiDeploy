@@ -1,7 +1,8 @@
 import { describe, expect, it } from "vitest";
 import { esc, posterHtml, readableOn, type PosterData } from "./html";
 
-const fonts = { inter: "data:font/woff2;base64,AA", heeboHe: "data:font/woff2;base64,AA", heeboLatin: "data:font/woff2;base64,AA" };
+const f = "data:font/woff2;base64,AA";
+const fonts = { sans: f, sansBold: f, sansHe: f, sansHeBold: f, display: f, displayHe: f };
 const base: PosterData = { locale: "he", format: "portrait", variant: "A", brand: { primary: "#0f766e", secondary: "#14304a", fontLatin: "Rubik", fontHebrew: "Heebo" }, orgName: "Eliezer.immo", tag: "למכירה", title: "4 חדרים · רעננה", place: "רעננה", price: "₪3,450,000", specs: ["112 מ״ר", "ממ״ד"], phone: "050-123-4567", agentName: "יעל", legal: "מתווך מורשה" };
 
 describe("posterHtml", () => {

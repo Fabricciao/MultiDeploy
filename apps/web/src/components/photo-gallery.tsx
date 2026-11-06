@@ -14,14 +14,14 @@ export function PhotoGallery({ propertyId, items, canEdit, seed }: { propertyId:
   const main = items[0];
   const rest = items.slice(1, 5);
   return (
-    <div className="card" style={{ padding: 8 }}>
-      <div style={{ display: "grid", gridTemplateColumns: rest.length ? "2fr 1fr 1fr" : "1fr", gridTemplateRows: rest.length ? "140px 140px" : "260px", gap: 6, borderRadius: 8, overflow: "hidden" }}>
-        <div style={{ gridRow: rest.length ? "span 2" : undefined }}>{main ? <img src={main.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <Photo seed={seed} />}</div>
-        {rest.map((p) => <div key={p.id}><img src={p.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /></div>)}
+    <div className="col" style={{ gap: 8 }}>
+      <div style={{ display: "grid", gridTemplateColumns: rest.length ? "2fr 1fr 1fr" : "1fr", gridTemplateRows: rest.length ? "150px 150px" : "300px", gap: 8 }}>
+        <div className="photo door" style={{ gridRow: rest.length ? "span 2" : undefined }}>{main ? <img src={main.url} alt="" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /> : <Photo seed={seed} />}</div>
+        {rest.map((p) => <div key={p.id} className="photo"><img src={p.url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} /></div>)}
       </div>
-      {items.length === 0 && <p className="note" style={{ padding: "8px 6px 2px" }}>{t("empty")}</p>}
+      {items.length === 0 && <p className="note">{t("empty")}</p>}
       {canEdit && (
-        <div className="col" style={{ gap: 8, padding: "10px 6px 4px" }}>
+        <div className="col" style={{ gap: 8 }}>
           {items.length > 0 && (
             <div className="row wrap" style={{ gap: 8 }}>
               {items.map((p) => (
@@ -37,7 +37,7 @@ export function PhotoGallery({ propertyId, items, canEdit, seed }: { propertyId:
           )}
           <form action={action} className="row wrap" style={{ gap: 8 }}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple className="input" style={{ maxWidth: 340, height: "auto", padding: 5 }} aria-label={t("choose")} />
+            <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple className="input" style={{ maxWidth: 340, height: "auto", padding: 5, display: "block" }} aria-label={t("choose")} />
             <button className="btn sm" disabled={pending}><Upload size={14} aria-hidden />{pending ? t("uploading") : t("upload")}</button>
           </form>
           {state && (state.errors?.length || state.ok === false) && !pending ? <div className="err" role="alert">{state.errors?.length ? state.errors.map((e) => `${e.name}: ${t(`errors.${e.code}`)}`).join(" · ") : t("errors.none")}</div> : null}

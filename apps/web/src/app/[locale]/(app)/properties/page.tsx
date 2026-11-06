@@ -1,16 +1,16 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ChevronLeft, ChevronRight, Clock, Plus, SlidersHorizontal, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, LayoutGrid, Plus, Rows3, SlidersHorizontal, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { listProperties } from "@/lib/data/properties";
 import { listAgents, listCities, cityName } from "@/lib/data/geo";
 import { MUST_HAVE, PAGE_SIZE, parsePropertyFilters, toQuery, type SP } from "@/lib/data/filters";
 import { dateShort, initials, money, num } from "@/lib/format";
-import { Badge, Avatar, PageHeader, Photo } from "@/components/ui";
+import { Badge, Avatar, Cover, PageHeader, statusTone } from "@/components/ui";
+import { AutoSubmit } from "@/components/shell";
+import { PropertyPeek } from "@/components/peek";
 import { SavedViews } from "@/components/saved-views";
 import { listViews } from "@/lib/data/views";
-
-const STATUS_TONE: Record<string, "ok" | "warn" | "acc" | ""> = { active: "ok", under_offer: "warn", sold: "acc", rented: "acc", draft: "" };
 
 export default async function PropertiesPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<SP> }) {
   const { locale } = await params;
@@ -22,7 +22,9 @@ export default async function PropertiesPage({ params, searchParams }: { params:
   const tc = await getTranslations("common");
   const [{ rows, total }, cities, agents, views] = await Promise.all([listProperties(ctx, f), listCities(ctx), listAgents(ctx), listViews(ctx, "properties")]);
 
-  const base = { q: f.q, tx: f.transaction, status: f.status, city: f.cityIds, rmin: f.roomsMin, rmax: f.roomsMax, pmin: f.priceMin, pmax: f.priceMax, has: f.has, agent: f.agent, mandate: f.mandate, sort: f.sort === "recent" ? undefined : f.sort };
+  const view = sp.view === "grid" ? "grid" : undefined;
+  const peekId = typeof sp.peek === "string" && /^[0-9a-f-]{36}$/i.test(sp.peek) ? sp.peek : null;
+  const base = { view, page: f.page > 1 ? f.page : undefined, q: f.q, tx: f.transaction, status: f.status, city: f.cityIds, rmin: f.roomsMin, rmax: f.roomsMax, pmin: f.priceMin, pmax: f.priceMax, has: f.has, agent: f.agent, mandate: f.mandate, sort: f.sort === "recent" ? undefined : f.sort };
   const without = (...keys: (keyof typeof base)[]) => toQuery({ ...base, ...Object.fromEntries(keys.map((k) => [k, undefined])) });
   const chips: { label: string; href: string }[] = [];
   if (f.q) chips.push({ label: `“${f.q}”`, href: without("q") });
@@ -37,6 +39,11 @@ export default async function PropertiesPage({ params, searchParams }: { params:
 
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const pageHref = (p: number) => toQuery({ ...base, page: p === 1 ? undefined : p });
+  const peekHref = (id: string) => `/properties${toQuery({ ...base, peek: id })}`;
+  const peekIdx = peekId ? rows.findIndex((r) => r.id === peekId) : -1;
+  const tag = (p: (typeof rows)[number]) => <Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>;
+  const name = (p: (typeof rows)[number]) => p.title ?? `${t(`types.${p.property_type}`)} · ${p.street ?? ""}`;
+  const city = (p: (typeof rows)[number]) => cityName({ name_fr: p.city_fr, name_he: p.city_he, name_en: p.city_en }, locale);
 
   return (
     <>
@@ -46,10 +53,10 @@ export default async function PropertiesPage({ params, searchParams }: { params:
       </PageHeader>
 
       <SavedViews scope="properties" views={views} currentQs={toQuery({ ...base, page: undefined }).replace(/^\?/, "")} locale={locale} canShare={ctx.caps.has("org.manage")} />
-      <form method="get" className="row wrap" style={{ marginBottom: 10 }}>
-        {f.sort !== "recent" && <input type="hidden" name="sort" value={f.sort} />}
-        <input name="q" defaultValue={f.q} placeholder={t("filters.q")} className="input" style={{ width: 220 }} aria-label={t("filters.q")} />
-        <select name="tx" defaultValue={f.transaction ?? ""} className="input" style={{ width: 130 }} aria-label={t("filters.transaction")}>
+      <form id="filters" method="get" className="row wrap" style={{ marginBottom: 10 }}>
+        {view && <input type="hidden" name="view" value={view} />}
+        <input name="q" type="search" defaultValue={f.q} placeholder={t("filters.q")} className="input" style={{ width: 220, height: 34 }} aria-label={t("filters.q")} />
+        <select name="tx" defaultValue={f.transaction ?? ""} className="input" style={{ width: 130, height: 34 }} aria-label={t("filters.transaction")}>
           <option value="">{t("filters.allTx")}</option><option value="sale">{t("tx.sale")}</option><option value="rent">{t("tx.rent")}</option>
         </select>
         <details className="pop" open={f.cityIds.length > 0 ? undefined : undefined}>
@@ -88,12 +95,17 @@ export default async function PropertiesPage({ params, searchParams }: { params:
             <div><div className="lbl">{t("filters.mandate")}</div><select name="mandate" defaultValue={f.mandate ?? ""} className="input"><option value="">{tc("all")}</option><option value="exclusive">{t("mandate.exclusive")}</option><option value="expiring">{t("mandate.expiring")}</option></select></div>
           </div>
         </details>
-        <select name="sort" defaultValue={f.sort} className="input" style={{ width: 170 }} aria-label={t("filters.sort")}>
+        <select name="sort" defaultValue={f.sort} className="input" style={{ width: 170, height: 34 }} aria-label={t("filters.sort")}>
           {(["recent", "price_asc", "price_desc", "mandate"] as const).map((s) => <option key={s} value={s}>{t(`sort.${s}`)}</option>)}
         </select>
-        <button className="btn pri">{tc("apply")}</button>
+        <button className="sr-only">{tc("apply")}</button>
         {chips.length > 0 && <Link href="/properties" className="btn ghost sm">{tc("reset")}</Link>}
+        <div className="seg sp" role="group" aria-label={t("viewLabel")}>
+          <Link href={`/properties${toQuery({ ...base, view: undefined })}`} className={view ? "" : "on"} aria-label={t("viewTable")} title={t("viewTable")}><Rows3 size={14} aria-hidden /></Link>
+          <Link href={`/properties${toQuery({ ...base, view: "grid" })}`} className={view ? "on" : ""} aria-label={t("viewGrid")} title={t("viewGrid")}><LayoutGrid size={14} aria-hidden /></Link>
+        </div>
       </form>
+      <AutoSubmit formId="filters" />
 
       {chips.length > 0 && (
         <div className="row wrap" style={{ marginBottom: 12 }}>
@@ -101,34 +113,44 @@ export default async function PropertiesPage({ params, searchParams }: { params:
         </div>
       )}
 
-      <div className="card" style={{ overflow: "hidden" }}>
-        {rows.length === 0 ? (
-          <p className="muted" style={{ padding: "40px 20px", textAlign: "center" }}>{t("empty")}</p>
-        ) : (
+      {rows.length === 0 ? (
+        <div className="card empty"><h3>{t("empty")}</h3>{chips.length > 0 && <Link href="/properties" className="btn">{tc("reset")}</Link>}</div>
+      ) : view ? (
+        <div className="pgrid">
+          {rows.map((p) => (
+            <Link key={p.id} href={peekHref(p.id)} scroll={false} className="pcard">
+              <div className="photo"><Cover path={p.cover_thumb} /><span className="tag">{tag(p)}</span></div>
+              <div className="b"><div className="price" style={{ fontSize: 16 }}>{money(locale, p.price, p.currency)}{p.transaction.includes("rent") ? <span className="note"> {t("perMonth")}</span> : null}</div><div className="trunc" style={{ fontWeight: 500, marginBlockStart: 2 }}>{name(p)}</div><div className="note">{city(p)}</div>
+                <div className="spec" style={{ marginBlockStart: 8 }}><span>{num(locale, p.rooms)} {t("rooms").toLowerCase()}</span><span>{num(locale, p.area_built, 0)} {t("sqm")}</span></div></div>
+            </Link>
+          ))}
+        </div>
+      ) : (
+        <div className="card" style={{ overflow: "hidden" }}>
           <div style={{ overflowX: "auto" }}>
-            <table className="tbl">
+            <table className="tbl props">
               <thead><tr>
-                <th style={{ width: 30 }}></th><th>{t("property")}</th><th>{t("city")}</th><th>{t("rooms")}</th><th>{t("area")}</th><th>{t("floor")}</th><th>{t("price")}</th><th>{t("statusLabel")}</th><th>{t("mandateLabel")}</th><th>{t("agent")}</th>
+                <th style={{ width: 36 }}></th><th>{t("property")}</th><th>{t("city")}</th><th className="n">{t("rooms")}</th><th className="n">{t("area")}</th><th className="n">{t("floor")}</th><th className="n">{t("price")}</th><th>{t("statusLabel")}</th><th>{t("mandateLabel")}</th><th>{t("agent")}</th>
               </tr></thead>
               <tbody>
                 {rows.map((p) => {
                   const days = p.mandate?.type === "exclusive" && p.mandate.end ? Math.round((new Date(p.mandate.end).getTime() - Date.now()) / 86_400_000) : null;
                   return (
-                    <tr key={p.id}>
+                    <tr key={p.id} data-row className={p.id === peekId ? "peek" : ""}>
                       <td><input type="checkbox" className="ck" name="p" value={p.id} form="bulk" aria-label={p.reference} /></td>
                       <td>
-                        <Link href={`/properties/${p.id}`} className="row" style={{ gap: 12 }}>
-                          <div className="thumb">{p.cover_thumb ? <img src={`/api/files/${p.cover_thumb}`} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover" }} /> : <Photo seed={p.id} label="" />}</div>
-                          <div><div style={{ fontWeight: 500 }}>{p.title ?? `${t(`types.${p.property_type}`)} · ${p.street ?? ""}`}</div><div className="note"><span className="ltr tab">{p.reference}</span></div></div>
-                        </Link>
+                        <div className="row gap12">
+                          <Link href={peekHref(p.id)} scroll={false} data-peek className="thumb" aria-label={name(p)}><Cover path={p.cover_thumb} /></Link>
+                          <div className="cell-t"><Link href={peekHref(p.id)} scroll={false} style={{ fontWeight: 500, display: "block", lineHeight: "18px" }}>{name(p)}</Link><Link href={`/properties/${p.id}`} data-open className="note"><span className="ltr tab">{p.reference}</span></Link></div>
+                        </div>
                       </td>
-                      <td>{cityName({ name_fr: p.city_fr, name_he: p.city_he, name_en: p.city_en }, locale)}<div className="note">{p.street} {p.address_visibility === "exact" ? p.house_number : ""}</div></td>
-                      <td className="tab">{num(locale, p.rooms)}</td>
-                      <td className="tab">{num(locale, p.area_built, 0)} {t("sqm")}</td>
-                      <td className="tab"><span className="ltr">{p.floor ?? "–"}{p.floors_total ? `/${p.floors_total}` : ""}</span></td>
-                      <td className="tab" style={{ fontWeight: 500 }}>{money(locale, p.price, p.currency)}{p.transaction.includes("rent") ? <span className="note"> {t("perMonth")}</span> : null}</td>
-                      <td><Badge tone={STATUS_TONE[p.status] ?? ""}><i className="dot" />{t(`status.${p.status}`)}</Badge></td>
-                      <td>{days === null ? <span className="muted">{p.mandate?.type === "non_exclusive" ? t("mandate.non_exclusive") : "—"}</span> : days <= 30 && days >= 0 ? <Badge tone="warn"><Clock size={12} aria-hidden />{t("mandate.expiresIn", { days })}</Badge> : days < 0 ? <Badge tone="bad">{t("mandate.expired")}</Badge> : <Badge>{t("mandate.exclusive")} · {dateShort(locale, p.mandate!.end)}</Badge>}</td>
+                      <td>{city(p)}<div className="note">{p.street} {p.address_visibility === "exact" ? p.house_number : ""}</div></td>
+                      <td className="n">{num(locale, p.rooms)}</td>
+                      <td className="n">{num(locale, p.area_built, 0)} {t("sqm")}</td>
+                      <td className="n"><span className="ltr">{p.floor === 0 ? t("ground") : p.floor ?? "–"}{p.floors_total ? `/${p.floors_total}` : ""}</span></td>
+                      <td className="n price">{money(locale, p.price, p.currency)}{p.transaction.includes("rent") ? <span className="note" style={{ fontWeight: 400 }}> {t("perMonth")}</span> : null}</td>
+                      <td>{tag(p)}</td>
+                      <td>{days === null ? <span className="note">{p.mandate?.type === "non_exclusive" ? t("mandate.non_exclusive") : "—"}</span> : days <= 30 && days >= 0 ? <Badge tone="warn"><Clock size={12} aria-hidden />{t("mandate.expiresIn", { days })}</Badge> : days < 0 ? <Badge tone="bad">{t("mandate.expired")}</Badge> : <Badge tone="acc">{t("mandate.exclusive")} · {dateShort(locale, p.mandate!.end)}</Badge>}</td>
                       <td>{p.agent_name ? <Avatar text={initials(p.agent_name)} /> : "—"}</td>
                     </tr>
                   );
@@ -136,8 +158,8 @@ export default async function PropertiesPage({ params, searchParams }: { params:
               </tbody>
             </table>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       <form id="bulk" action={`/${locale}/properties/send`} method="get" className="row" style={{ marginTop: 12, gap: 8 }}><button className="btn sm">{t("bulkSend")}</button><span className="note">{t("bulkHint")}</span></form>
 
@@ -148,6 +170,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
           {f.page < pages ? <Link href={`/properties${pageHref(f.page + 1)}`} className="btn sm">{tc("next")}<span className="flip"><ChevronRight size={14} aria-hidden /></span></Link> : null}
         </div>
       )}
+      {peekId && <PropertyPeek ctx={ctx} id={peekId} locale={locale} nav={{ closeHref: `/properties${toQuery(base)}`, prevHref: peekIdx > 0 ? peekHref(rows[peekIdx - 1]!.id) : null, nextHref: peekIdx >= 0 && peekIdx < rows.length - 1 ? peekHref(rows[peekIdx + 1]!.id) : null }} />}
     </>
   );
 }

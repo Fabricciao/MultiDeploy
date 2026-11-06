@@ -7,9 +7,8 @@ import { PageHeader } from "@/components/ui";
 
 function Bars({ rows, fmt }: { rows: { label: string; n: number; sub?: string }[]; fmt?: (n: number) => string }) {
   const max = Math.max(1, ...rows.map((r) => r.n));
-  return <div className="col" style={{ gap: 8 }} role="list">{rows.map((r, i) => (
-    <div key={i} role="listitem" className="col" style={{ gap: 3 }}><div className="row"><span className="grow">{r.label}</span><b className="tab">{fmt ? fmt(r.n) : r.n}</b></div>
-      <div className="bar" style={{ height: 8 }}><i style={{ width: `${(r.n / max) * 100}%` }} /></div>{r.sub && <span className="note">{r.sub}</span>}</div>))}</div>;
+  return <div className="col" role="list">{rows.map((r, i) => (
+    <div key={i} role="listitem" className="hbar" title={`${r.label} : ${fmt ? fmt(r.n) : r.n}`}><span className="trunc">{r.label}</span><div className="grow"><i style={{ width: `${(r.n / max) * 100}%` }} /></div><b className="tab">{fmt ? fmt(r.n) : r.n}</b>{r.sub && <span className="note tab hide-m">{r.sub}</span>}</div>))}</div>;
 }
 
 export default async function ReportsPage({ params }: { params: Promise<{ locale: string }> }) {
@@ -22,7 +21,7 @@ export default async function ReportsPage({ params }: { params: Promise<{ locale
   return (
     <>
       <PageHeader title={t("title")} sub={t("sub")} />
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(360px,1fr))", gap: 16, alignItems: "start" }}>
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,360px),1fr))", gap: 12, alignItems: "start" }}>
         <section className="card"><h2>{t("funnel")}</h2><div className="card-b"><Bars rows={r.funnel.filter((s) => s.kind !== "lost").map((s) => ({ label: pickName(s.name, locale), n: s.n, sub: s.value ? money(locale, s.value) : undefined }))} /></div></section>
         <section className="card"><h2>{t("sources")}</h2><div className="card-b">{r.sources.length ? <Bars rows={r.sources.map((s) => ({ label: pickName(s.name, locale), n: s.n }))} /> : <p className="muted">{t("empty")}</p>}</div></section>
         <section className="card"><h2>{t("propsByStatus")}</h2><div className="card-b"><Bars rows={r.status.map((s) => ({ label: tp(`status.${s.status}`), n: s.n }))} /></div></section>

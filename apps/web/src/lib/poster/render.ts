@@ -6,11 +6,19 @@ import type { Browser } from "playwright-core";
 import { FORMATS, type PosterFormat } from "./html";
 
 const FONT_DIR = process.env.POSTER_FONT_DIR ?? join(process.cwd(), "assets", "fonts");
-let fontCache: { inter: string; heeboHe: string; heeboLatin: string } | null = null;
+export type EmbeddedFonts = { sans: string; sansBold: string; sansHe: string; sansHeBold: string; display: string; displayHe: string };
+let fontCache: EmbeddedFonts | null = null;
 export async function loadFonts() {
   if (fontCache) return fontCache;
-  const b64 = async (f: string) => `data:font/woff2;base64,${(await readFile(join(FONT_DIR, f))).toString("base64")}`;
-  return (fontCache = { inter: await b64("inter-latin-wght-normal.woff2"), heeboHe: await b64("heebo-hebrew-wght-normal.woff2"), heeboLatin: await b64("heebo-latin-wght-normal.woff2") });
+  const read = async (f: string) => `data:font/woff2;base64,${(await readFile(join(FONT_DIR, f))).toString("base64")}`;
+  // Repli sur les anciennes polices si le dossier déployé n'a pas encore les nouvelles : une affiche ne doit jamais échouer pour une police.
+  const b64 = (f: string, old: string) => read(f).catch(() => read(old));
+  const [sans, sansBold, sansHe, sansHeBold, display, displayHe] = await Promise.all([
+    b64("ibm-plex-sans-latin-400-normal.woff2", "inter-latin-wght-normal.woff2"), b64("ibm-plex-sans-latin-600-normal.woff2", "inter-latin-wght-normal.woff2"),
+    b64("ibm-plex-sans-hebrew-hebrew-400-normal.woff2", "heebo-hebrew-wght-normal.woff2"), b64("ibm-plex-sans-hebrew-hebrew-600-normal.woff2", "heebo-hebrew-wght-normal.woff2"),
+    b64("frank-ruhl-libre-latin-wght-normal.woff2", "inter-latin-wght-normal.woff2"), b64("frank-ruhl-libre-hebrew-wght-normal.woff2", "heebo-hebrew-wght-normal.woff2"),
+  ]);
+  return (fontCache = { sans, sansBold, sansHe, sansHeBold, display, displayHe });
 }
 
 /** Chromium : CHROMIUM_PATH si défini, sinon le Chromium pré-installé de l'environnement, sinon celui de Playwright. */

@@ -25,15 +25,15 @@ export function Crumbs() {
 
 /** Bascule clair/sombre : le choix reste sur l'appareil, le script de <head> l'applique avant le premier affichage. */
 export function ThemeToggle() {
-  const t = useTranslations("common");
+  const tc = useTranslations("common");
   const [dark, setDark] = useState(false);
   useEffect(() => { setDark(document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches)); }, []);
   const flip = () => { const next = dark ? "light" : "dark"; document.documentElement.dataset.theme = next; try { localStorage.setItem("theme", next); } catch { /* stockage indisponible */ } setDark(!dark); };
-  return <button type="button" className="iconbtn hide-m" onClick={flip} aria-label={t("toggleTheme")} title={t("toggleTheme")}>{dark ? <Sun size={17} strokeWidth={1.75} aria-hidden /> : <Moon size={17} strokeWidth={1.75} aria-hidden />}</button>;
+  return <button type="button" className="iconbtn hide-m" onClick={flip} aria-label={tc("toggleTheme")} title={tc("toggleTheme")}>{dark ? <Sun size={17} strokeWidth={1.75} aria-hidden /> : <Moon size={17} strokeWidth={1.75} aria-hidden />}</button>;
 }
 
 export function NewMenu() {
-  const t = useTranslations("common");
+  const tc = useTranslations("common");
   const ref = useRef<HTMLDetailsElement>(null);
   const close = () => { if (ref.current) ref.current.open = false; };
   useEffect(() => {
@@ -44,13 +44,13 @@ export function NewMenu() {
   }, []);
   return (
     <details className="pop hide-m" ref={ref}>
-      <summary className="btn pri"><Plus size={15} aria-hidden />{t("new")}<ChevronDown size={13} aria-hidden /></summary>
+      <summary className="btn pri"><Plus size={15} aria-hidden />{tc("new")}<ChevronDown size={13} aria-hidden /></summary>
       <div className="pop-body" style={{ minWidth: 220, padding: 6, insetInlineStart: "auto", insetInlineEnd: 0 }} onClick={close}>
-        <Link href="/intake?mode=voice&target=contact" className="mi" style={{ fontWeight: 500 }}><Mic size={16} aria-hidden />{t("dictate")}</Link>
-        <Link href="/intake?mode=scan&target=contact" className="mi" style={{ fontWeight: 500 }}><ScanLine size={16} aria-hidden />{t("scan")}</Link>
+        <Link href="/intake?mode=voice&target=contact" className="mi" style={{ fontWeight: 500 }}><Mic size={16} aria-hidden />{tc("dictate")}</Link>
+        <Link href="/intake?mode=scan&target=contact" className="mi" style={{ fontWeight: 500 }}><ScanLine size={16} aria-hidden />{tc("scan")}</Link>
         <div className="sep" />
-        <Link href="/clients/new" className="mi"><UserPlus size={16} aria-hidden />{t("newClient")}</Link>
-        <Link href="/properties/new" className="mi"><House size={16} aria-hidden />{t("newProperty")}</Link>
+        <Link href="/clients/new" className="mi"><UserPlus size={16} aria-hidden />{tc("newClient")}</Link>
+        <Link href="/properties/new" className="mi"><House size={16} aria-hidden />{tc("newProperty")}</Link>
       </div>
     </details>
   );
@@ -101,8 +101,8 @@ const GO: Record<string, string> = { a: "/", b: "/properties", c: "/clients", f:
 
 /** Raccourcis clavier globaux. Inactifs pendant la saisie. */
 export function Shortcuts() {
-  const t = useTranslations("shortcuts");
-  const tn = useTranslations("nav");
+  const ts = useTranslations("shortcuts");
+  const t = useTranslations("nav");
   const router = useRouter();
   const [help, setHelp] = useState(false);
   useEffect(() => {
@@ -134,14 +134,14 @@ export function Shortcuts() {
   if (!help) return null;
   const row = (keys: string[], label: string) => <div className="row" style={{ height: 30, fontSize: 13 }}><span className="grow">{label}</span>{keys.map((k) => <span key={k} className="kbd">{k}</span>)}</div>;
   return (
-    <div role="dialog" aria-modal="true" aria-label={t("title")} className="overlay" onClick={() => setHelp(false)}>
+    <div role="dialog" aria-modal="true" aria-label={ts("title")} className="overlay" onClick={() => setHelp(false)}>
       <div className="dialog" style={{ width: 640 }} onClick={(e) => e.stopPropagation()}>
         <div className="bd">
-          <h3 style={{ marginBlockEnd: 14 }}>{t("title")}</h3>
+          <h3 style={{ marginBlockEnd: 14 }}>{ts("title")}</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 24 }}>
-            <div><div className="over" style={{ marginBlockEnd: 6 }}>{t("go")}</div>{row(["G", "A"], tn("today"))}{row(["G", "B"], tn("properties"))}{row(["G", "C"], tn("clients"))}{row(["G", "F"], tn("deals"))}{row(["G", "P"], tn("agenda"))}{row(["G", "R"], tn("reports"))}</div>
-            <div><div className="over" style={{ marginBlockEnd: 6 }}>{t("general")}</div>{row(["⌘", "K"], t("search"))}{row(["N"], t("new"))}{row(["["], t("rail"))}{row(["?"], t("help"))}</div>
-            <div><div className="over" style={{ marginBlockEnd: 6 }}>{t("list")}</div>{row(["J", "K"], t("move"))}{row(["↵"], t("open"))}{row([t("space")], t("peek"))}{row(["X"], t("select"))}</div>
+            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("go")}</div>{row(["G", "A"], t("today"))}{row(["G", "B"], t("properties"))}{row(["G", "C"], t("clients"))}{row(["G", "F"], t("deals"))}{row(["G", "P"], t("agenda"))}{row(["G", "R"], t("reports"))}</div>
+            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("general")}</div>{row(["⌘", "K"], ts("search"))}{row(["N"], ts("new"))}{row(["["], ts("rail"))}{row(["?"], ts("help"))}</div>
+            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("list")}</div>{row(["J", "K"], ts("move"))}{row(["↵"], ts("open"))}{row([ts("space")], ts("peek"))}{row(["X"], ts("select"))}</div>
           </div>
         </div>
       </div>

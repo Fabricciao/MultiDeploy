@@ -27,7 +27,7 @@ export default async function SignPage({ params, searchParams }: { params: Promi
   const fmt = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-GB" : "fr-FR", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Jerusalem" });
   return (
     <main style={{ maxWidth: 560, margin: "0 auto", padding: "24px 16px 48px" }}>
-      <h1 style={{ fontSize: 22, fontWeight: 600, marginBottom: 2 }}>{TEXT[locale].title}</h1>
+      <h1 className="t-page" style={{ marginBottom: 2 }}>{TEXT[locale].title}</h1>
       <p className="muted" style={{ marginBottom: 16 }}>{info.orgName}</p>
       <dl className="card card-b" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px", margin: "0 0 16px" }}>
         <dt className="note">{TEXT[locale].property}</dt><dd style={{ margin: 0 }}>{info.reference} — {info.address}</dd>

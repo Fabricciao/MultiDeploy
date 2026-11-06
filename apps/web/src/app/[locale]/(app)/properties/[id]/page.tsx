@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Pencil, Archive, Sparkles, Target } from "lucide-react";
+import { Pencil, Archive, Image as ImageIcon, Sparkles } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { getProperty } from "@/lib/data/properties";
@@ -8,7 +8,7 @@ import { cityName } from "@/lib/data/geo";
 import { contactName } from "@/lib/data/contacts";
 import { dateTime, initials, money, num, relDays } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
-import { Avatar, Badge, PageHeader, Photo } from "@/components/ui";
+import { Avatar, Badge, PageHeader, statusTone } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
 import { hasWhatsApp } from "@/lib/data/connections";
 import { PhotoGallery } from "@/components/photo-gallery";
@@ -45,10 +45,10 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
   return (
     <>
       <PageHeader title={title} sub={[city, p.street && `${p.street}${p.address_visibility === "exact" && p.house_number ? " " + p.house_number : ""}`].filter(Boolean).join(" · ")}>
-        <Badge tone={p.status === "active" ? "ok" : p.status === "under_offer" ? "warn" : ""}><i className="dot" />{t(`status.${p.status}`)}</Badge>
+        <Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>
         <span className="badge"><span className="ltr tab">{p.reference}</span></span>
         {days !== null && days >= 0 && days <= 30 && <Badge tone="warn">{t("mandate.expiresIn", { days })}</Badge>}
-        {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><Sparkles size={14} aria-hidden />{t("poster")}</Link>}
+        {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><ImageIcon size={14} aria-hidden />{t("poster")}</Link>}
         {canEdit && <Link href={`/properties/${id}/edit`} className="btn"><Pencil size={14} aria-hidden />{tc("edit")}</Link>}
       </PageHeader>
 
@@ -60,7 +60,7 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
             {spec(t("price"), money(locale, p.price, p.currency))}
             {spec(t("rooms"), num(locale, p.rooms))}
             {spec(t("area"), `${num(locale, p.area_built, 0)} ${t("sqm")}`)}
-            {spec(t("floor"), <span className="ltr">{p.floor ?? "–"}{p.floors_total ? ` / ${p.floors_total}` : ""}</span>)}
+            {spec(t("floor"), <span className="ltr">{p.floor === 0 ? t("ground") : p.floor ?? "–"}{p.floors_total ? ` / ${p.floors_total}` : ""}</span>)}
             {spec(t("has.mamad"), yes(p.mamad))}{spec(t("has.parking"), p.parking_count ?? 0)}{spec(t("has.elevator"), yes(p.elevator))}{spec(t("has.sukkah_balcony"), yes(p.sukkah_balcony))}
             {spec(t("form.arnona"), money(locale, p.arnona_monthly))}{spec(t("form.vaad"), money(locale, p.vaad_bayit_monthly))}
             {spec(t("form.registration"), p.registration_type ? t(`form.reg.${p.registration_type}`) : "—")}
@@ -77,14 +77,14 @@ export default async function PropertyPage({ params }: { params: Promise<{ local
 
         <div className="col" style={{ gap: 16 }}>
           <div className="card"><div className="card-b col" style={{ gap: 12 }}>
-            <div><div className="note">{t("askingPrice")}</div><div className="tab" style={{ fontSize: 26, fontWeight: 600, letterSpacing: "-.02em" }}>{money(locale, p.price, p.currency)}</div>
+            <div><div className="note">{t("askingPrice")}</div><div className="t-price tab">{money(locale, p.price, p.currency)}</div>
               {p.price && p.area_built && <div className="note tab">{money(locale, Number(p.price) / Number(p.area_built), p.currency)} / {t("sqm")}</div>}</div>
             <hr className="sw" />
             <div className="row">{p.agent_name && <Avatar text={initials(p.agent_name)} />}<div className="grow"><div style={{ fontWeight: 500 }}>{p.agent_name ?? "—"}</div><div className="note">{t("agent")}</div></div></div>
             {data.owners.map((o) => <div key={o.id + o.relation} className="row"><Avatar text={initials(contactName(o, locale))} /><div className="grow"><Link href={`/clients/${o.id}`} style={{ fontWeight: 500 }}>{contactName(o, locale)}</Link><div className="note">{t(`relation.${o.relation}`)}{o.phones?.[0]?.e164 ? <> · <span className="ltr">{formatPhone(o.phones[0].e164)}</span></> : null}</div></div></div>)}
           </div></div>
 
-          <div className="card"><h2><Target size={15} aria-hidden />{ts("matchingClients")}<span className="badge acc">{items.length}</span></h2>
+          <div className="card"><h2><Sparkles size={15} aria-hidden />{ts("matchingClients")}<span className="badge sig">{items.length}</span></h2>
             {p.status === "active" ? <SendForm mode="property" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /> : <p className="muted card-b">{ts("onlyActive")}</p>}
           </div>
 

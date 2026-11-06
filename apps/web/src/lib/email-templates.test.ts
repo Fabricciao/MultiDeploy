@@ -21,5 +21,5 @@ describe("renderShareEmail", () => {
     expect(r.html).toContain("unsubscribe");
     expect(r.text).toContain("unsubscribe");
   });
-  it("ignore une couleur d'accent invalide", () => expect(renderShareEmail({ ...base, locale: "en", accent: "red;}</style>" }).html).toContain("#1f4fd8"));
+  it("ignore une couleur d'accent invalide", () => expect(renderShareEmail({ ...base, locale: "en", accent: "red;}</style>" }).html).toContain("#005C73"));
 });
