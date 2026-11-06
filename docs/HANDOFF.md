@@ -12,7 +12,7 @@ Docs : `docs/spec/` (spec + résultats), `docs/DEPLOY-VPS.md`, `docs/KEYS.md`, `
 - Réponses en français, courtes, honnêtes sur ce qui est vérifié ou non.
 
 ## Adresses (domaine `nadlanhub.cloud`, enregistré le 6/11 via le crédit gratuit d'un an Hostinger, sans paiement)
-- `https://nadlanhub.cloud` (et `www.`) : **page d'attente de la vitrine**, en HTTPS (certificat Let's Encrypt, vérifié 200). Projet Docker `vitrine` (nginx:1.27-alpine, page écrite par le `command` du compose, routeur Traefik `Host(nadlanhub.cloud) || Host(www.nadlanhub.cloud)`). Texte en français seulement (« Bientôt disponible »), sans contact ni argument commercial inventé. À remplacer par le vrai site de présentation. La redirection `http://` → `https://` **n'a pas pu être testée** depuis la session (le proxy bloque le HTTP) : à vérifier dans un navigateur.
+- `https://nadlanhub.cloud` (et `www.`) : **page d'attente de la vitrine**, en HTTPS (certificat Let's Encrypt, vérifié 200). Projet Docker `vitrine` (nginx:1.27-alpine, page écrite par le `command` du compose, routeur Traefik `Host(nadlanhub.cloud) || Host(www.nadlanhub.cloud)`). Texte en français seulement (« Bientôt disponible »), sans contact ni argument commercial inventé. À remplacer par le vrai site de présentation. Redirection `http://` → `https://` **confirmée par l'utilisateur** (navigateur, 6/11) pour `nadlanhub.cloud` ; non testée pour `www.`, `admin.` et `eliezerimmo.` (le proxy de la session bloque le HTTP simple).
 - `https://admin.nadlanhub.cloud` : console plateforme (administrateur, sans agence) **et** serveur d'authentification GoTrue (`/auth/v1`). Hôte réservé dans `tenant.ts` (« admin », « app », « www », etc. ne sont jamais des agences).
 - `https://<slug>.nadlanhub.cloud` : une agence, connexion directe sur son adresse (l'agence est imposée par l'hôte). Aujourd'hui : `eliezerimmo`.
 - DNS (Hostinger) : `@` et `*` en A vers 46.202.130.62 (TTL 300), `www` CNAME, + enregistrements Resend (voir plus bas).
@@ -54,7 +54,7 @@ Pour la production (≈ 10 agences) : VPS dédié + Coolify (joker automatique).
 ## État fonctionnel (vérifié)
 - Migrations 1-18 appliquées ; GoTrue OK ; CRM en ligne sur `admin.` et `eliezerimmo.` (health 200, login 200, certificats valides) ; rendu actif ; sauvegarde quotidienne OK.
 - Compte administrateur plateforme : `fabrice.delpec@gmail.com` (connexion par lien et par code OK sur `admin.`).
-- Agence pilote : slug `eliezerimmo`, nom FR « Eliezer Immo », plan essai, langue fr, propriétaire `contact@eliezer.immo` (compte et rôle `owner` actifs, vérifiés en base le 6/11). **Invitation envoyée et livrée le 6/11** ; **connexion du propriétaire pas encore confirmée**. Le nom hébreu de l'agence est encore en lettres latines. Ligne `org_domains` de l'agence restée sur l'ancien hôte sslip.io (sans effet : l'agence est résolue par le slug du sous-domaine).
+- Agence pilote : slug `eliezerimmo`, nom FR « Eliezer Immo », plan essai, langue fr, propriétaire `contact@eliezer.immo` (compte et rôle `owner` actifs, vérifiés en base le 6/11). **Invitation envoyée et livrée le 6/11** ; **le propriétaire s'est connecté et est entré dans son interface (confirmé par l'utilisateur le 6/11)**. Le nom hébreu de l'agence est encore en lettres latines. Ligne `org_domains` de l'agence restée sur l'ancien hôte sslip.io (sans effet : l'agence est résolue par le slug du sous-domaine).
 - **Non testé en réel** : connexion du propriétaire d'agence sur `eliezerimmo.nadlanhub.cloud`, invitations d'équipe par e-mail, création de biens/clients/affiches/bon de visite, Google, Meta/WhatsApp, IA, Stripe (désactivé, facturation manuelle).
 - Connu : les liens générés côté agence (invitations d'équipe, etc.) utilisent `NEXT_PUBLIC_SITE_URL` (= `admin.`) : l'invité arrive sur `admin.` (fonctionne, l'agence active étant déduite de son profil) plutôt que sur le sous-domaine de son agence. À corriger si gênant.
 
@@ -67,8 +67,8 @@ Pour la production (≈ 10 agences) : VPS dédié + Coolify (joker automatique).
 - IA : fournisseurs interchangeables (Anthropic ou compatible OpenAI type DeepSeek/Groq pour le texte ; DeepSeek ne lit pas les images ; transcription par `STT_BASE_URL`).
 
 ## À faire (dans l'ordre conseillé)
-1. **Confirmer la connexion du propriétaire** (`contact@eliezer.immo`) sur `eliezerimmo.nadlanhub.cloud` ; s'il ne trouve rien, regarder ses courriers indésirables (statut Resend `delivered`). Corriger ensuite le nom hébreu de l'agence et fixer l'échéance d'essai.
-2. **Vérifier `http://nadlanhub.cloud` → HTTPS** dans un navigateur (et `www.`), et que `http://admin.` / `http://eliezerimmo.` redirigent aussi.
+1. Corriger le nom hébreu de l'agence pilote et fixer l'échéance d'essai (console `admin.`). Recueillir les retours du propriétaire sur son premier passage.
+2. Vérifier dans un navigateur que `http://www.`, `http://admin.` et `http://eliezerimmo.` redirigent aussi vers HTTPS (probablement le cas : redirection globale du Traefik).
 3. **Vitrine** : remplacer la page d'attente par le vrai site de présentation (contenu, version hébreu/anglais relue).
 4. Vérifier le CRM de bout en bout avec l'utilisateur (bien, client, affiche, bon de visite, import CSV d'Eliezer.immo).
 5. **En fin de mise en place** : supprimer la clé Resend Full access et son credential réseau ; copie des sauvegardes hors VPS ; régénérer les secrets si souhaité ; supprimer la clé de déploiement GitHub une fois une autre méthode de mise à jour en place ; créer `main` si une référence stable est voulue.
