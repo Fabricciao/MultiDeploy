@@ -2,7 +2,7 @@ import "server-only";
 import { existsSync } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { join } from "node:path";
-import { chromium, type Browser } from "playwright-core";
+import type { Browser } from "playwright-core";
 import { FORMATS, type PosterFormat } from "./html";
 
 const FONT_DIR = process.env.POSTER_FONT_DIR ?? join(process.cwd(), "assets", "fonts");
@@ -19,7 +19,8 @@ function executablePath() {
   return existsSync("/opt/pw-browsers/chromium") ? "/opt/pw-browsers/chromium" : undefined;
 }
 declare global { var __browser: Promise<Browser> | undefined }
-const browser = () => (globalThis.__browser ??= chromium.launch({ executablePath: executablePath(), args: ["--no-sandbox", "--disable-dev-shm-usage"] }).then((b) => { b.on("disconnected", () => { globalThis.__browser = undefined; }); return b; }));
+// Import paresseux : en production le rendu passe par POSTER_RENDER_URL et playwright-core (incomplet dans la sortie autonome) ne doit jamais être chargé.
+const browser = () => (globalThis.__browser ??= import("playwright-core").then(({ chromium }) => chromium.launch({ executablePath: executablePath(), args: ["--no-sandbox", "--disable-dev-shm-usage"] })).then((b) => { b.on("disconnected", () => { globalThis.__browser = undefined; }); return b; }));
 
 let active = 0; const waiters: (() => void)[] = [];
 const MAX = Number(process.env.POSTER_CONCURRENCY ?? 2);

@@ -45,7 +45,7 @@ export default async function PlatformHome({ params, searchParams }: { params: P
         <form action={createAgencyAction} className="card"><h2>{t("create")}</h2><div className="card-b col" style={{ gap: 10 }}>
           <input type="hidden" name="locale" value={locale} />
           <input name="name_fr" className="input" placeholder={t("nameFr")} aria-label={t("nameFr")} /><input name="name_he" className="input" dir="rtl" placeholder={t("nameHe")} aria-label={t("nameHe")} /><input name="name_en" className="input" placeholder={t("nameEn")} aria-label={t("nameEn")} />
-          <input name="slug" className="input" dir="ltr" placeholder="slug" required pattern="[a-z0-9][a-z0-9-]{1,30}[a-z0-9]" aria-label="slug" />
+          <input name="slug" className="input" dir="ltr" placeholder="slug" required pattern="[a-z0-9][a-z0-9\-]{1,30}[a-z0-9]" aria-label="slug" />
           <input name="owner_email" type="email" className="input" dir="ltr" placeholder={t("ownerEmail")} required aria-label={t("ownerEmail")} />
           <div className="row" style={{ gap: 8 }}><select name="default_locale" className="input" aria-label={t("defaultLocale")}><option value="fr">FR</option><option value="he">עב</option><option value="en">EN</option></select>
             <select name="plan" className="input" defaultValue="trial" aria-label={t("plan")}>{plans.map((p) => <option key={p.key} value={p.key}>{pickName(p.name, locale)}</option>)}</select></div>
