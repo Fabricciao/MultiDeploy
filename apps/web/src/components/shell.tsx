@@ -23,12 +23,12 @@ export function Crumbs() {
   );
 }
 
-/** Bascule clair/sombre : le choix reste sur l'appareil, le script de <head> l'applique avant le premier affichage. */
+/** Bascule clair/sombre : le choix est gardé dans un cookie, lu côté serveur, donc appliqué dès le premier affichage. */
 export function ThemeToggle() {
   const tc = useTranslations("common");
   const [dark, setDark] = useState(false);
   useEffect(() => { setDark(document.documentElement.dataset.theme === "dark" || (!document.documentElement.dataset.theme && matchMedia("(prefers-color-scheme: dark)").matches)); }, []);
-  const flip = () => { const next = dark ? "light" : "dark"; document.documentElement.dataset.theme = next; try { localStorage.setItem("theme", next); } catch { /* stockage indisponible */ } setDark(!dark); };
+  const flip = () => { const next = dark ? "light" : "dark"; document.documentElement.dataset.theme = next; document.cookie = `theme=${next};path=/;max-age=31536000;samesite=lax`; setDark(!dark); };
   return <button type="button" className="iconbtn hide-m" onClick={flip} aria-label={tc("toggleTheme")} title={tc("toggleTheme")}>{dark ? <Sun size={17} strokeWidth={1.75} aria-hidden /> : <Moon size={17} strokeWidth={1.75} aria-hidden />}</button>;
 }
 

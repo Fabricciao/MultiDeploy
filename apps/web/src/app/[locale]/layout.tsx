@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { notFound } from "next/navigation";
+import { cookies } from "next/headers";
 import { hasLocale, NextIntlClientProvider } from "next-intl";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { isRtl, routing } from "@/i18n/routing";
@@ -24,11 +25,12 @@ export default async function LocaleLayout({ children, params }: { children: Rea
   if (!hasLocale(routing.locales, locale)) notFound();
   setRequestLocale(locale);
   const css = themeCss(null, 6);
+  const saved = (await cookies()).get("theme")?.value;
+  const theme = saved === "dark" || saved === "light" ? saved : undefined;
   return (
-    <html lang={locale} dir={isRtl(locale) ? "rtl" : "ltr"} suppressHydrationWarning>
+    <html lang={locale} dir={isRtl(locale) ? "rtl" : "ltr"} data-theme={theme}>
       <head>
         <style dangerouslySetInnerHTML={{ __html: css }} />
-        <script dangerouslySetInnerHTML={{ __html: `try{var t=localStorage.getItem("theme");if(t)document.documentElement.dataset.theme=t}catch(e){}` }} />
       </head>
       <body>
         <NextIntlClientProvider>{children}</NextIntlClientProvider>

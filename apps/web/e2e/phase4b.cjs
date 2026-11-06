@@ -36,8 +36,8 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   // ── vues enregistrées ──
   await p.goto(`${BASE}/fr/properties?tx=sale&rmin=4`); await p.click('summary:has-text("Enregistrer la vue")'); await p.fill('input[name="name"]', "Ventes 4p+"); await p.check('input[name="shared"]'); await p.click('button:has-text("Enregistrer la vue")'); await p.waitForURL(/rmin=4/); await p.waitForTimeout(800);
   ok((await sql`select count(*)::int n from saved_views where name = 'Ventes 4p+' and shared`)[0].n === 1, "vue enregistrée (partagée avec l'agence)");
-  await as(david); await p.goto(`${BASE}/fr/properties`); ok(await p.locator('a:has-text("Ventes 4p+")').isVisible(), "la vue partagée est visible par un collègue");
-  await p.click('a:has-text("Ventes 4p+")'); await p.waitForURL(/tx=sale/); ok(/rmin=4/.test(p.url()), "ouvrir une vue restaure ses filtres");
+  await as(david); await p.goto(`${BASE}/fr/properties`); ok(await p.locator('main a:has-text("Ventes 4p+")').isVisible(), "la vue partagée est visible par un collègue");
+  await p.click('main a:has-text("Ventes 4p+")'); await p.waitForURL(/tx=sale/); ok(/rmin=4/.test(p.url()), "ouvrir une vue restaure ses filtres");
   ok((await p.locator("form", { hasText: "Ventes 4p+" }).locator("button").count()) === 0, "un collègue ne peut pas supprimer la vue d'un autre");
   await as(yael);
 
@@ -82,7 +82,7 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   const ics = await ctx.request.get(`${BASE}/api/ics/agenda`); const icsT = await ics.text();
   ok(ics.status() === 200 && icsT.includes("BEGIN:VEVENT") && icsT.includes("DTSTART:") && (ics.headers()["content-type"] ?? "").includes("text/calendar"), "export iCalendar de l'agenda");
   const vid = (await sql`select id from visits where agent_id = ${yael} order by created_at desc limit 1`)[0].id; ok((await (await ctx.request.get(`${BASE}/api/ics/visit/${vid}`)).text()).includes("SUMMARY:Visite"), "export .ics d'une visite");
-  await p.goto(`${BASE}/fr/agenda`); await p.locator('button:has-text("Effectuée")').first().click(); await p.waitForTimeout(800); ok((await sql`select count(*)::int n from visits where status = 'done' and agent_id = ${yael}`)[0].n >= 1, "visite marquée effectuée");
+  await p.goto(`${BASE}/fr/agenda?view=list`); await p.locator('button:has-text("Effectuée")').first().click(); await p.waitForTimeout(800); ok((await sql`select count(*)::int n from visits where status = 'done' and agent_id = ${yael}`)[0].n >= 1, "visite marquée effectuée");
   ok(await p.locator("text=Chabbat").first().isVisible(), "le samedi est signalé « Chabbat » dans la semaine");
 
   // ── rapports ──

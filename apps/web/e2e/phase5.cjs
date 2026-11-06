@@ -117,9 +117,9 @@ const mock = http.createServer((req, res) => {
   // ── bon de visite signé ──
   const contact = (await sql`select id from contacts where organization_id = ${eliezer} and deleted_at is null limit 1`)[0];
   const [v] = await sql`insert into visits (organization_id, property_id, contact_id, agent_id, starts_at, ends_at) values (${eliezer}, ${prop.id}, ${contact.id}, ${yael}, now() + interval '3 days', now() + interval '3 days 30 minutes') returning id`;
-  await p.goto(`${BASE}/fr/agenda?w=0`); await p.waitForLoadState("networkidle");
+  await p.goto(`${BASE}/fr/agenda?w=0&view=list`); await p.waitForLoadState("networkidle");
   const hasBtn = await p.locator('button:has-text("Lien du bon de visite")').count();
-  if (!hasBtn) { await p.goto(`${BASE}/fr/agenda?w=1`); }
+  if (!hasBtn) { await p.goto(`${BASE}/fr/agenda?w=1&view=list`); }
   await p.locator('button:has-text("Lien du bon de visite")').first().click(); await p.waitForSelector('[role="status"] input');
   const link = await p.locator('[role="status"] input').first().inputValue();
   ok(/\/fr\/sign\/.+/.test(link), "l'agent obtient un lien de signature");
@@ -142,7 +142,7 @@ const mock = http.createServer((req, res) => {
   await as(david); ok((await ctx.request.get(`${BASE}/api/files/${sv.document_path}`)).status() === 200, "…et par un collègue de la même agence"); ctx.clearCookies();
     await vis.goto(link.replace(/^https?:\/\/[^/]+/, BASE)); ok(await vis.locator("text=Merci").isVisible(), "relire le lien après signature : pas de double signature");
   ok((await sql`select count(*)::int n from activities where kind = 'visit_signed' and payload->>'visit_id' = ${vid}`)[0].n === 1, "signature journalisée");
-  await as(yael); await p.goto(`${BASE}/fr/agenda?w=1`); ok(await p.locator('a:has-text("Document signé")').count() >= 0, "agenda : lien vers le document signé");
+  await as(yael); await p.goto(`${BASE}/fr/agenda?w=1&view=list`); ok(await p.locator('a:has-text("Document signé")').count() >= 0, "agenda : lien vers le document signé");
 
   // ── PWA, santé ──
   const man = await (await fetch(`${BASE}/manifest.webmanifest`)).json(); ok(man.display === "standalone" && man.icons.length >= 3, "manifeste PWA valide");

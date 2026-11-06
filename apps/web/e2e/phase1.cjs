@@ -137,7 +137,8 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   // 6. hébreu : RTL + pas d'erreur console
   await p.goto(`${BASE}/he/clients`);
   ok((await p.getAttribute("html", "dir")) === "rtl", "hébreu : <html dir=rtl>");
-  ok(errors.filter((e) => !/favicon|Failed to load resource/.test(e)).length === 0, `aucune erreur console/JS (${errors.length ? errors[0] : "0"})`);
+  const realErrors = errors.filter((e) => !/favicon|Failed to load resource/.test(e));
+  ok(realErrors.length === 0, `aucune erreur console/JS (${realErrors.length ? realErrors[0].slice(0, 400) : "0"})`);
 
   await b.close(); await sql.end();
   if (failed) { console.log(`\n${failed} ÉCHEC(S)`); process.exit(1); }
