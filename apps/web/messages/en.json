@@ -79,6 +79,9 @@
     "email": "Email address",
     "magic": "Email me a sign-in link",
     "sent": "Link sent. Check your inbox.",
+    "code": "Or enter the code from the email",
+    "codeHint": "Useful if you open the email on another device or browser. The code expires after one hour.",
+    "codeSubmit": "Verify code",
     "inviteOnly": "Access is by invitation from your agency.",
     "notConfigured": "Supabase is not configured in this environment (see .env.example).",
     "errors": {
@@ -88,7 +91,8 @@
       "auth": "Could not sign in. Please try again.",
       "no_agency": "Your account is not linked to an active agency. Ask for an invitation.",
       "unknown_tenant": "This address does not match any agency.",
-      "rate": "Too many attempts. Try again in a few minutes."
+      "rate": "Too many attempts. Try again in a few minutes.",
+      "code": "Invalid or expired code. Check it or request a new link."
     }
   },
   "design": {

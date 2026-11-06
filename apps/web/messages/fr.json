@@ -79,6 +79,9 @@
     "email": "Adresse e-mail",
     "magic": "Recevoir un lien de connexion",
     "sent": "Lien envoyé. Consultez votre boîte e-mail.",
+    "code": "Ou saisissez le code reçu par e-mail",
+    "codeHint": "Utile si vous ouvrez l'e-mail sur un autre appareil ou navigateur. Le code expire au bout d'une heure.",
+    "codeSubmit": "Valider le code",
     "inviteOnly": "L'accès se fait sur invitation de votre agence.",
     "notConfigured": "Supabase n'est pas configuré dans cet environnement (voir .env.example).",
     "errors": {
@@ -88,7 +91,8 @@
       "auth": "Connexion impossible. Réessayez.",
       "no_agency": "Votre compte n'est rattaché à aucune agence active. Demandez une invitation.",
       "unknown_tenant": "Cette adresse ne correspond à aucune agence.",
-      "rate": "Trop de tentatives. Réessayez dans quelques minutes."
+      "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "code": "Code invalide ou expiré. Vérifiez-le ou demandez un nouveau lien."
     }
   },
   "design": {

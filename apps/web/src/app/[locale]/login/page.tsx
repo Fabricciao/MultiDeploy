@@ -1,7 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { LocaleSwitcher } from "@/components/locale-switcher";
 import { supabaseEnv } from "@/lib/supabase/env";
-import { signInWithGoogle, signInWithMagicLink } from "./actions";
+import { signInWithGoogle, signInWithMagicLink, verifyLoginCode } from "./actions";
 
 export default async function LoginPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ error?: string; sent?: string; next?: string }> }) {
   const { locale } = await params;
@@ -22,7 +22,7 @@ export default async function LoginPage({ params, searchParams }: { params: Prom
         <p className="mb-6 mt-1 text-muted">{t("subtitle")}</p>
 
         {!configured && <p role="status" className="mb-4 rounded-ui border border-line bg-sunken p-3 text-[13px]">{t("notConfigured")}</p>}
-        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth", "no_agency", "unknown_tenant", "rate"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
+        {sp.error && <p role="alert" className="mb-4 text-[13px] text-danger">{t(`errors.${["oauth", "email", "magic", "auth", "no_agency", "unknown_tenant", "rate", "code"].includes(sp.error) ? sp.error : "auth"}`)}</p>}
         {sp.sent && <p role="status" className="mb-4 text-[13px] text-success">{t("sent")}</p>}
 
         <form action={signInWithGoogle}>
@@ -36,6 +36,15 @@ export default async function LoginPage({ params, searchParams }: { params: Prom
           <input id="email" name="email" type="email" dir="ltr" autoComplete="email" required className={`${field} text-start`} />
           <button disabled={!configured} className={`${btn} bg-accent text-white hover:bg-accent-hover disabled:opacity-50`}>{t("magic")}</button>
         </form>
+        {sp.sent && (
+          <form action={verifyLoginCode} className="mt-6 space-y-3 border-t border-line pt-5">
+            <input type="hidden" name="locale" value={locale} /><input type="hidden" name="next" value={sp.next ?? ""} />
+            <label className="block text-[13px] font-medium" htmlFor="code">{t("code")}</label>
+            <input id="code" name="code" type="text" inputMode="numeric" pattern="[0-9]*" minLength={4} maxLength={10} dir="ltr" autoComplete="one-time-code" required className={`${field} text-center tracking-[0.4em]`} />
+            <p className="text-[12px] text-muted">{t("codeHint")}</p>
+            <button className={`${btn} border border-line-strong bg-surface hover:bg-sunken`}>{t("codeSubmit")}</button>
+          </form>
+        )}
         <p className="mt-6 text-[12px] text-muted">{t("inviteOnly")}</p>
       </div>
     </main>
