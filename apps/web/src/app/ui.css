@@ -278,3 +278,6 @@ tr[data-row]{cursor:default}
 .cal{min-width:640px}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .top img[alt="NadlanHub"]{content:url(/brand/nadlanhub-logo-sur-sombre.svg)}}
 :root[data-theme="dark"] .top img[alt="NadlanHub"]{content:url(/brand/nadlanhub-logo-sur-sombre.svg)}
+
+div.ltr{display:block}
+.tbl td{vertical-align:middle}

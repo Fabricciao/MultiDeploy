@@ -57,6 +57,14 @@ Pour la production (≈ 10 agences) : VPS dédié + Coolify (joker automatique).
 - Connexion : e-mail avec lien **et** code à usage unique (saisie du code sur la page de connexion, cookie `md_login_email` de 10 min, limites par IP et par adresse) — testé par l'utilisateur, OK.
 - Invitation de l'agence pilote : l'e-mail automatique de création d'agence était resté en dry-run (Resend pas encore branché) et la console n'a pas de bouton pour le renvoyer ; un message équivalent a été envoyé le 6/11 via l'API Resend à `contact@eliezer.immo` (livré). Domaine d'envoi neuf et sans DMARC : les messages peuvent arriver en indésirables.
 
+## Design NadlanHub (6/11)
+- **Charte** : `docs/design/` (règles, marque, navigation, RTL, marque blanche, audit) et `docs/design/logos/`. Version illustrée (privée) : https://claude.ai/artifact/VmHGqWxsm2cjnYcwSxw9er.
+- **Déployé : commit `c3ce178`** sur `admin.` et `eliezerimmo.` (`multideploy` puis `mdapp`, environ 1 min de coupure, aucune migration). Un commit suivant corrige deux détails de la console plateforme (slug, alignement) : il partira avec la prochaine mise à jour.
+- **Code** : tokens dans `apps/web/src/app/globals.css`, kit dans `ui.css`, thème d'agence dans `lib/theme.ts` (rail + accent + sombre). Les agences encore sur l'ancien bleu `#1f4fd8` reçoivent Yam. Polices embarquées des affiches et du bon de visite dans `assets/fonts` (repli sur les anciennes si absentes).
+- **Nouveau** : barre latérale groupée et repliable (cookie `rail`), vues enregistrées dans le rail, fil d'Ariane, raccourcis (`?`), navigation mobile, thème clair/sombre (cookie `theme`), aperçu `?peek=<id>` sur Biens et Clients, grille `?view=grid` sur Biens, filtres sans bouton, agenda semaine (`?view=list` pour les actions).
+- **Non fait** : module Marketing (toujours désactivé), carte des biens, notifications, tendances des indicateurs. Hébreu ajouté à faire relire par un natif, dont le slogan et le logo « נדל״ן Hub ». Recherche d'antériorité du logo non faite.
+- **Non vérifié en ligne** : écrans connectés de l'agence Eliezer Immo, rendu d'une affiche et d'un bon de visite par le service `renderer` en production (vérifiés seulement en local).
+
 ## État fonctionnel (vérifié le 6/11)
 - **Déployé : commit `931a2f4`** (branche `claude/zealous-allen-vhexg9`, identique à `claude/zen-pasteur-h3lmmv`), vérifié : `BUILD DONE 931a2f4`, health 200 sur `admin.` et `eliezerimmo.`, visite de 10:00 affichée 10:00. Migrations 1-18 appliquées ; GoTrue OK ; CRM en ligne sur `admin.` et `eliezerimmo.` (health 200, certificats valides) ; rendu actif ; sauvegarde quotidienne OK.
 - Compte administrateur plateforme : `fabrice.delpec@gmail.com` (connexion par lien et par code OK sur `admin.`).
