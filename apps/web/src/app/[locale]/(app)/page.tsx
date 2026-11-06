@@ -18,7 +18,7 @@ export default async function TodayPage({ params }: { params: Promise<{ locale: 
   const d = await getToday(ctx);
   const onboarding = await getOnboarding(ctx);
   const to = await getTranslations("onboarding");
-  const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { weekday: "long", day: "numeric", month: "long" }).format(new Date());
+  const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" }).format(new Date());
   const place = (r: Record<string, any>) => [r.street, cityName({ name_fr: r.city_fr, name_he: r.city_he, name_en: r.city_en }, locale)].filter(Boolean).join(", ");
   const kpi = (label: string, value: React.ReactNode) => <div className="card card-b"><div className="note">{label}</div><div className="tab" style={{ fontSize: 24, fontWeight: 600, letterSpacing: "-.02em", marginTop: 2 }}>{value}</div></div>;
   return (
