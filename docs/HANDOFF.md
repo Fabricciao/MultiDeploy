@@ -59,10 +59,11 @@ Pour la production (≈ 10 agences) : VPS dédié + Coolify (joker automatique).
 
 ## Design NadlanHub (6/11)
 - **Charte** : `docs/design/` (règles, marque, navigation, RTL, marque blanche, audit) et `docs/design/logos/`. Version illustrée (privée) : https://claude.ai/artifact/VmHGqWxsm2cjnYcwSxw9er.
-- **Déployé : commit `c3ce178`** sur `admin.` et `eliezerimmo.` (`multideploy` puis `mdapp`, environ 1 min de coupure, aucune migration). Un commit suivant corrige deux détails de la console plateforme (slug, alignement) : il partira avec la prochaine mise à jour.
+- **Déployé : commit `c3ce178`** sur `admin.` et `eliezerimmo.` (`multideploy` puis `mdapp`, environ 1 min de coupure, aucune migration). Les deux détails de la console plateforme (slug, alignement) sont partis avec `cc0187c`.
 - **Code** : tokens dans `apps/web/src/app/globals.css`, kit dans `ui.css`, thème d'agence dans `lib/theme.ts` (rail + accent + sombre). Les agences encore sur l'ancien bleu `#1f4fd8` reçoivent Yam. Polices embarquées des affiches et du bon de visite dans `assets/fonts` (repli sur les anciennes si absentes).
 - **Nouveau** : barre latérale groupée et repliable (cookie `rail`), vues enregistrées dans le rail, fil d'Ariane, raccourcis (`?`), navigation mobile, thème clair/sombre (cookie `theme`), aperçu `?peek=<id>` sur Biens et Clients, grille `?view=grid` sur Biens, filtres sans bouton, agenda semaine (`?view=list` pour les actions).
-- **Non fait** : module Marketing (toujours désactivé), carte des biens, notifications, tendances des indicateurs. Hébreu ajouté à faire relire par un natif, dont le slogan et le logo « נדל״ן Hub ». Recherche d'antériorité du logo non faite.
+- **Marketing (7/11, commit `cc0187c`, déployé)** : onglet activé, page `/marketing` (historique des affiches de l'agence filtrable par format, biens en ligne sans affiche, crédits IA, lien vers les connexions sociales). Pas encore de campagnes e-mail ni de bibliothèque de modèles.
+- **Non fait** : campagnes e-mail, carte des biens, notifications, tendances des indicateurs. Hébreu ajouté à faire relire par un natif, dont le slogan et le logo « נדל״ן Hub ». Recherche d'antériorité du logo non faite.
 - **Non vérifié en ligne** : écrans connectés de l'agence Eliezer Immo, rendu d'une affiche et d'un bon de visite par le service `renderer` en production (vérifiés seulement en local).
 
 ## État fonctionnel (vérifié le 6/11)
