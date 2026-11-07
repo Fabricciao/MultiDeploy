@@ -85,4 +85,30 @@ export async function generatePoster(ctx: Ctx, r: PosterRequest): Promise<Poster
 export async function listPosters(ctx: Ctx, propertyId: string) {
   return (await db(ctx, (tx) => tx`select pg.id, pg.format, pg.locale, pg.template, pg.level, pg.output_path, pg.width, pg.height, pg.created_at, u.full_name as author from public.poster_generations pg left join public.profiles u on u.id = pg.created_by where pg.property_id = ${propertyId} order by pg.created_at desc limit 24`)) as unknown as { id: string; format: string; locale: string; template: string; level: string; output_path: string; width: number; height: number; created_at: Date; author: string | null }[];
 }
+/** Toutes les affiches de l'agence, les plus récentes d'abord (page Marketing). */
+export async function listAgencyPosters(ctx: Ctx, format: string | null, limit = 48) {
+  return (await db(ctx, (tx) => tx`
+    select pg.id, pg.format, pg.locale, pg.output_path, pg.created_at, pg.property_id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en
+    from public.poster_generations pg join public.properties p on p.id = pg.property_id left join public.geo_places g on g.id = p.city_id
+    where p.deleted_at is null and (${format}::text is null or pg.format = ${format}) order by pg.created_at desc limit ${limit}`)) as unknown as Record<string, any>[];
+}
+
+export async function marketingStats(ctx: Ctx) {
+  const [r] = await db(ctx, (tx) => tx`select
+    (select count(*) from public.poster_generations)::int as total,
+    (select count(*) from public.poster_generations where created_at >= date_trunc('month', now()))::int as month,
+    (select count(*) from public.properties p where p.status in ('active','under_offer') and p.deleted_at is null and not exists (select 1 from public.poster_generations pg where pg.property_id = p.id))::int as todo`);
+  return r as unknown as { total: number; month: number; todo: number };
+}
+
+/** Biens en ligne qui n'ont encore aucune affiche. */
+export async function propertiesWithoutPoster(ctx: Ctx, limit = 6) {
+  return (await db(ctx, (tx) => tx`
+    select p.id, p.reference, p.street, p.price, p.currency, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
+      (select pm.thumb_path from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb
+    from public.properties p left join public.geo_places g on g.id = p.city_id
+    where p.status in ('active','under_offer') and p.deleted_at is null and not exists (select 1 from public.poster_generations pg where pg.property_id = p.id)
+    order by p.created_at desc limit ${limit}`)) as unknown as Record<string, any>[];
+}
+
 export async function aiBalance(ctx: Ctx) { return Number((await db(ctx, (tx) => tx`select public.ai_balance() as b`))[0]!.b); }

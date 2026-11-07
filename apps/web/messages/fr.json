@@ -1172,5 +1172,36 @@
     "peek": "Ouvrir en aperçu",
     "select": "Sélectionner",
     "space": "Espace"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "sub": "Les affiches de l'agence et les biens à mettre en avant.",
+    "kpi": {
+      "total": "Affiches créées",
+      "month": "Ce mois-ci",
+      "todo": "Biens sans affiche",
+      "credits": "Crédits IA restants"
+    },
+    "all": "Tous les formats",
+    "formats": {
+      "square": "Carré",
+      "portrait": "Portrait",
+      "story": "Story",
+      "facebook": "Facebook",
+      "a4": "A4"
+    },
+    "empty": "Aucune affiche pour l'instant",
+    "emptyFormat": "Aucune affiche dans ce format",
+    "emptyHint": "Choisissez un bien dans la liste « Créer une affiche » : elle sera prête en moins d'une minute.",
+    "open": "Ouvrir l'affiche",
+    "download": "Télécharger",
+    "create": "Créer une affiche",
+    "createOne": "Créer",
+    "allDone": "Tous vos biens en ligne ont déjà une affiche.",
+    "otherProperty": "Choisir un autre bien",
+    "social": "Réseaux sociaux",
+    "socialOn": "Facebook ou Instagram est connecté : publiez une affiche depuis la page du bien.",
+    "socialOff": "Connectez Facebook et Instagram pour publier vos affiches sans quitter le CRM.",
+    "socialManage": "Gérer les connexions"
   }
 }

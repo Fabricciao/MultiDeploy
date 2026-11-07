@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
-import { CalendarDays, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleHelp, Handshake, House, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
+import { CalendarDays, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleHelp, Handshake, House, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
-const MODULES = ["properties", "clients", "deals", "agenda", "reports", "settings", "intake", "import"] as const;
+const MODULES = ["properties", "clients", "deals", "agenda", "marketing", "reports", "settings", "intake", "import"] as const;
 
 /** Fil d'Ariane déduit de l'URL : module, puis sous-page. */
 export function Crumbs() {
@@ -82,6 +82,7 @@ export function MobileNav() {
         <div className="sheet" role="dialog" aria-label={t("more")}><div className="grab" />
           {line("/deals", t("deals"), <Handshake size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/agenda", t("agenda"), <CalendarDays size={20} strokeWidth={1.75} aria-hidden />)}
+          {line("/marketing", t("marketing"), <Megaphone size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/reports", t("reports"), <ChartNoAxesColumn size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/settings", t("settings"), <Settings size={20} strokeWidth={1.75} aria-hidden />)}
         </div>
@@ -97,7 +98,7 @@ export function MobileNav() {
   );
 }
 
-const GO: Record<string, string> = { a: "/", b: "/properties", c: "/clients", f: "/deals", p: "/agenda", r: "/reports" };
+const GO: Record<string, string> = { a: "/", b: "/properties", c: "/clients", f: "/deals", p: "/agenda", m: "/marketing", r: "/reports" };
 
 /** Raccourcis clavier globaux. Inactifs pendant la saisie. */
 export function Shortcuts() {
@@ -139,7 +140,7 @@ export function Shortcuts() {
         <div className="bd">
           <h3 style={{ marginBlockEnd: 14 }}>{ts("title")}</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 24 }}>
-            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("go")}</div>{row(["G", "A"], t("today"))}{row(["G", "B"], t("properties"))}{row(["G", "C"], t("clients"))}{row(["G", "F"], t("deals"))}{row(["G", "P"], t("agenda"))}{row(["G", "R"], t("reports"))}</div>
+            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("go")}</div>{row(["G", "A"], t("today"))}{row(["G", "B"], t("properties"))}{row(["G", "C"], t("clients"))}{row(["G", "F"], t("deals"))}{row(["G", "P"], t("agenda"))}{row(["G", "M"], t("marketing"))}{row(["G", "R"], t("reports"))}</div>
             <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("general")}</div>{row(["⌘", "K"], ts("search"))}{row(["N"], ts("new"))}{row(["["], ts("rail"))}{row(["?"], ts("help"))}</div>
             <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("list")}</div>{row(["J", "K"], ts("move"))}{row(["↵"], ts("open"))}{row([ts("space")], ts("peek"))}{row(["X"], ts("select"))}</div>
           </div>

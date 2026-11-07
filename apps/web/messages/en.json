@@ -1172,5 +1172,36 @@
     "peek": "Open preview",
     "select": "Select",
     "space": "Space"
+  },
+  "marketing": {
+    "title": "Marketing",
+    "sub": "The agency's posters and the properties to promote.",
+    "kpi": {
+      "total": "Posters created",
+      "month": "This month",
+      "todo": "Properties without a poster",
+      "credits": "AI credits left"
+    },
+    "all": "All formats",
+    "formats": {
+      "square": "Square",
+      "portrait": "Portrait",
+      "story": "Story",
+      "facebook": "Facebook",
+      "a4": "A4"
+    },
+    "empty": "No posters yet",
+    "emptyFormat": "No posters in this format",
+    "emptyHint": "Pick a property in the “Create a poster” list: it will be ready in under a minute.",
+    "open": "Open the poster",
+    "download": "Download",
+    "create": "Create a poster",
+    "createOne": "Create",
+    "allDone": "Every live property already has a poster.",
+    "otherProperty": "Choose another property",
+    "social": "Social networks",
+    "socialOn": "Facebook or Instagram is connected: publish a poster from the property page.",
+    "socialOff": "Connect Facebook and Instagram to publish posters without leaving the CRM.",
+    "socialManage": "Manage connections"
   }
 }

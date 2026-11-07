@@ -8,7 +8,7 @@ import { Mark } from "@/components/logo";
 type Item = { key: string; href: string; icon: LucideIcon; ready?: boolean };
 const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "agenda", href: "/agenda", icon: CalendarDays }];
 const PORTFOLIO: Item[] = [{ key: "properties", href: "/properties", icon: House }, { key: "clients", href: "/clients", icon: Users }, { key: "deals", href: "/deals", icon: Handshake }];
-const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone, ready: false }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
+const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
 
 export type RailView = { id: string; name: string; href: string };
 
