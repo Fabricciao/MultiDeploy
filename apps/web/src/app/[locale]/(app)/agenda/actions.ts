@@ -4,6 +4,7 @@ import { getCtx } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { createVisit, setVisitStatus } from "@/lib/data/visits";
+import { syncDealOnVisit } from "@/lib/data/deals";
 import { visitSignLink } from "@/lib/data/signature";
 import { getUserTokens, saveUserTokens } from "@/lib/data/connections";
 import { insertEvent } from "@/lib/integrations/google";
@@ -24,6 +25,7 @@ export async function createVisitAction(_p: VisitState, fd: FormData): Promise<V
   if (quiet && fd.get("force") !== "on") return { warning: quiet }; // Chabbat / fête / veille : confirmation explicite requise
   const r = await createVisit(ctx, { propertyId: property, contactId: contact || null, startsAt, minutes: Number(fd.get("minutes")) || 30 });
   if (r.error) return { error: r.error };
+  if (contact) { try { await syncDealOnVisit(ctx, contact, property); } catch { /* l'affaire reste modifiable à la main */ } }
   // Agenda Google personnel (si connecté) : copie « au mieux », un échec n'empêche jamais la visite d'exister.
   try {
     const tokens = await getUserTokens(ctx.userId, "google_calendar");
@@ -34,7 +36,7 @@ export async function createVisitAction(_p: VisitState, fd: FormData): Promise<V
       await insertEvent(t2, { summary: `Visite · ${v?.title ?? ""}`, location: v?.street ?? undefined, start: startsAt, end: new Date(startsAt.getTime() + (Number(fd.get("minutes")) || 30) * 60_000) });
     }
   } catch { /* connexion Google expirée ou indisponible */ }
-  revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`);
+  revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`); revalidatePath(`/${locale}/deals`);
   return { ok: true };
 }
 export async function visitStatusAction(id: string, status: "done" | "cancelled" | "no_show" | "planned", fd: FormData) {

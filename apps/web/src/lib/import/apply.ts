@@ -34,7 +34,7 @@ export async function importProperties(ctx: Ctx, rows: MappedRow<string>[], citi
     const type = TYPE.find(([re]) => re.test(v.property_type ?? ""))?.[1] ?? "apartment";
     const input: PropertyInput = { transaction: rent ? "rent" : "sale", property_type: type, status: "draft", city_id: city.id, street: v.street ?? null, house_number: v.house_number ?? null, address_visibility: "street", price, currency: "ILS", rooms,
       area_built: v.area_built ? csvNumber(v.area_built) : null, floor: v.floor ? csvNumber(v.floor) : null, floors_total: v.floors_total ? csvNumber(v.floors_total) : null, mamad: v.mamad ? csvYes(v.mamad) : false, parking_count: v.parking_count ? Math.max(0, Math.min(20, csvNumber(v.parking_count) ?? 0)) : 0, elevator: v.elevator ? csvYes(v.elevator) : false, sukkah_balcony: false, storage: false, ac: false,
-      arnona_monthly: null, vaad_bayit_monthly: null, registration_type: null, mandate_type: "non_exclusive", mandate_end: null, internal_notes: null, titles: { [locale]: v.title ?? "" } as Record<string, string>, descriptions: { [locale]: v.description ?? "" } as Record<string, string> };
+      arnona_monthly: null, vaad_bayit_monthly: null, registration_type: null, mandate_type: "non_exclusive", mandate_end: null, mandate_origin: "own", mandate_partner: null, mandate_co_broke: false, internal_notes: null, titles: { [locale]: v.title ?? "" } as Record<string, string>, descriptions: { [locale]: v.description ?? "" } as Record<string, string> };
     try { await createProperty(ctx, input, locale); rep.created++; } catch { rep.errors.push({ line, code: "failed" }); }
   }
   return rep;

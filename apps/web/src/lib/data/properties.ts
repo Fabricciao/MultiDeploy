@@ -1,16 +1,24 @@
-import { db, type Ctx } from "../session";
+import { db, seesAllProperties, type Ctx } from "../session";
 import { PAGE_SIZE, type PropertyFilters } from "./filters";
+
+/** Mandat : exclusivité, provenance (bien de l'agence ou d'une agence partenaire) et ouverture au co-courtage (שיתוף פעולה). */
+export type MandateInfo = { type?: string; end?: string; origin?: "own" | "partner"; partner?: string; co_broke?: boolean };
+export const buildMandate = (i: Pick<PropertyInput, "mandate_type" | "mandate_end" | "mandate_origin" | "mandate_partner" | "mandate_co_broke">): MandateInfo => ({
+  type: i.mandate_type, ...(i.mandate_end ? { end: i.mandate_end } : {}), origin: i.mandate_origin,
+  ...(i.mandate_origin === "partner" && i.mandate_partner ? { partner: i.mandate_partner } : {}), co_broke: i.mandate_co_broke,
+});
 
 export type PropertyListRow = {
   id: string; reference: string; transaction: string; property_type: string; status: string; price: string | null; currency: string; rooms: string | null;
   area_built: string | null; floor: number | null; floors_total: number | null; street: string | null; house_number: string | null; address_visibility: string;
-  mamad: boolean | null; parking_count: number | null; elevator: boolean | null; mandate: { type?: string; end?: string } | null; created_at: Date;
+  mamad: boolean | null; parking_count: number | null; elevator: boolean | null; mandate: MandateInfo | null; created_at: Date;
   agent_id: string | null; agent_name: string | null; cover_thumb: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; title: string | null; total: string;
 };
 
 export async function listProperties(ctx: Ctx, f: PropertyFilters) {
   return db(ctx, async (tx) => {
     const w = [tx`p.deleted_at is null`];
+    if (!seesAllProperties(ctx)) w.push(tx`p.agent_id = ${ctx.userId}`);
     if (f.q) w.push(tx`p.search_text like '%' || app.normalize_search(${f.q}) || '%'`);
     if (f.transaction) w.push(f.transaction === "rent" ? tx`p.transaction in ('rent','commercial_rent')` : tx`p.transaction in ('sale','commercial_sale')`);
     if (f.status.length) w.push(tx`p.status::text = any(${f.status})`);
@@ -22,6 +30,9 @@ export async function listProperties(ctx: Ctx, f: PropertyFilters) {
     for (const k of f.has) w.push(k === "parking" ? tx`coalesce(p.parking_count,0) > 0` : tx`coalesce(p.${tx(k)}, false)`);
     if (f.agent) w.push(tx`p.agent_id = ${f.agent}`);
     if (f.mandate === "exclusive") w.push(tx`p.mandate->>'type' = 'exclusive'`);
+    if (f.mandate === "own") w.push(tx`coalesce(p.mandate->>'origin', 'own') = 'own'`);
+    if (f.mandate === "partner") w.push(tx`p.mandate->>'origin' = 'partner'`);
+    if (f.mandate === "co_broke") w.push(tx`(p.mandate->>'co_broke')::boolean is true`);
     if (f.mandate === "expiring") w.push(tx`p.mandate->>'type' = 'exclusive' and (p.mandate->>'end')::date between current_date and current_date + 30`);
     const where = w.reduce((a, b) => tx`${a} and ${b}`);
     const order = { recent: tx`p.created_at desc`, price_asc: tx`p.price asc nulls last`, price_desc: tx`p.price desc nulls last`, mandate: tx`(p.mandate->>'end') asc nulls last` }[f.sort];
@@ -46,7 +57,7 @@ export async function getProperty(ctx: Ctx, id: string) {
       select p.*, ag.full_name as agent_name, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, g.id as city_gid
       from public.properties p left join public.profiles ag on ag.id = p.agent_id left join public.geo_places g on g.id = p.city_id
       where p.id = ${id} and p.deleted_at is null`;
-    if (!p) return null;
+    if (!p || (!seesAllProperties(ctx) && p.agent_id !== ctx.userId)) return null;
     const translations = await tx`select locale, title, description, origin, reviewed from public.property_translations where property_id = ${id}`;
     const owners = await tx`select c.id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.phones, pc.relation from public.property_contacts pc join public.contacts c on c.id = pc.contact_id where pc.property_id = ${id}`;
     const matches = await tx`
@@ -63,7 +74,7 @@ export type PropertyInput = {
   price: number | null; currency: string; rooms: number | null; area_built: number | null; floor: number | null; floors_total: number | null;
   mamad: boolean; parking_count: number; elevator: boolean; sukkah_balcony: boolean; storage: boolean; ac: boolean;
   arnona_monthly: number | null; vaad_bayit_monthly: number | null; registration_type: string | null;
-  mandate_type: "exclusive" | "non_exclusive"; mandate_end: string | null; internal_notes: string | null;
+  mandate_type: "exclusive" | "non_exclusive"; mandate_end: string | null; mandate_origin: "own" | "partner"; mandate_partner: string | null; mandate_co_broke: boolean; internal_notes: string | null;
   titles: Record<string, string>; descriptions: Record<string, string>; agent_id?: string | null;
 };
 
@@ -79,7 +90,7 @@ async function saveTranslations(tx: any, orgId: string, propertyId: string, loca
 
 export async function createProperty(ctx: Ctx, i: PropertyInput, locale: string) {
   return db(ctx, async (tx) => {
-    const mandate = { type: i.mandate_type, ...(i.mandate_end ? { end: i.mandate_end } : {}) };
+    const mandate = buildMandate(i);
     const [row] = await tx`
       insert into public.properties (organization_id, transaction, property_type, status, agent_id, city_id, street, house_number, address_visibility, price, currency, rooms, area_built, floor, floors_total,
         mamad, parking_count, elevator, sukkah_balcony, storage, ac, arnona_monthly, vaad_bayit_monthly, registration_type, mandate, internal_notes, published_at, public_token)
@@ -94,7 +105,7 @@ export async function createProperty(ctx: Ctx, i: PropertyInput, locale: string)
 
 export async function updateProperty(ctx: Ctx, id: string, i: PropertyInput, locale: string) {
   return db(ctx, async (tx) => {
-    const mandate = { type: i.mandate_type, ...(i.mandate_end ? { end: i.mandate_end } : {}) };
+    const mandate = buildMandate(i);
     const rows = await tx`
       update public.properties set transaction = ${i.transaction}, property_type = ${i.property_type}, status = ${i.status}, city_id = ${i.city_id}, street = ${i.street}, house_number = ${i.house_number},
         address_visibility = ${i.address_visibility}, price = ${i.price}, currency = ${i.currency}, rooms = ${i.rooms}, area_built = ${i.area_built}, floor = ${i.floor}, floors_total = ${i.floors_total},
@@ -110,4 +121,20 @@ export async function updateProperty(ctx: Ctx, id: string, i: PropertyInput, loc
 
 export async function archiveProperty(ctx: Ctx, id: string) {
   return db(ctx, async (tx) => (await tx`update public.properties set deleted_at = now(), status = 'withdrawn' where id = ${id} returning id`).length > 0);
+}
+
+export const PROPERTY_STATUSES = ["draft", "active", "under_offer", "sold", "rented", "withdrawn"] as const;
+export type PropertyStatus = (typeof PROPERTY_STATUSES)[number];
+
+/** Changement de statut rapide (depuis la liste). « Actif » exige un prix et une ville, comme le formulaire. */
+export async function setPropertyStatus(ctx: Ctx, id: string, status: PropertyStatus): Promise<"ok" | "forbidden" | "active_needs_price_city"> {
+  return db(ctx, async (tx) => {
+    const [p] = await tx`select price, city_id from public.properties where id = ${id} and deleted_at is null`;
+    if (!p) return "forbidden";
+    if (status === "active" && (p.price === null || !p.city_id)) return "active_needs_price_city";
+    const rows = await tx`update public.properties set status = ${status}, published_at = coalesce(published_at, ${status === "active" ? tx`now()` : null}) where id = ${id} returning id`;
+    if (!rows.length) return "forbidden";
+    await tx`insert into public.activities (organization_id, kind, property_id, summary, payload) values (${ctx.orgId}, 'status_change', ${id}, 'status_change', ${tx.json({ status })})`;
+    return "ok";
+  });
 }

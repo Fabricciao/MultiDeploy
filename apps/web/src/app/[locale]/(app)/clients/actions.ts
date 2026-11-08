@@ -6,6 +6,7 @@ import { parseContactForm, type FormErrors } from "@/lib/data/forms";
 import { addNote, createContact, DuplicatePhoneError, updateContactCore } from "@/lib/data/contacts";
 import { createDeal } from "@/lib/data/deals";
 import { createTask, toggleTask } from "@/lib/data/today";
+import { parseDue } from "@/lib/calendar/due";
 
 export type ContactFormState = { errors?: FormErrors; error?: string; duplicateId?: string } | null;
 const loc = (fd: FormData) => (["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr");
@@ -43,7 +44,7 @@ export async function addTaskAction(contactId: string, fd: FormData) {
   const ctx = await getCtx(locale);
   const title = String(fd.get("title") ?? "").trim().slice(0, 200);
   const due = String(fd.get("due") ?? "");
-  if (title && ctx.caps.has("tasks.write")) await createTask(ctx, title, due && !Number.isNaN(Date.parse(due)) ? new Date(`${due}T17:00:00`).toISOString() : null, contactId);
+  if (title && ctx.caps.has("tasks.write")) await createTask(ctx, title, parseDue(due, String(fd.get("time") ?? "")).at?.toISOString() ?? null, contactId);
   revalidatePath(`/${locale}`, "layout");
 }
 

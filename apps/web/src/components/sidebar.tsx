@@ -1,30 +1,33 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bookmark, CalendarDays, ChartNoAxesColumn, Handshake, House, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, Sun, Users, type LucideIcon } from "lucide-react";
+import { Bookmark, CalendarDays, ChartNoAxesColumn, CircleCheck, Ellipsis, Handshake, House, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, Sun, UserRound, Users, type LucideIcon } from "lucide-react";
+import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Mark } from "@/components/logo";
 
 type Item = { key: string; href: string; icon: LucideIcon; ready?: boolean };
-const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "agenda", href: "/agenda", icon: CalendarDays }];
+const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "tasks", href: "/tasks", icon: CircleCheck }, { key: "agenda", href: "/agenda", icon: CalendarDays }];
 const PORTFOLIO: Item[] = [{ key: "properties", href: "/properties", icon: House }, { key: "clients", href: "/clients", icon: Users }, { key: "deals", href: "/deals", icon: Handshake }];
 const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
 
 export type RailView = { id: string; name: string; href: string };
 
-export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, counts, views, mini: miniInit }: { orgName: string; logoUrl?: string | null; userName: string; avatarUrl?: string | null; roleLabel: string; counts: { properties: number; clients: number }; views: RailView[]; mini: boolean }) {
+export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, counts, views, mini: miniInit }: { orgName: string; logoUrl?: string | null; userName: string; avatarUrl?: string | null; roleLabel: string; counts: { properties: number; clients: number; deals?: number; due?: number }; views: RailView[]; mini: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [mini, setMini] = useState(miniInit);
   const toggle = () => setMini((m) => { document.cookie = `rail=${m ? "full" : "mini"};path=/;max-age=31536000;samesite=lax`; return !m; });
   useEffect(() => { const on = () => toggle(); window.addEventListener("toggle-rail", on); return () => window.removeEventListener("toggle-rail", on); }, []);
-  const cnt = (k: string) => (k === "properties" ? counts.properties : k === "clients" ? counts.clients : null);
+  const cnt = (k: string) => (k === "properties" ? counts.properties : k === "clients" ? counts.clients : k === "deals" ? counts.deals ?? null : null);
+  const alert = (k: string) => (k === "today" || k === "tasks") && counts.due ? counts.due : null;
+  const locale = useLocale();
   const link = ({ key, href, icon: Icon, ready = true }: Item) => {
     const on = href === "/" ? pathname === "/" : pathname.startsWith(href);
     const n = cnt(key);
     return ready ? (
       <Link key={key} href={href} className={`nav ${on ? "on" : ""}`} aria-current={on ? "page" : undefined} title={mini ? t(key) : undefined}>
-        <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>{n !== null && <span className="cnt">{n}</span>}
+        <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>{alert(key) ? <span className="cnt alert">{alert(key)}</span> : n !== null && <span className="cnt">{n}</span>}
       </Link>
     ) : (
       <span key={key} className="nav" aria-disabled="true" title={t("soon")} style={{ opacity: 0.55, cursor: "not-allowed" }}>
@@ -48,7 +51,14 @@ export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, coun
       {views.slice(0, 6).map((v) => <Link key={v.id} href={v.href} className="nav" title={v.name}><Bookmark size={14} strokeWidth={1.75} aria-hidden /><span className="trunc">{v.name}</span></Link>)}
       <div className="side-foot">
         {link({ key: "settings", href: "/settings", icon: Settings })}
-        <Link href="/settings/profile" className="me" title={t("profile")}><span className="avatar">{avatarUrl ? <img src={avatarUrl} alt="" /> : initials}</span><div className="grow"><b className="trunc">{userName}</b></div></Link>
+        <details className="pop me-pop">
+          <summary className="me" title={userName}><span className="avatar">{avatarUrl ? <img src={avatarUrl} alt="" /> : initials}</span><div className="grow"><b className="trunc">{userName}</b></div><Ellipsis size={15} aria-hidden className="me-more" /></summary>
+          <div className="pop-body" style={{ minWidth: 200, padding: 6, insetBlockEnd: "calc(100% + 6px)", insetBlockStart: "auto" }}>
+            <Link href="/settings/profile" className="mi"><UserRound size={16} aria-hidden />{t("profile")}</Link>
+            <div className="sep" />
+            <form action="/auth/signout" method="post"><input type="hidden" name="locale" value={locale} /><button className="mi danger" style={{ width: "100%" }}><LogOut size={16} aria-hidden />{t("signOut")}</button></form>
+          </div>
+        </details>
         <div className="row" style={{ gap: 4, justifyContent: mini ? "center" : undefined }}>
           <div className="powered grow"><Mark size={11} color="var(--rail-muted)" /><span>{t("poweredBy")}</span></div>
           <button type="button" onClick={toggle} className="rail-toggle" aria-label={t(mini ? "expand" : "collapse")} title={t(mini ? "expand" : "collapse")}><span className="flip">{mini ? <PanelLeftOpen size={15} aria-hidden /> : <PanelLeftClose size={15} aria-hidden />}</span></button>

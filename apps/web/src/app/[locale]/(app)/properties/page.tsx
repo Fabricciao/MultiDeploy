@@ -8,6 +8,7 @@ import { MUST_HAVE, PAGE_SIZE, parsePropertyFilters, toQuery, type SP } from "@/
 import { dateShort, initials, money, num } from "@/lib/format";
 import { Badge, Avatar, Cover, PageHeader, statusTone } from "@/components/ui";
 import { AutoSubmit } from "@/components/shell";
+import { StatusSelect } from "@/components/status-select";
 import { PropertyPeek } from "@/components/peek";
 import { SavedViews } from "@/components/saved-views";
 import { listViews } from "@/lib/data/views";
@@ -35,8 +36,9 @@ export default async function PropertiesPage({ params, searchParams }: { params:
   if (f.priceMin !== undefined || f.priceMax !== undefined) chips.push({ label: `${f.priceMin !== undefined ? money(locale, f.priceMin) : "…"} – ${f.priceMax !== undefined ? money(locale, f.priceMax) : "…"}`, href: without("pmin", "pmax") });
   for (const k of f.has) chips.push({ label: t(`has.${k}`), href: toQuery({ ...base, has: f.has.filter((x) => x !== k) }) });
   if (f.agent) chips.push({ label: agents.find((a) => a.id === f.agent)?.full_name ?? "", href: without("agent") });
-  if (f.mandate) chips.push({ label: t(`mandate.${f.mandate}`), href: without("mandate") });
+  if (f.mandate) chips.push({ label: ["own", "partner"].includes(f.mandate) ? t(`origin.${f.mandate}`) : f.mandate === "co_broke" ? t("origin.coBrokeTag") : t(`mandate.${f.mandate}`), href: without("mandate") });
 
+  const canWrite = ctx.caps.has("properties.write") && !ctx.impersonating;
   const pages = Math.max(1, Math.ceil(total / PAGE_SIZE));
   const pageHref = (p: number) => toQuery({ ...base, page: p === 1 ? undefined : p });
   const peekHref = (id: string) => `/properties${toQuery({ ...base, peek: id })}`;
@@ -92,7 +94,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
           <div className="pop-body col" style={{ gap: 10, minWidth: 240 }}>
             <div><div className="lbl">{t("filters.statusLabel")}</div>{(["active", "under_offer", "draft", "sold"] as const).map((s) => <label key={s} className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name="status" value={s} defaultChecked={f.status.includes(s)} />{t(`status.${s}`)}</label>)}</div>
             <div><div className="lbl">{t("filters.agent")}</div><select name="agent" defaultValue={f.agent ?? ""} className="input"><option value="">{tc("all")}</option>{agents.map((a) => <option key={a.id} value={a.id}>{a.full_name}</option>)}</select></div>
-            <div><div className="lbl">{t("filters.mandate")}</div><select name="mandate" defaultValue={f.mandate ?? ""} className="input"><option value="">{tc("all")}</option><option value="exclusive">{t("mandate.exclusive")}</option><option value="expiring">{t("mandate.expiring")}</option></select></div>
+            <div><div className="lbl">{t("filters.mandate")}</div><select name="mandate" defaultValue={f.mandate ?? ""} className="input"><option value="">{tc("all")}</option><option value="exclusive">{t("mandate.exclusive")}</option><option value="expiring">{t("mandate.expiring")}</option><option value="own">{t("origin.own")}</option><option value="partner">{t("origin.partner")}</option><option value="co_broke">{t("origin.coBrokeTag")}</option></select></div>
           </div>
         </details>
         <select name="sort" defaultValue={f.sort} className="input" style={{ width: 170, height: 34 }} aria-label={t("filters.sort")}>
@@ -149,8 +151,9 @@ export default async function PropertiesPage({ params, searchParams }: { params:
                       <td className="n">{num(locale, p.area_built, 0)} {t("sqm")}</td>
                       <td className="n"><span className="ltr">{p.floor === 0 ? t("ground") : p.floor ?? "–"}{p.floors_total ? `/${p.floors_total}` : ""}</span></td>
                       <td className="n price">{money(locale, p.price, p.currency)}{p.transaction.includes("rent") ? <span className="note" style={{ fontWeight: 400 }}> {t("perMonth")}</span> : null}</td>
-                      <td>{tag(p)}</td>
-                      <td>{days === null ? <span className="note">{p.mandate?.type === "non_exclusive" ? t("mandate.non_exclusive") : "—"}</span> : days <= 30 && days >= 0 ? <Badge tone="warn"><Clock size={12} aria-hidden />{t("mandate.expiresIn", { days })}</Badge> : days < 0 ? <Badge tone="bad">{t("mandate.expired")}</Badge> : <Badge tone="acc">{t("mandate.exclusive")} · {dateShort(locale, p.mandate!.end)}</Badge>}</td>
+                      <td><StatusSelect id={p.id} status={p.status} canEdit={canWrite && (p.agent_id === ctx.userId || ctx.caps.has("properties.write_all"))} /></td>
+                      <td><div className="mtags">{days === null ? <span className="note">{p.mandate?.type === "exclusive" ? t("mandate.exclusive") : p.mandate?.type === "non_exclusive" ? t("mandate.non_exclusive") : "—"}</span> : days <= 30 && days >= 0 ? <Badge tone="warn"><Clock size={12} aria-hidden />{t("mandate.expiresIn", { days })}</Badge> : days < 0 ? <Badge tone="bad">{t("mandate.expired")}</Badge> : <Badge tone="acc">{t("mandate.exclusive")} · {dateShort(locale, p.mandate!.end)}</Badge>}
+                        {p.mandate?.origin === "partner" && <Badge tone="info" >{t("origin.partner")}</Badge>}{p.mandate?.co_broke && <Badge tone="sig">{t("origin.coBrokeTag")}</Badge>}</div></td>
                       <td>{p.agent_name ? <Avatar text={initials(p.agent_name)} /> : "—"}</td>
                     </tr>
                   );

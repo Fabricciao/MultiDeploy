@@ -1,5 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
-import { getCtx, db } from "@/lib/session";
+import { getCtx, db, seesAllProperties } from "@/lib/session";
 import { listCitiesWithAliases, cityName } from "@/lib/data/geo";
 import { nlToPropertiesUrl } from "@/lib/search/nl";
 import { contactName } from "@/lib/data/contacts";
@@ -16,7 +16,7 @@ export async function GET(req: NextRequest) {
   const [props, contacts, cities] = await Promise.all([
     db(ctx, (tx) => tx`select p.id, p.reference, p.price, p.currency, p.rooms, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
       (select t.title from public.property_translations t where t.property_id = p.id order by (t.locale = ${locale}) desc limit 1) as title
-      from public.properties p left join public.geo_places g on g.id = p.city_id where p.deleted_at is null and p.search_text like '%' || app.normalize_search(${q}) || '%' order by p.created_at desc limit 6`),
+      from public.properties p left join public.geo_places g on g.id = p.city_id where p.deleted_at is null and (${seesAllProperties(ctx)} or p.agent_id = ${ctx.userId}) and p.search_text like '%' || app.normalize_search(${q}) || '%' order by p.created_at desc limit 6`),
     db(ctx, (tx) => tx`select c.id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.phones from public.contacts c where c.deleted_at is null and c.search_text like '%' || app.normalize_search(${q}) || '%' order by c.created_at desc limit 6`),
     listCitiesWithAliases(ctx),
   ]);

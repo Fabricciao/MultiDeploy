@@ -142,3 +142,15 @@ export async function getPublicListing(token: string) {
     from public.properties p left join public.geo_places g on g.id = p.city_id where p.id = ${p.id}`;
   return { share: { ...m, locale: "fr" } as Record<string, any>, props: props as unknown as Record<string, any>[], agentPhone: m?.agent_phone ? formatPhone(m.agent_phone) : null };
 }
+
+/** Trace un envoi WhatsApp « lien direct » (wa.me) fait depuis la fiche du bien : historique du client, sans envoi par le serveur. */
+export async function logWhatsAppLink(ctx: Ctx, contactId: string, propertyId: string, locale: string) {
+  return db(ctx, async (tx) => {
+    const [c] = await tx`select id from public.contacts where id = ${contactId} and deleted_at is null`;
+    if (!c) return false;
+    const [s] = await tx`insert into public.shares (organization_id, contact_id, sender_id, channel, property_ids, locale, status, sent_at)
+      values (${ctx.orgId}, ${contactId}, ${ctx.userId}, 'whatsapp_link', ${[propertyId]}::uuid[], ${loc(locale)}, 'sent', now()) returning id`;
+    await tx`insert into public.activities (organization_id, kind, contact_id, property_id, summary, payload) values (${ctx.orgId}, 'share', ${contactId}, ${propertyId}, 'whatsapp_link', ${tx.json({ share_id: s!.id, properties: 1, status: "link" })})`;
+    return true;
+  });
+}

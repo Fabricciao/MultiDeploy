@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { useTranslations } from "next-intl";
-import { CalendarDays, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleHelp, Handshake, House, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
+import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
-const MODULES = ["properties", "clients", "deals", "agenda", "marketing", "reports", "settings", "intake", "import"] as const;
+const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "marketing", "reports", "settings", "intake", "import"] as const;
 
 /** Fil d'Ariane déduit de l'URL : module, puis sous-page. */
 export function Crumbs() {
@@ -51,6 +51,10 @@ export function NewMenu() {
         <div className="sep" />
         <Link href="/clients/new" className="mi"><UserPlus size={16} aria-hidden />{tc("newClient")}</Link>
         <Link href="/properties/new" className="mi"><House size={16} aria-hidden />{tc("newProperty")}</Link>
+        <div className="sep" />
+        <Link href="/tasks?new=1" className="mi"><ListPlus size={16} aria-hidden />{tc("newTask")}</Link>
+        <Link href="/agenda" className="mi"><CalendarPlus size={16} aria-hidden />{tc("newVisit")}</Link>
+        <Link href="/deals?new=1" className="mi"><Handshake size={16} aria-hidden />{tc("newDeal")}</Link>
       </div>
     </details>
   );
@@ -60,6 +64,7 @@ export function NewMenu() {
 export function MobileNav() {
   const t = useTranslations("nav");
   const tc = useTranslations("common");
+  const locale = useLocale();
   const path = usePathname();
   const [sheet, setSheet] = useState<null | "new" | "more">(null);
   useEffect(() => setSheet(null), [path]);
@@ -76,15 +81,19 @@ export function MobileNav() {
           </div>
           {line("/clients/new", tc("newClient"), <UserPlus size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/properties/new", tc("newProperty"), <House size={20} strokeWidth={1.75} aria-hidden />)}
+          {line("/tasks?new=1", tc("newTask"), <ListPlus size={20} strokeWidth={1.75} aria-hidden />)}
+          {line("/deals?new=1", tc("newDeal"), <Handshake size={20} strokeWidth={1.75} aria-hidden />)}
         </div>
       )}
       {sheet === "more" && (
         <div className="sheet" role="dialog" aria-label={t("more")}><div className="grab" />
+          {line("/tasks", t("tasks"), <CircleCheck size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/deals", t("deals"), <Handshake size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/agenda", t("agenda"), <CalendarDays size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/marketing", t("marketing"), <Megaphone size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/reports", t("reports"), <ChartNoAxesColumn size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/settings", t("settings"), <Settings size={20} strokeWidth={1.75} aria-hidden />)}
+          <form action="/auth/signout" method="post"><input type="hidden" name="locale" value={locale} /><button className="row" style={{ height: 50, gap: 12, width: "100%", background: "none", border: 0, font: "inherit", color: "var(--danger)", cursor: "pointer" }}><LogOut size={20} strokeWidth={1.75} aria-hidden />{t("signOut")}</button></form>
         </div>
       )}
       <nav className="tabbar" aria-label={t("label")}>
@@ -98,7 +107,7 @@ export function MobileNav() {
   );
 }
 
-const GO: Record<string, string> = { a: "/", b: "/properties", c: "/clients", f: "/deals", p: "/agenda", m: "/marketing", r: "/reports" };
+const GO: Record<string, string> = { t: "/tasks", a: "/", b: "/properties", c: "/clients", f: "/deals", p: "/agenda", m: "/marketing", r: "/reports" };
 
 /** Raccourcis clavier globaux. Inactifs pendant la saisie. */
 export function Shortcuts() {
@@ -140,7 +149,7 @@ export function Shortcuts() {
         <div className="bd">
           <h3 style={{ marginBlockEnd: 14 }}>{ts("title")}</h3>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(180px,1fr))", gap: 24 }}>
-            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("go")}</div>{row(["G", "A"], t("today"))}{row(["G", "B"], t("properties"))}{row(["G", "C"], t("clients"))}{row(["G", "F"], t("deals"))}{row(["G", "P"], t("agenda"))}{row(["G", "M"], t("marketing"))}{row(["G", "R"], t("reports"))}</div>
+            <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("go")}</div>{row(["G", "A"], t("today"))}{row(["G", "T"], t("tasks"))}{row(["G", "B"], t("properties"))}{row(["G", "C"], t("clients"))}{row(["G", "F"], t("deals"))}{row(["G", "P"], t("agenda"))}{row(["G", "M"], t("marketing"))}{row(["G", "R"], t("reports"))}</div>
             <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("general")}</div>{row(["⌘", "K"], ts("search"))}{row(["N"], ts("new"))}{row(["["], ts("rail"))}{row(["?"], ts("help"))}</div>
             <div><div className="over" style={{ marginBlockEnd: 6 }}>{ts("list")}</div>{row(["J", "K"], ts("move"))}{row(["↵"], ts("open"))}{row([ts("space")], ts("peek"))}{row(["X"], ts("select"))}</div>
           </div>

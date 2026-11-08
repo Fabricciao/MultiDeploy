@@ -26,7 +26,10 @@
     "help": "Aide et raccourcis",
     "close": "Fermer",
     "openRecord": "Ouvrir la fiche",
-    "preview": "Aperçu"
+    "preview": "Aperçu",
+    "newTask": "Nouvelle tâche",
+    "newVisit": "Nouvelle visite",
+    "newDeal": "Nouvelle affaire"
   },
   "nav": {
     "label": "Navigation principale",
@@ -54,16 +57,20 @@
     "poster": "Affiche",
     "more": "Plus",
     "intake": "Saisie assistée",
-    "import": "Import"
+    "import": "Import",
+    "tasks": "Tâches",
+    "signOut": "Se déconnecter"
   },
   "today": {
     "title": "Aujourd'hui",
     "subtitle": "Ce qui demande votre attention aujourd'hui.",
     "tasks": {
       "title": "Tâches du jour",
-      "empty": "Aucune tâche prévue. Les relances à faire apparaîtront ici.",
+      "empty": "Aucune tâche pour aujourd'hui. Ajoutez-en une avec « Ajouter ».",
       "done": "Marquer comme faite",
-      "overdue": "En retard"
+      "overdue": "En retard",
+      "add": "Ajouter",
+      "all": "Tout voir"
     },
     "visits": {
       "title": "Visites",
@@ -93,7 +100,16 @@
     "next": {
       "title": "Prochaine visite",
       "route": "Itinéraire",
-      "call": "Appeler"
+      "call": "Appeler",
+      "sheet": "Bon de visite"
+    },
+    "scope": "Périmètre",
+    "me": "Moi",
+    "agency": "Agence",
+    "trend": {
+      "month": "+{n} ce mois",
+      "stale": "{n} à relancer",
+      "won": "{v} conclus sur 30 j"
     }
   },
   "login": {
@@ -189,7 +205,17 @@
     "noneSelected": "Aucun bien actif sélectionné. Retournez à la liste et cochez des biens.",
     "recipient": "Destinataire",
     "searchClient": "Chercher un client…",
-    "whatsappApi": "WhatsApp (API)"
+    "whatsappApi": "WhatsApp (API)",
+    "sendToClient": "Envoyer à un client",
+    "waTitle": "Envoyer par WhatsApp",
+    "waClient": "Client",
+    "waPick": "Choisir un client…",
+    "waPhone": "Ou saisir un numéro (05x…)",
+    "waMessage": "Message",
+    "waReset": "Rétablir le message proposé",
+    "waOpen": "Ouvrir WhatsApp",
+    "waHint": "WhatsApp (ou WhatsApp Web) s'ouvre avec le message prêt et le lien du bien ; il ne reste qu'à appuyer sur Envoyer.",
+    "waNoLink": "Le lien de la fiche publique n'est disponible que pour un bien « Actif »."
   },
   "form": {
     "errors": {
@@ -211,7 +237,25 @@
     "moveFailed": "Impossible de déplacer l'affaire (droits insuffisants).",
     "moveTo": "Déplacer vers…",
     "noProperty": "Aucun bien lié",
-    "wonLine": "Conclu : {count} affaires · {value}"
+    "wonLine": "Conclu : {count} affaires · {value}",
+    "viewBoard": "Tableau",
+    "viewList": "Liste",
+    "new": "Nouvelle affaire",
+    "readOnly": "Mode support en lecture seule : les affaires ne peuvent pas être modifiées.",
+    "createFailed": "Impossible de créer l'affaire (client manquant ou droits insuffisants).",
+    "client": "Client",
+    "pickClient": "Choisir un client…",
+    "property": "Bien",
+    "value": "Montant",
+    "valueHint": "Prix du bien par défaut",
+    "stage": "Étape",
+    "noClients": "Aucun client : créez d'abord un client.",
+    "agent": "Agent",
+    "allAgents": "Tous les agents",
+    "empty": "Aucune affaire pour l'instant",
+    "emptyHint": "Créez une affaire ici ou depuis la fiche d'un client. Une visite planifiée avec un client crée ou fait avancer son affaire automatiquement.",
+    "updated": "Mise à jour",
+    "stale": "À relancer"
   },
   "public": {
     "title": "Votre sélection de biens",
@@ -316,7 +360,14 @@
         "empty": "Rédigez d'abord une description dans une autre langue.",
         "insufficient_credits": "Crédits IA insuffisants.",
         "unavailable": "Traduction indisponible."
-      }
+      },
+      "origin": "Provenance",
+      "originHint": "Bien de votre agence ou apporté par une autre agence.",
+      "partnerAgency": "Agence d'origine",
+      "partnerPlaceholder": "Nom de l'agence partenaire",
+      "coBroke": "Ouvert au shitouf peoula (co-courtage avec d'autres agences)",
+      "coBrokeHint": "Les autres agences peuvent le proposer à leurs clients, commission partagée.",
+      "coBrokeShort": "Shitouf peoula"
     },
     "title": "Biens",
     "count": "{count, plural, one {# bien} other {# biens}}",
@@ -366,7 +417,18 @@
     "ground": "RDC",
     "viewLabel": "Affichage",
     "viewTable": "Tableau",
-    "viewGrid": "Grille"
+    "viewGrid": "Grille",
+    "quickStatus": {
+      "label": "Changer le statut",
+      "needsPriceCity": "Prix et ville requis pour « Actif ».",
+      "forbidden": "Modification non autorisée."
+    },
+    "origin": {
+      "own": "Bien de l'agence",
+      "partner": "Autre agence",
+      "coBrokeTag": "Shitouf peoula"
+    },
+    "taskTitle": "Ajouter une tâche"
   },
   "clients": {
     "kind": {
@@ -734,6 +796,14 @@
       "wrong_account": "Cette invitation est destinée à une autre adresse e-mail.",
       "seat_limit": "L'agence a atteint sa limite de sièges.",
       "invalid": "Invitation invalide ou expirée."
+    },
+    "scopes": {
+      "title": "Ce que voient les agents",
+      "intro": "Le propriétaire et les administrateurs voient tout. Cochez ce que les agents peuvent voir en plus de leurs propres biens, clients et chiffres.",
+      "properties_read_all": "Tous les biens de l'agence",
+      "contacts_read_all": "Tous les clients de l'agence",
+      "reports_read_all": "Les statistiques de toute l'agence",
+      "save": "Enregistrer"
     }
   },
   "plan": {
@@ -1106,7 +1176,35 @@
     "openDeals": "Affaires ouvertes",
     "visits30": "Visites (30 j)",
     "wonValue": "Valeur conclue",
-    "scope": "{n} agents dans le périmètre. Les agents ne voient que ce que leurs droits permettent."
+    "scope": "{n} agents dans le périmètre. Les agents ne voient que ce que leurs droits permettent.",
+    "scopeMe": "Mes chiffres",
+    "scopeAgency": "Agence",
+    "period": "{days} derniers jours",
+    "periodLabel": "Période",
+    "periods": {
+      "30": "30 j",
+      "90": "90 j",
+      "180": "6 mois"
+    },
+    "export": "Exporter",
+    "allAgents": "Tous les agents",
+    "kpi": {
+      "commissions": "Commissions conclues",
+      "commissionsSub": "{n} affaires conclues",
+      "leadToVisit": "Délai lead → visite",
+      "closeRate": "Taux de conclusion",
+      "closeRateSub": "{won} conclues sur {closed}",
+      "avgAge": "Âge moyen des biens"
+    },
+    "daysShort": "j",
+    "sourcesP": "Origine des nouveaux clients ({days} j)",
+    "wonByAgent": "Affaires conclues par agent",
+    "mandates": "Mandats qui expirent",
+    "noMandates": "Aucun mandat exclusif n'expire dans les 45 jours.",
+    "myStats": "Mes statistiques",
+    "visitsP": "Visites faites",
+    "wonN": "Conclues",
+    "scopeAgent": "Vous voyez vos propres chiffres. Le gérant de l'agence voit ceux de toute l'équipe."
   },
   "connections": {
     "title": "Connexions",
@@ -1203,5 +1301,37 @@
     "socialOn": "Facebook ou Instagram est connecté : publiez une affiche depuis la page du bien.",
     "socialOff": "Connectez Facebook et Instagram pour publier vos affiches sans quitter le CRM.",
     "socialManage": "Gérer les connexions"
+  },
+  "tasks": {
+    "title": "Tâches",
+    "sub": "{count} à faire · {overdue} en retard",
+    "mine": "Mes tâches",
+    "agency": "Agence",
+    "open": "À faire",
+    "done": "Terminées",
+    "placeholder": "Nouvelle tâche : rappeler, envoyer un dossier…",
+    "titleLabel": "Intitulé",
+    "due": "Échéance",
+    "time": "Heure",
+    "timeHint": "Avec une heure, la tâche est aussi ajoutée à votre Google Agenda (si connecté).",
+    "client": "Client lié",
+    "noClient": "Sans client",
+    "assignee": "Assignée à",
+    "me": "Moi",
+    "add": "Ajouter",
+    "assignHint": "En tant que gérant, vous pouvez assigner une tâche à un agent.",
+    "calendarHint": "Une tâche avec date et heure est copiée dans votre Google Agenda si vous l'avez connecté (Paramètres › Connexions).",
+    "empty": "Rien à faire pour le moment.",
+    "emptyDone": "Aucune tâche terminée ces 30 derniers jours.",
+    "groups": {
+      "overdue": "En retard",
+      "today": "Aujourd'hui",
+      "later": "À venir",
+      "none": "Sans date",
+      "done": "Terminées (30 j)"
+    },
+    "reopen": "Rouvrir",
+    "markDone": "Marquer comme faite",
+    "delete": "Supprimer"
   }
 }

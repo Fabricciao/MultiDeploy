@@ -2,7 +2,7 @@
 import { headers } from "next/headers";
 import { revalidatePath } from "next/cache";
 import { getCtx } from "@/lib/session";
-import { sendShares, type ShareResult } from "@/lib/data/shares";
+import { logWhatsAppLink, sendShares, type ShareResult } from "@/lib/data/shares";
 
 export type SendState = { results?: ShareResult[]; error?: string } | null;
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -22,4 +22,14 @@ export async function sendSelection(_prev: SendState, fd: FormData): Promise<Sen
   const results = await sendShares(ctx, { contactIds, propertyIds, channel, message }, site);
   revalidatePath(`/${locale}`, "layout");
   return { results };
+}
+
+/** Journalise un envoi WhatsApp direct (le lien wa.me est ouvert par le navigateur de l'agent). */
+export async function logWhatsAppAction(locale: string, contactId: string, propertyId: string): Promise<boolean> {
+  if (!uuid.test(contactId) || !uuid.test(propertyId)) return false;
+  const ctx = await getCtx(["fr", "he", "en"].includes(locale) ? locale : "fr");
+  if (!ctx.caps.has("shares.send") || ctx.impersonating) return false;
+  const ok = await logWhatsAppLink(ctx, contactId, propertyId, locale);
+  revalidatePath(`/${locale}/clients/${contactId}`);
+  return ok;
 }

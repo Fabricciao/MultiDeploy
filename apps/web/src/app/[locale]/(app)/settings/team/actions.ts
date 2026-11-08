@@ -3,7 +3,7 @@ import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getCtx } from "@/lib/session";
-import { changeMember, inviteMember, revokeInvitation } from "@/lib/data/team";
+import { AGENT_SCOPES, changeMember, inviteMember, revokeInvitation, setAgentScopes } from "@/lib/data/team";
 
 const loc = (fd: FormData) => (["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr");
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
@@ -34,4 +34,12 @@ export async function revokeAction(id: string, fd: FormData) {
   if (uuid.test(id) && ctx.caps.has("members.manage")) await revokeInvitation(ctx, id);
   revalidatePath(`/${locale}/settings/team`);
   back(locale);
+}
+
+export async function agentScopesAction(fd: FormData) {
+  const locale = loc(fd); const ctx = await getCtx(locale);
+  if (!ctx.caps.has("org.manage") || ctx.impersonating) return back(locale, "forbidden");
+  await setAgentScopes(ctx, Object.fromEntries(AGENT_SCOPES.map((c) => [c, fd.get(c) === "on"])));
+  revalidatePath(`/${locale}`, "layout");
+  return back(locale, undefined, "saved");
 }

@@ -13,13 +13,15 @@ const uuid = z.string().uuid();
 
 export const PAGE_SIZE = 40;
 export const MUST_HAVE = ["mamad", "parking", "elevator", "sukkah_balcony", "storage", "ac"] as const;
+export const MANDATE_FILTERS = ["exclusive", "expiring", "own", "partner", "co_broke"] as const;
+export type Mandate = (typeof MANDATE_FILTERS)[number];
 export const SORTS = ["recent", "price_asc", "price_desc", "mandate"] as const;
 export const STATUSES = ["draft", "active", "under_offer", "sold", "rented", "withdrawn", "expired"] as const;
 
 export type PropertyFilters = {
   q?: string; transaction?: "sale" | "rent"; status: string[]; cityIds: string[];
   roomsMin?: number; roomsMax?: number; priceMin?: number; priceMax?: number;
-  has: string[]; agent?: string; mandate?: "expiring" | "exclusive"; sort: (typeof SORTS)[number]; page: number;
+  has: string[]; agent?: string; mandate?: Mandate; sort: (typeof SORTS)[number]; page: number;
 };
 
 export function parsePropertyFilters(sp: SP): PropertyFilters {
@@ -33,7 +35,7 @@ export function parsePropertyFilters(sp: SP): PropertyFilters {
     roomsMin: num(sp.rmin), roomsMax: num(sp.rmax), priceMin: num(sp.pmin), priceMax: num(sp.pmax),
     has: list(sp.has).filter((s) => (MUST_HAVE as readonly string[]).includes(s)),
     agent: uuid.safeParse(first(sp.agent)).success ? first(sp.agent) : undefined,
-    mandate: first(sp.mandate) === "expiring" || first(sp.mandate) === "exclusive" ? (first(sp.mandate) as "expiring" | "exclusive") : undefined,
+    mandate: (MANDATE_FILTERS as readonly string[]).includes(first(sp.mandate) ?? "") ? (first(sp.mandate) as Mandate) : undefined,
     sort: (SORTS as readonly string[]).includes(sort ?? "") ? sort : "recent",
     page: Math.max(1, Math.floor(num(sp.page) ?? 1)),
   };

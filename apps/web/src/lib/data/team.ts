@@ -58,3 +58,22 @@ export async function acceptInvitation(userId: string, token: string): Promise<{
     return { orgId: r!.org };
   } catch (e) { const m = String((e as Error).message); return { error: m.includes("wrong_account") ? "wrong_account" : m.includes("seat_limit") ? "seat_limit" : "invalid" }; }
 }
+
+/** Ce que voient les agents de l'agence (surcharge des droits par défaut). */
+export const AGENT_SCOPES = ["properties.read_all", "contacts.read_all", "reports.read_all"] as const;
+export async function getAgentScopes(ctx: Ctx) {
+  const rows = await db(ctx, (tx) => tx`select distinct on (capability) capability, granted from public.role_capabilities
+    where role = 'agent' and capability = any(${[...AGENT_SCOPES]}) and (organization_id = ${ctx.orgId} or organization_id is null) order by capability, organization_id nulls last`);
+  const m = new Map(rows.map((r) => [r.capability as string, r.granted as boolean]));
+  return Object.fromEntries(AGENT_SCOPES.map((c) => [c, m.get(c) ?? false])) as Record<(typeof AGENT_SCOPES)[number], boolean>;
+}
+export async function setAgentScopes(ctx: Ctx, values: Record<string, boolean>) {
+  if (!ctx.caps.has("org.manage")) return false;
+  await db(ctx, async (tx) => {
+    for (const c of AGENT_SCOPES) {
+      await tx`delete from public.role_capabilities where organization_id = ${ctx.orgId} and role = 'agent' and capability = ${c}`;
+      await tx`insert into public.role_capabilities (organization_id, role, capability, granted) values (${ctx.orgId}, 'agent', ${c}, ${!!values[c]})`;
+    }
+  });
+  return true;
+}

@@ -37,6 +37,7 @@ export function parsePropertyForm(fd: FormData): Parsed<PropertyInput> {
     arnona_monthly: numOrNull(fd, "arnona_monthly", errors, { min: 0 }), vaad_bayit_monthly: numOrNull(fd, "vaad_bayit_monthly", errors, { min: 0 }),
     registration_type: str(fd, "registration_type") && ["tabu", "minhal", "company", "other"].includes(str(fd, "registration_type")!) ? str(fd, "registration_type") : null,
     mandate_type: oneOf(str(fd, "mandate_type"), ["exclusive", "non_exclusive"] as const, "non_exclusive"), mandate_end: str(fd, "mandate_end"),
+    mandate_origin: oneOf(str(fd, "mandate_origin"), ["own", "partner"] as const, "own"), mandate_partner: str(fd, "mandate_partner")?.slice(0, 120) ?? null, mandate_co_broke: bool(fd, "mandate_co_broke"),
     internal_notes: str(fd, "internal_notes"),
     titles: { fr: str(fd, "title_fr") ?? "", he: str(fd, "title_he") ?? "", en: str(fd, "title_en") ?? "" },
     descriptions: { fr: str(fd, "desc_fr") ?? "", he: str(fd, "desc_he") ?? "", en: str(fd, "desc_en") ?? "" },

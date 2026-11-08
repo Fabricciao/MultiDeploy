@@ -26,7 +26,7 @@ export function PropertyForm({ action, cities, d = {}, missing, hints, canTransl
   const translate = (l: string) => { setSugErr(null); const src = (["fr", "en", "he"] as const).find((x) => x !== l && (val(`desc_${x}`)?.value ?? "").trim()); if (!src) { setSugErr("empty"); return; } startBusy(async () => { const r = await suggestTextAction({ mode: "translate", target: l, source: src, v: {}, text: val(`desc_${src}`)!.value }); if (r.ok) { const tt = val(`title_${src}`)?.value.trim(); fill(l, { description: r.description }); void tt; } else setSugErr(r.error); }); };
   const e = (k: string) => (state?.errors?.[k] ? tf(`errors.${state.errors[k]}`) : undefined);
   const chk = (k: string, label: string) => <label className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name={k} defaultChecked={!!d[k]} />{label}</label>;
-  const mandate = (d.mandate ?? {}) as { type?: string; end?: string };
+  const mandate = (d.mandate ?? {}) as { type?: string; end?: string; origin?: string; partner?: string; co_broke?: boolean };
   const tr = (d.translations ?? {}) as Record<string, { title?: string; description?: string }>;
   return (
     <form ref={formRef} action={formAction} className="col" style={{ gap: 16, maxWidth: 920 }}>
@@ -65,6 +65,9 @@ export function PropertyForm({ action, cities, d = {}, missing, hints, canTransl
       <section className="card"><h2>{t("form.mandate")}</h2><div className="card-b" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(200px,1fr))", gap: 14 }}>
         <Field label={t("mandateLabel")}><select name="mandate_type" className="input" defaultValue={mandate.type ?? "non_exclusive"}><option value="non_exclusive">{t("mandate.non_exclusive")}</option><option value="exclusive">{t("mandate.exclusive")}</option></select></Field>
         <Field label={t("form.mandateEnd")} error={e("mandate_end")}><input name="mandate_end" type="date" className="input" defaultValue={mandate.end ?? ""} /></Field>
+        <Field label={t("form.origin")} hint={t("form.originHint")}><select name="mandate_origin" className="input" defaultValue={mandate.origin ?? "own"}><option value="own">{t("origin.own")}</option><option value="partner">{t("origin.partner")}</option></select></Field>
+        <Field label={t("form.partnerAgency")}><input name="mandate_partner" className="input" maxLength={120} defaultValue={mandate.partner ?? ""} placeholder={t("form.partnerPlaceholder")} /></Field>
+        <div style={{ gridColumn: "1 / -1" }}><label className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name="mandate_co_broke" defaultChecked={!!mandate.co_broke} />{t("form.coBroke")}</label><div className="note" style={{ marginBlockStart: 4 }}>{t("form.coBrokeHint")}</div></div>
         <div style={{ gridColumn: "1 / -1" }}><Field label={t("form.internalNotes")}><textarea name="internal_notes" className="input" defaultValue={d.internal_notes ?? ""} /></Field></div>
       </div></section>
 

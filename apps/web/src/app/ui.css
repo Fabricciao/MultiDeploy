@@ -288,3 +288,18 @@ div.ltr{display:block}
 .poster-ph img{max-width:100%;max-height:100%;object-fit:contain;border-radius:var(--radius-sm);box-shadow:var(--shadow-1)}
 .poster-b{padding:10px 12px 12px;min-width:0}
 @media (max-width:900px){.posters{grid-template-columns:1fr 1fr;gap:8px}.poster-b{padding:8px}}
+
+/* ---------- ajouts du 8/11 : menu profil, compteur d'alerte, tâches, statut rapide, co-courtage ---------- */
+.nav .cnt.alert{min-width:18px;height:18px;padding-inline:5px;border-radius:999px;background:var(--signal,#EE5F2A);color:#fff;font-size:11px;font-weight:600;display:inline-grid;place-items:center}
+.me-pop{display:block}.me-pop>summary{list-style:none;cursor:pointer}.me-pop>summary::-webkit-details-marker{display:none}
+.me-pop .me-more{color:var(--rail-muted);flex:none}.me-pop .pop-body{color:var(--text);inset-inline-start:0}
+.me-pop .mi{background:none;border:0;cursor:pointer;font:inherit;color:inherit;text-align:start}.me-pop .mi.danger{color:var(--danger)}
+.side.mini .me-more{display:none}
+.st-sel{appearance:none;-webkit-appearance:none;border:0;border-radius:999px;font:inherit;font-size:12px;font-weight:500;height:22px;padding-inline:10px 22px;cursor:pointer;background-repeat:no-repeat;background-position:right 7px center;background-size:9px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23667' stroke-width='1.5'/%3E%3C/svg%3E")}
+[dir=rtl] .st-sel{padding-inline:22px 10px;background-position:left 7px center}
+.st-sel:disabled{cursor:progress;opacity:.6}
+.task-row{display:grid;grid-template-columns:22px 1fr auto;gap:10px;align-items:center;padding:10px 14px;border-block-start:1px solid var(--border)}
+.task-row:first-child{border-block-start:0}.task-row.done b{text-decoration:line-through;color:var(--text-muted);font-weight:400}
+.task-add{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.task-add>*{flex:1 1 130px;min-width:0}.task-add>[name=title]{flex:3 1 260px}.task-add>button{flex:0 0 auto}
+.mtags{display:flex;flex-wrap:wrap;gap:4px}
+.task-add.compact>[name=title],.task-add.compact>select{flex-basis:100%}

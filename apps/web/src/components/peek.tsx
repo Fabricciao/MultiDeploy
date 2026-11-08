@@ -38,7 +38,7 @@ export async function PropertyPeek({ ctx, id, locale, nav }: { ctx: Ctx; id: str
   const tr = Object.fromEntries(data.translations.map((x) => [x.locale, x]));
   const title = tr[locale]?.title || tr.fr?.title || tr.he?.title || `${t(`types.${p.property_type}`)} · ${p.street ?? ""}`;
   const city = cityName({ name_fr: p.city_fr, name_he: p.city_he, name_en: p.city_en }, locale);
-  const m = p.mandate as { type?: string } | null;
+  const m = p.mandate as { type?: string; origin?: string; co_broke?: boolean } | null;
   const kv = (k: string, v: React.ReactNode) => <div><div className="k">{k}</div><div className="v tab">{v}</div></div>;
   return (
     <aside className="drawer peek" aria-label={title}>
@@ -46,7 +46,7 @@ export async function PropertyPeek({ ctx, id, locale, nav }: { ctx: Ctx; id: str
       <div style={{ overflow: "auto", flex: 1 }}>
         <div style={{ height: 210 }}><Cover path={media[0]?.storage_path} full /></div>
         <div className="col" style={{ padding: "16px 20px", gap: 10 }}>
-          <div className="row wrap"><Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>{m?.type === "exclusive" && <Badge tone="acc">{t("mandate.exclusive")}</Badge>}</div>
+          <div className="row wrap"><Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>{m?.type === "exclusive" && <Badge tone="acc">{t("mandate.exclusive")}</Badge>}{m?.origin === "partner" && <Badge tone="info">{t("origin.partner")}</Badge>}{m?.co_broke && <Badge tone="sig">{t("origin.coBrokeTag")}</Badge>}</div>
           <div><h2 className="t-page" style={{ fontSize: 22, lineHeight: "28px" }}>{title}</h2><p className="note">{city} · <span className="ltr tab">{p.reference}</span></p></div>
           <div><div className="t-price">{money(locale, p.price, p.currency)}</div>{p.price && p.area_built && <div className="note tab">{money(locale, Number(p.price) / Number(p.area_built), p.currency)} / {t("sqm")}</div>}</div>
           <div className="kv" style={{ gridTemplateColumns: "repeat(3,1fr)" }}>

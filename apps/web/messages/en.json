@@ -26,7 +26,10 @@
     "help": "Help and shortcuts",
     "close": "Close",
     "openRecord": "Open record",
-    "preview": "Preview"
+    "preview": "Preview",
+    "newTask": "New task",
+    "newVisit": "New viewing",
+    "newDeal": "New deal"
   },
   "nav": {
     "label": "Main navigation",
@@ -54,16 +57,20 @@
     "poster": "Poster",
     "more": "More",
     "intake": "Assisted entry",
-    "import": "Import"
+    "import": "Import",
+    "tasks": "Tasks",
+    "signOut": "Sign out"
   },
   "today": {
     "title": "Today",
     "subtitle": "What needs your attention today.",
     "tasks": {
       "title": "Today's tasks",
-      "empty": "No tasks scheduled. Follow-ups to make will show up here.",
+      "empty": "No tasks for today. Use “Add” to create one.",
       "done": "Mark as done",
-      "overdue": "Overdue"
+      "overdue": "Overdue",
+      "add": "Add",
+      "all": "See all"
     },
     "visits": {
       "title": "Viewings",
@@ -93,7 +100,16 @@
     "next": {
       "title": "Next visit",
       "route": "Directions",
-      "call": "Call"
+      "call": "Call",
+      "sheet": "Viewing form"
+    },
+    "scope": "Scope",
+    "me": "Me",
+    "agency": "Agency",
+    "trend": {
+      "month": "+{n} this month",
+      "stale": "{n} to follow up",
+      "won": "{v} won in 30 days"
     }
   },
   "login": {
@@ -189,7 +205,17 @@
     "noneSelected": "No active property selected. Go back to the list and tick properties.",
     "recipient": "Recipient",
     "searchClient": "Find a client…",
-    "whatsappApi": "WhatsApp (API)"
+    "whatsappApi": "WhatsApp (API)",
+    "sendToClient": "Send to a client",
+    "waTitle": "Send via WhatsApp",
+    "waClient": "Client",
+    "waPick": "Choose a client…",
+    "waPhone": "Or type a number (05x…)",
+    "waMessage": "Message",
+    "waReset": "Restore suggested message",
+    "waOpen": "Open WhatsApp",
+    "waHint": "WhatsApp (or WhatsApp Web) opens with the message and listing link ready; just press Send.",
+    "waNoLink": "The public listing link is only available for an “Active” property."
   },
   "form": {
     "errors": {
@@ -211,7 +237,25 @@
     "moveFailed": "Could not move the deal (insufficient rights).",
     "moveTo": "Move to…",
     "noProperty": "No linked property",
-    "wonLine": "Won: {count} deals · {value}"
+    "wonLine": "Won: {count} deals · {value}",
+    "viewBoard": "Board",
+    "viewList": "List",
+    "new": "New deal",
+    "readOnly": "Read-only support mode: deals cannot be changed.",
+    "createFailed": "Could not create the deal (missing client or insufficient rights).",
+    "client": "Client",
+    "pickClient": "Choose a client…",
+    "property": "Property",
+    "value": "Amount",
+    "valueHint": "Defaults to the property price",
+    "stage": "Stage",
+    "noClients": "No clients yet: create a client first.",
+    "agent": "Agent",
+    "allAgents": "All agents",
+    "empty": "No deals yet",
+    "emptyHint": "Create a deal here or from a client page. Scheduling a viewing with a client creates or advances their deal automatically.",
+    "updated": "Updated",
+    "stale": "Follow up"
   },
   "public": {
     "title": "Your property selection",
@@ -316,7 +360,14 @@
         "empty": "Write a description in another language first.",
         "insufficient_credits": "Not enough AI credits.",
         "unavailable": "Translation unavailable."
-      }
+      },
+      "origin": "Source",
+      "originHint": "Your agency’s listing or one brought by another agency.",
+      "partnerAgency": "Originating agency",
+      "partnerPlaceholder": "Partner agency name",
+      "coBroke": "Open to shituf pe’ula (co-brokerage with other agencies)",
+      "coBrokeHint": "Other agencies may offer it to their clients, commission shared.",
+      "coBrokeShort": "Shituf pe’ula"
     },
     "title": "Properties",
     "count": "{count, plural, one {# property} other {# properties}}",
@@ -366,7 +417,18 @@
     "ground": "G",
     "viewLabel": "View",
     "viewTable": "Table",
-    "viewGrid": "Grid"
+    "viewGrid": "Grid",
+    "quickStatus": {
+      "label": "Change status",
+      "needsPriceCity": "Price and city required for “Active”.",
+      "forbidden": "Not allowed."
+    },
+    "origin": {
+      "own": "Agency listing",
+      "partner": "Other agency",
+      "coBrokeTag": "Shituf pe’ula"
+    },
+    "taskTitle": "Add a task"
   },
   "clients": {
     "kind": {
@@ -734,6 +796,14 @@
       "wrong_account": "This invitation is for a different email address.",
       "seat_limit": "The agency reached its seat limit.",
       "invalid": "Invalid or expired invitation."
+    },
+    "scopes": {
+      "title": "What agents can see",
+      "intro": "The owner and admins see everything. Tick what agents may see beyond their own properties, clients and figures.",
+      "properties_read_all": "All agency properties",
+      "contacts_read_all": "All agency clients",
+      "reports_read_all": "Statistics for the whole agency",
+      "save": "Save"
     }
   },
   "plan": {
@@ -1106,7 +1176,35 @@
     "openDeals": "Open deals",
     "visits30": "Viewings (30 d)",
     "wonValue": "Won value",
-    "scope": "{n} agents in scope. Agents only see what their rights allow."
+    "scope": "{n} agents in scope. Agents only see what their rights allow.",
+    "scopeMe": "My figures",
+    "scopeAgency": "Agency",
+    "period": "Last {days} days",
+    "periodLabel": "Period",
+    "periods": {
+      "30": "30 d",
+      "90": "90 d",
+      "180": "6 months"
+    },
+    "export": "Export",
+    "allAgents": "All agents",
+    "kpi": {
+      "commissions": "Commissions won",
+      "commissionsSub": "{n} deals won",
+      "leadToVisit": "Lead → viewing time",
+      "closeRate": "Close rate",
+      "closeRateSub": "{won} won out of {closed}",
+      "avgAge": "Average listing age"
+    },
+    "daysShort": "d",
+    "sourcesP": "New client sources ({days} d)",
+    "wonByAgent": "Deals won by agent",
+    "mandates": "Expiring mandates",
+    "noMandates": "No exclusive mandate expires within 45 days.",
+    "myStats": "My statistics",
+    "visitsP": "Viewings done",
+    "wonN": "Won",
+    "scopeAgent": "You see your own figures. The agency manager sees the whole team."
   },
   "connections": {
     "title": "Connections",
@@ -1203,5 +1301,37 @@
     "socialOn": "Facebook or Instagram is connected: publish a poster from the property page.",
     "socialOff": "Connect Facebook and Instagram to publish posters without leaving the CRM.",
     "socialManage": "Manage connections"
+  },
+  "tasks": {
+    "title": "Tasks",
+    "sub": "{count} to do · {overdue} overdue",
+    "mine": "My tasks",
+    "agency": "Agency",
+    "open": "To do",
+    "done": "Done",
+    "placeholder": "New task: call back, send a file…",
+    "titleLabel": "Title",
+    "due": "Due date",
+    "time": "Time",
+    "timeHint": "With a time, the task is also added to your Google Calendar (if connected).",
+    "client": "Linked client",
+    "noClient": "No client",
+    "assignee": "Assigned to",
+    "me": "Me",
+    "add": "Add",
+    "assignHint": "As a manager, you can assign a task to an agent.",
+    "calendarHint": "A task with a date and time is copied to your Google Calendar if connected (Settings › Connections).",
+    "empty": "Nothing to do right now.",
+    "emptyDone": "No tasks completed in the last 30 days.",
+    "groups": {
+      "overdue": "Overdue",
+      "today": "Today",
+      "later": "Upcoming",
+      "none": "No date",
+      "done": "Done (30 days)"
+    },
+    "reopen": "Reopen",
+    "markDone": "Mark as done",
+    "delete": "Delete"
   }
 }

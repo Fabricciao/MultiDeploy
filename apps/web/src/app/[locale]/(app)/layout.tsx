@@ -6,7 +6,7 @@ import { Crumbs, HelpButton, MobileNav, NewMenu, Shortcuts, ThemeToggle } from "
 import { listViews } from "@/lib/data/views";
 import { cookies } from "next/headers";
 import { CommandPalette, PaletteButton } from "@/components/command-palette";
-import { getCtx, db } from "@/lib/session";
+import { getCtx, db, seesAllProperties } from "@/lib/session";
 import { pickName } from "@/lib/data/types";
 import { getBrandKit } from "@/lib/data/brand";
 import { avatarSrc } from "@/lib/data/profile-input";
@@ -21,8 +21,11 @@ export default async function AppLayout({ children, params }: { children: React.
   const ctx = await getCtx(locale);
   const t = await getTranslations();
   const counts = await db(ctx, async (tx) => {
-    const [r] = await tx`select (select count(*) from public.properties where deleted_at is null) as p, (select count(*) from public.contacts where deleted_at is null) as c, (select avatar_url from public.profiles where id = ${ctx.userId}) as avatar`;
-    return { properties: Number(r!.p), clients: Number(r!.c), avatar: (r!.avatar as string | null) ?? null };
+    const [r] = await tx`select (select count(*) from public.properties where deleted_at is null and (${seesAllProperties(ctx)} or agent_id = ${ctx.userId})) as p, (select count(*) from public.contacts where deleted_at is null) as c,
+      (select count(*) from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'open' and d.deleted_at is null) as d,
+      (select count(*) from public.tasks where assignee_id = ${ctx.userId} and done_at is null and due_at < date_trunc('day', now() at time zone 'Asia/Jerusalem') at time zone 'Asia/Jerusalem' + interval '1 day') as due,
+      (select avatar_url from public.profiles where id = ${ctx.userId}) as avatar`;
+    return { properties: Number(r!.p), clients: Number(r!.c), deals: Number(r!.d), due: Number(r!.due), avatar: (r!.avatar as string | null) ?? null };
   });
   const brand = await getBrandKit(ctx);
   const [vp, vc] = await Promise.all([listViews(ctx, "properties"), listViews(ctx, "contacts")]);
@@ -31,7 +34,7 @@ export default async function AppLayout({ children, params }: { children: React.
   return (
     <div className="app">
       <style dangerouslySetInnerHTML={{ __html: themeCss(brand.colors.primary, brand.style.radius, brand.style.density) }} />
-      <Sidebar orgName={pickName(ctx.orgName, locale) || "—"} logoUrl={brand.logo_path ? `/api/files/${brand.logo_path}` : null} userName={ctx.fullName} avatarUrl={avatarSrc(counts.avatar)} roleLabel={t(`roles.${ctx.role}`)} counts={{ properties: counts.properties, clients: counts.clients }} views={views} mini={mini} />
+      <Sidebar orgName={pickName(ctx.orgName, locale) || "—"} logoUrl={brand.logo_path ? `/api/files/${brand.logo_path}` : null} userName={ctx.fullName} avatarUrl={avatarSrc(counts.avatar)} roleLabel={t(`roles.${ctx.role}`)} counts={{ properties: counts.properties, clients: counts.clients, deals: counts.deals, due: counts.due }} views={views} mini={mini} />
       <div className="main">
         {ctx.impersonating && (
           <form action={stopImpersonation} role="status" className="banner bad" style={{ borderRadius: 0, gap: 12, fontWeight: 500 }}>

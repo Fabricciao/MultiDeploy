@@ -1,13 +1,13 @@
 "use client";
 import { useOptimistic, useState, useTransition } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ArrowRightLeft } from "lucide-react";
+import { ArrowRightLeft, Clock } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Avatar } from "@/components/ui";
 import { moveDealAction } from "@/app/[locale]/(app)/deals/actions";
 
 export type BoardStage = { id: string; name: string; kind: string; probability: number };
-export type BoardDeal = { id: string; stageId: string; client: string; sub: string; value: number | null; agent: string; contactId: string };
+export type BoardDeal = { id: string; stageId: string; client: string; sub: string; value: number | null; agent: string; contactId: string; stale?: boolean };
 
 export function DealBoard({ stages, deals, canMove }: { stages: BoardStage[]; deals: BoardDeal[]; canMove: boolean }) {
   const locale = useLocale();
@@ -53,6 +53,7 @@ export function DealBoard({ stages, deals, canMove }: { stages: BoardStage[]; de
                   onDragStart={(e) => { e.dataTransfer.setData("text/plain", d.id); setDrag(d.id); }} onDragEnd={() => setDrag(null)}>
                   <Link href={`/clients/${d.contactId}`}><b>{d.client}</b></Link>
                   <small className="tab">{d.sub}</small>
+                  {d.stale && <span className="badge warn" style={{ marginBlockStart: 6 }}><Clock size={11} aria-hidden />{t("stale")}</span>}
                   <div className="f">
                     <span className="price tab">{d.value ? fmt(d.value) : "—"}</span>
                     <span className="row gap4">

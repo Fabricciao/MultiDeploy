@@ -16,7 +16,7 @@ export type Ctx = {
 export const DEV_USER_COOKIE = "dev_user";
 export const IMPERSONATE_COOKIE = "imp_org";
 export const devImpersonationEnabled = () => process.env.NODE_ENV !== "production" && !supabaseEnv();
-const CAPS = ["contacts.read_all", "contacts.write", "contacts.write_all", "contacts.delete", "properties.write", "properties.write_all", "properties.delete", "members.manage", "org.manage", "brand.manage", "audit.read", "deals.write", "tasks.write", "shares.send", "ai.use", "posters.create", "api.manage", "billing.manage", "exports.run"];
+const CAPS = ["properties.read_all", "reports.read_all", "contacts.read_all", "contacts.write", "contacts.write_all", "contacts.delete", "properties.write", "properties.write_all", "properties.delete", "members.manage", "org.manage", "brand.manage", "audit.read", "deals.write", "tasks.write", "shares.send", "ai.use", "posters.create", "api.manage", "billing.manage", "exports.run"];
 const FEATURES = ["custom_domain", "white_label", "whatsapp_api", "api", "creative_posters"];
 
 /** Identité authentifiée (sans notion d'agence). null si non connecté. */
@@ -81,6 +81,10 @@ async function build(a: { userId: string; orgId: string; role: Role; fullName: s
   const feats = (await sql`select f.k from unnest(${FEATURES}::text[]) f(k) where app.org_feature(${a.orgId}::uuid, f.k)`).map((r) => r.k as string);
   return { userId: a.userId, orgId: a.orgId, role: a.role, fullName: a.fullName, orgName: { fr: a.o.name_fr, he: a.o.name_he, en: a.o.name_en }, orgSlug: a.o.slug, locale: a.locale, caps: new Set(caps), features: new Set(feats), plan: a.o.plan, impersonating: a.imp, isPlatformAdmin: a.platformAdmin };
 }
+
+/** Niveau de compte : le gérant voit tous les biens / toutes les statistiques ; l'agent seulement les siens (sauf réglage de l'agence). */
+export const seesAllProperties = (ctx: Ctx) => ctx.caps.has("properties.read_all");
+export const seesAllStats = (ctx: Ctx) => ctx.caps.has("reports.read_all");
 
 /** Exécute une requête sous l'identité (RLS) de l'utilisateur courant (lecture seule si impersonation). */
 export async function db<T>(ctx: Ctx, fn: (tx: Tx) => Promise<T>): Promise<T> {
