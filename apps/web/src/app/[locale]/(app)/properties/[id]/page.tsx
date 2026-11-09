@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles } from "lucide-react";
+import { Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
+import { getPropertyInsights } from "@/lib/data/insights";
+import { CopyButton } from "@/components/copy-button";
 import { Link } from "@/i18n/navigation";
 import { getCtx, db } from "@/lib/session";
 import { WhatsAppSend } from "@/components/whatsapp-send";
@@ -9,7 +11,7 @@ import { TaskAdd } from "@/components/task-add";
 import { getProperty } from "@/lib/data/properties";
 import { cityName } from "@/lib/data/geo";
 import { contactName } from "@/lib/data/contacts";
-import { dateTime, initials, money, num, relDays } from "@/lib/format";
+import { dateShort, dateTime, initials, money, num, relDays } from "@/lib/format";
 import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge, PageHeader, statusTone } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
@@ -18,7 +20,7 @@ import { PhotoGallery } from "@/components/photo-gallery";
 import { listMedia } from "@/lib/data/media";
 import { archivePropertyAction } from "../actions";
 
-export default async function PropertyPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: Promise<{ send?: string }> }) {
+export default async function PropertyPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: Promise<{ send?: string; tab?: string }> }) {
   const { locale, id } = await params; const sp = await searchParams;
   setRequestLocale(locale);
   const ctx = await getCtx(locale);
@@ -52,6 +54,30 @@ export default async function PropertyPage({ params, searchParams }: { params: P
   const sign = [ctx.fullName, pickName(ctx.orgName, locale)].filter(Boolean).join(" · ");
   const spec = (k: string, v: React.ReactNode) => <div><div className="k">{k}</div><div className="v tab">{v}</div></div>;
   const yes = (b: boolean | null) => (b ? tc("yes") : tc("no"));
+  const tv = await getTranslations("propV2");
+  const tab = ["overview", "clients", "activity", "owner"].includes(sp.tab ?? "") ? sp.tab! : "overview";
+  const ins = await getPropertyInsights(ctx, id);
+  const tabHref = (k: string) => `/properties/${id}${k === "overview" ? "" : `?tab=${k}`}`;
+  const sharedTo = new Map(ins.shared.map((s) => [s.contact_id as string, s]));
+  const quality = [
+    { ok: media.length >= 5, label: tv("q.photos", { n: media.length }), href: undefined },
+    { ok: ["fr", "he"].every((l) => tr[l]?.description), label: tv("q.languages"), href: canEdit ? `/properties/${id}/edit` : undefined },
+    { ok: !!p.price, label: tv("q.price"), href: canEdit ? `/properties/${id}/edit` : undefined },
+    { ok: m?.type === "exclusive" && !!m.end, label: tv("q.mandate"), href: canEdit ? `/properties/${id}/edit` : undefined },
+    { ok: data.owners.length > 0, label: tv("q.owner"), href: canEdit ? `/properties/${id}/edit` : undefined },
+    { ok: !!p.street && !!p.city_fr, label: tv("q.address"), href: canEdit ? `/properties/${id}/edit` : undefined },
+  ];
+  const score = Math.round((quality.filter((x) => x.ok).length / quality.length) * 10);
+  const nextVisit = data.visits.filter((v) => v.status === "planned" && new Date(v.starts_at).getTime() > Date.now()).at(-1);
+  const sqm = p.price && p.area_built ? Number(p.price) / Number(p.area_built) : null;
+  const owner = data.owners[0];
+  const ownerLocale = owner && ["fr", "he", "en"].includes(owner.preferred_locale) ? (owner.preferred_locale as string) : locale;
+  const tr2 = await getTranslations({ locale: ownerLocale, namespace: "propV2" });
+  const report = owner ? tr2("report.body", { name: (ownerLocale === "he" ? owner.first_name_he || owner.first_name : owner.first_name || owner.first_name_he) ?? "", place: [p.street, ownerLocale === "he" ? p.city_he : ownerLocale === "en" ? p.city_en : p.city_fr].filter(Boolean).join(", "),
+    sent: ins.k.sent, opened: ins.k.opened, visits: ins.k.visits, offers: ins.k.offers, agent: ctx.fullName, agency: pickName(ctx.orgName, ownerLocale) }) : "";
+  const ownerPhone = owner?.phones?.[0]?.e164 as string | undefined;
+  const tlIcon = (k: string) => ({ visit: <CalendarCheck size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, deal: <Handshake size={14} aria-hidden />, note: <StickyNote size={14} aria-hidden />, stage_change: <ArrowRightLeft size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <ArrowRightLeft size={14} aria-hidden />;
+  const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
 
   return (
     <>
@@ -63,53 +89,98 @@ export default async function PropertyPage({ params, searchParams }: { params: P
         {m?.co_broke && <Badge tone="sig">{t("origin.coBrokeTag")}</Badge>}
         {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><ImageIcon size={14} aria-hidden />{t("poster")}</Link>}
         {canEdit && <Link href={`/properties/${id}/edit`} className="btn"><Pencil size={14} aria-hidden />{tc("edit")}</Link>}
-        {canSend && <Link href={`/properties/${id}?send=wa#wa`} className="btn pri" scroll={false}><Send size={14} aria-hidden className="flip" />{ts("sendToClient")}</Link>}
+        {canSend && <Link href={`/properties/${id}?tab=clients#wa`} className="btn pri" scroll={false}><Send size={14} aria-hidden className="flip" />{ts("sendToClient")}</Link>}
       </PageHeader>
 
-      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 360px", gap: 20, alignItems: "start" }} className="split">
-        <div className="col" style={{ gap: 16 }}>
+      <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 344px", gap: 16, alignItems: "start" }} className="split">
+        <div className="col" style={{ gap: 12, minWidth: 0 }}>
           <PhotoGallery propertyId={id} seed={id} canEdit={canEdit} items={media.map((m) => ({ id: m.id, url: `/api/files/${m.storage_path}`, isCover: m.is_cover }))} />
 
-          <div className="card"><h2>{t("details")}</h2><div className="card-b"><div className="kv">
-            {spec(t("price"), money(locale, p.price, p.currency))}
-            {spec(t("rooms"), num(locale, p.rooms))}
-            {spec(t("area"), `${num(locale, p.area_built, 0)} ${t("sqm")}`)}
-            {spec(t("floor"), <span className="ltr">{p.floor === 0 ? t("ground") : p.floor ?? "–"}{p.floors_total ? ` / ${p.floors_total}` : ""}</span>)}
-            {spec(t("has.mamad"), yes(p.mamad))}{spec(t("has.parking"), p.parking_count ?? 0)}{spec(t("has.elevator"), yes(p.elevator))}{spec(t("has.sukkah_balcony"), yes(p.sukkah_balcony))}
-            {spec(t("form.arnona"), money(locale, p.arnona_monthly))}{spec(t("form.vaad"), money(locale, p.vaad_bayit_monthly))}
-            {spec(t("form.registration"), p.registration_type ? t(`form.reg.${p.registration_type}`) : "—")}
-            {spec(t("mandateLabel"), m?.type === "exclusive" ? `${t("mandate.exclusive")}${m.end ? ` · ${relDays(locale, m.end)}` : ""}` : t("mandate.non_exclusive"))}
-            {spec(t("form.origin"), m?.origin === "partner" ? `${t("origin.partner")}${m.partner ? ` · ${m.partner}` : ""}` : t("origin.own"))}
-            {spec(t("form.coBrokeShort"), yes(!!m?.co_broke))}
-          </div></div></div>
+          <nav className="tabs" aria-label={tv("tabs")}>
+            {(["overview", "clients", "activity", "owner"] as const).map((k) => <Link key={k} href={tabHref(k) as "/"} scroll={false} className={tab === k ? "on" : ""} aria-current={tab === k ? "page" : undefined}>{tv(`tab.${k}`)}{k === "clients" && <span className="cnt-b">{items.length}</span>}</Link>)}
+          </nav>
 
-          <div className="card"><h2>{t("form.description")}</h2><div className="card-b col" style={{ gap: 10 }}>
-            {desc ? <p style={{ maxWidth: "68ch", lineHeight: 1.7 }}>{desc}</p> : <p className="muted">{t("noDescription")}</p>}
-            {tr[locale]?.origin === "ai" && !tr[locale]?.reviewed && <Badge tone="warn">{t("aiNotReviewed")}</Badge>}
-          </div></div>
+          {tab === "overview" && <>
+            <div className="card"><h2>{t("details")}</h2><div className="card-b"><div className="kv" style={{ gridTemplateColumns: "repeat(auto-fill,minmax(150px,1fr))" }}>
+              {spec(t("rooms"), num(locale, p.rooms))}
+              {spec(t("area"), `${num(locale, p.area_built, 0)} ${t("sqm")}`)}
+              {spec(t("floor"), <span className="ltr">{p.floor === 0 ? t("ground") : p.floor ?? "–"}{p.floors_total ? ` / ${p.floors_total}` : ""}</span>)}
+              {spec(t("has.mamad"), yes(p.mamad))}{spec(t("has.parking"), p.parking_count ?? 0)}{spec(t("has.elevator"), yes(p.elevator))}{spec(t("has.sukkah_balcony"), yes(p.sukkah_balcony))}
+              {spec(t("form.arnona"), money(locale, p.arnona_monthly))}{spec(t("form.vaad"), money(locale, p.vaad_bayit_monthly))}
+              {spec(t("form.registration"), p.registration_type ? t(`form.reg.${p.registration_type}`) : "—")}
+              {spec(t("mandateLabel"), m?.type === "exclusive" ? `${t("mandate.exclusive")}${m.end ? ` · ${relDays(locale, m.end)}` : ""}` : t("mandate.non_exclusive"))}
+              {spec(t("form.origin"), m?.origin === "partner" ? `${t("origin.partner")}${m.partner ? ` · ${m.partner}` : ""}` : t("origin.own"))}
+              {spec(t("form.coBrokeShort"), yes(!!m?.co_broke))}
+            </div></div></div>
 
-          {p.internal_notes && <div className="card"><h2>{t("form.internalNotes")}</h2><div className="card-b" style={{ whiteSpace: "pre-wrap" }}>{p.internal_notes}</div></div>}
+            <div className="card"><h2>{tv("perf.title")}<small>{tv("perf.sub")}</small></h2><div className="card-b col" style={{ gap: 10 }}>
+              <div className="fun">
+                <div><b>{ins.k.sent}</b><small>{tv("perf.sent")}</small></div>
+                <div><b>{ins.k.opened}</b><small>{tv("perf.opened")}</small></div>
+                <div><b>{ins.k.visits}</b><small>{tv("perf.visits")}</small></div>
+                <div><b>{ins.k.offers}</b><small>{tv("perf.offers")}</small></div>
+              </div>
+              <p className="note">{tv("perf.total", { sent: ins.k.sent_all, visits: ins.k.visits_all })}</p>
+            </div></div>
+
+            <div className="card"><h2>{t("form.description")}</h2><div className="card-b col" style={{ gap: 10 }}>
+              {desc ? <p style={{ maxWidth: "68ch", lineHeight: 1.7 }}>{desc}</p> : <p className="muted">{t("noDescription")}</p>}
+              {tr[locale]?.origin === "ai" && !tr[locale]?.reviewed && <Badge tone="warn">{t("aiNotReviewed")}</Badge>}
+            </div></div>
+
+            {p.internal_notes && <div className="card"><h2>{t("form.internalNotes")}</h2><div className="card-b" style={{ whiteSpace: "pre-wrap" }}>{p.internal_notes}</div></div>}
+          </>}
+
+          {tab === "clients" && <>
+            <div className="card"><h2><Sparkles size={15} aria-hidden style={{ color: "var(--signal-text)" }} />{ts("matchingClients")}<span className="badge sig">{items.length}</span></h2>
+              {p.status === "active" ? <SendForm mode="property" fixedId={id} items={items.map((it) => { const s = sharedTo.get(it.id); return s ? { ...it, sub: [it.sub, s.opened_at ? tv("sentOpened") : tv("sentOn", { d: dateShort(locale, s.created_at) })].filter(Boolean).join(" · ") } : it; })} waApi={await hasWhatsApp(ctx)} /> : <p className="muted card-b">{ts("onlyActive")}</p>}
+            </div>
+            {canSend && <div className="card" id="wa"><h2><MessageCircle size={15} aria-hidden />{ts("waTitle")}</h2><WhatsAppSend property={waProperty} contacts={waContacts} sign={sign} /></div>}
+          </>}
+
+          {tab === "activity" && <div className="card">{ins.timeline.length === 0 ? <p className="muted card-b">{tv("tl.empty")}</p> : <div className="card-b tl">{ins.timeline.map((r) => (
+            <div key={r.kind + r.id} className="tl-i"><span className={`tl-d ${r.kind === "share" ? "acc" : r.kind === "visit" ? "ok" : r.kind === "deal" ? "sig" : ""}`}>{tlIcon(r.kind)}</span>
+              <div style={{ minWidth: 0 }}>{r.contact_id ? <Link href={`/clients/${r.contact_id}`}><b>{tlText(r)}</b></Link> : <b>{tlText(r)}</b>}<p>{r.actor ?? ""}</p></div><time>{dateShort(locale, r.at)}</time></div>))}</div>}</div>}
+
+          {tab === "owner" && <>
+            <div className="card"><h2>{tv("owner.title")}</h2><div className="card-b col" style={{ gap: 12 }}>
+              {data.owners.length === 0 ? <p className="muted">{tv("owner.none")}{canEdit && <> <Link href={`/properties/${id}/edit`} style={{ color: "var(--accent-text)" }}>{tc("edit")}</Link></>}</p> : data.owners.map((o) => (
+                <div key={o.id + o.relation} className="row gap12"><Avatar text={initials(contactName(o, locale))} cls="lg" /><div className="grow"><Link href={`/clients/${o.id}`} style={{ fontWeight: 600 }}>{contactName(o, locale)}</Link><div className="note">{t(`relation.${o.relation}`)}{o.phones?.[0]?.e164 ? <> · <span className="ltr">{formatPhone(o.phones[0].e164)}</span></> : null}</div></div>
+                  {o.phones?.[0]?.e164 && <a className="btn" href={`tel:${o.phones[0].e164}`}><Phone size={14} aria-hidden />{tv("owner.call")}</a>}</div>))}
+            </div></div>
+            {owner && <div className="card"><h2>{tv("report.title")}<small>{tv("report.sub", { lang: ownerLocale.toUpperCase() })}</small></h2><div className="card-b col" style={{ gap: 12 }}>
+              <div className="rep" dir={ownerLocale === "he" ? "rtl" : "ltr"} lang={ownerLocale}>{report}</div>
+              <div className="row wrap"><CopyButton text={report} label={tv("report.copy")} done={tv("report.copied")} />
+                {ownerPhone && canSend && <a className="btn pri" href={`https://wa.me/${ownerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(report)}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={14} aria-hidden />{tv("report.wa")}</a>}</div>
+              <p className="note">{tv("report.hint")}</p>
+            </div></div>}
+          </>}
         </div>
 
-        <div className="col" style={{ gap: 16 }}>
+        <div className="col" style={{ gap: 12 }}>
           <div className="card"><div className="card-b col" style={{ gap: 12 }}>
             <div><div className="note">{t("askingPrice")}</div><div className="t-price tab">{money(locale, p.price, p.currency)}</div>
-              {p.price && p.area_built && <div className="note tab">{money(locale, Number(p.price) / Number(p.area_built), p.currency)} / {t("sqm")}</div>}</div>
+              {sqm && <div className="note tab">{money(locale, sqm, p.currency)} / {t("sqm")}</div>}</div>
+            {ins.median && sqm && <div className="row" style={{ fontSize: 12.5 }}><span className="muted grow">{tv("median", { n: ins.medianN })}</span><b className="tab">{money(locale, ins.median)} / {t("sqm")}</b></div>}
+            {p.price && <div className="row" style={{ fontSize: 12.5 }}><span className="muted grow">{tv("fee")}</span><b className="tab">{money(locale, Number(p.price) * 0.02 * 1.18)}</b></div>}
             <hr className="sw" />
             <div className="row">{p.agent_name && <Avatar text={initials(p.agent_name)} />}<div className="grow"><div style={{ fontWeight: 500 }}>{p.agent_name ?? "—"}</div><div className="note">{t("agent")}</div></div></div>
-            {data.owners.map((o) => <div key={o.id + o.relation} className="row"><Avatar text={initials(contactName(o, locale))} /><div className="grow"><Link href={`/clients/${o.id}`} style={{ fontWeight: 500 }}>{contactName(o, locale)}</Link><div className="note">{t(`relation.${o.relation}`)}{o.phones?.[0]?.e164 ? <> · <span className="ltr">{formatPhone(o.phones[0].e164)}</span></> : null}</div></div></div>)}
           </div></div>
 
-          {canSend && <div className="card" id="wa" style={sp.send === "wa" ? { outline: "2px solid var(--accent)", outlineOffset: 2 } : undefined}><h2><MessageCircle size={15} aria-hidden />{ts("waTitle")}</h2>
-            <WhatsAppSend property={waProperty} contacts={waContacts} sign={sign} /></div>}
-
-          <div className="card"><h2><Sparkles size={15} aria-hidden />{ts("matchingClients")}<span className="badge sig">{items.length}</span></h2>
-            {p.status === "active" ? <SendForm mode="property" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /> : <p className="muted card-b">{ts("onlyActive")}</p>}
+          <div className="card"><h2><Sparkles size={15} aria-hidden style={{ color: "var(--signal-text)" }} />{ts("matchingClients")}<span className="badge sig">{items.length}</span><Link href={tabHref("clients") as "/"} scroll={false} className="sp">{tv("seeAll")}</Link></h2>
+            {items.length === 0 ? <p className="muted card-b">{p.status === "active" ? tv("noMatch") : ts("onlyActive")}</p> : items.slice(0, 4).map((it) => (
+              <Link key={it.id} href={`/clients/${it.id}`} className="li"><div className="grow" style={{ minWidth: 0 }}><b className="trunc">{it.label}</b><small>{sharedTo.get(it.id) ? (sharedTo.get(it.id)!.opened_at ? tv("sentOpened") : tv("sentOn", { d: dateShort(locale, sharedTo.get(it.id)!.created_at) })) : tv("notSent")}</small></div><span className="ring" style={{ background: `conic-gradient(var(--signal) ${it.score * 3.6}deg, var(--surface-sunken) 0)` }}><span className="ring-in tab">{it.score}</span></span></Link>))}
           </div>
+
+          <div className="card"><h2>{tv("q.title")}<span className="sp strong tab">{score} / 10</span></h2><div className="card-b" style={{ paddingBlock: 10 }}>
+            {quality.map((x) => <div key={x.label} className={`q-row ${x.ok ? "" : "todo"}`}>{x.ok ? <CircleCheck size={15} aria-hidden /> : <Circle size={15} aria-hidden />}<span className="grow">{x.label}</span>{!x.ok && x.href && <Link href={x.href as "/"} style={{ color: "var(--accent-text)", fontWeight: 500 }}>{tv("q.fix")}</Link>}</div>)}
+          </div></div>
+
+          {nextVisit && <div className="card"><h2>{tv("nextVisit")}</h2><div className="card-b row gap12"><span className="tl-d acc"><CalendarCheck size={14} aria-hidden /></span><div className="grow"><b style={{ fontWeight: 500 }}>{dateTime(locale, nextVisit.starts_at)}</b><div className="note">{[nextVisit.first_name, nextVisit.last_name].filter(Boolean).join(" ")}</div></div></div></div>}
 
           {ctx.caps.has("tasks.write") && <div className="card"><h2>{t("taskTitle")}</h2><div className="card-b"><TaskAdd locale={locale} propertyId={id} compact /></div></div>}
 
-          {data.visits.length > 0 && <div className="card"><h2>{t("visits")}</h2><div className="card-b col" style={{ gap: 8 }}>{data.visits.map((v) => <div key={v.id} className="row"><span className="grow">{dateTime(locale, v.starts_at)}</span><span className="note">{v.first_name ?? ""} {v.last_name ?? ""}</span></div>)}</div></div>}
+          {p.status === "active" && p.public_token && <div className="card"><div className="card-b row gap12"><span className="tl-d acc"><Globe size={14} aria-hidden /></span><div className="grow" style={{ minWidth: 0 }}><b style={{ fontWeight: 500 }}>{tv("public")}</b><div className="note trunc ltr">/l/{p.public_token as string}</div></div><Link className="btn sm" href={`/l/${p.public_token as string}`} target="_blank"><Eye size={13} aria-hidden /></Link></div></div>}
 
           {(ctx.caps.has("properties.delete") || ctx.caps.has("properties.write_all")) && (
             <form action={archivePropertyAction.bind(null, id)}><input type="hidden" name="locale" value={locale} /><button className="btn danger sm"><Archive size={14} aria-hidden />{t("archive")}</button></form>

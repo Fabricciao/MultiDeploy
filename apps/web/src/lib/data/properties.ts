@@ -13,6 +13,7 @@ export type PropertyListRow = {
   area_built: string | null; floor: number | null; floors_total: number | null; street: string | null; house_number: string | null; address_visibility: string;
   mamad: boolean | null; parking_count: number | null; elevator: boolean | null; mandate: MandateInfo | null; created_at: Date;
   agent_id: string | null; agent_name: string | null; cover_thumb: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; title: string | null; total: string;
+  lat: number | null; lng: number | null; approx: boolean;
 };
 
 export async function listProperties(ctx: Ctx, f: PropertyFilters) {
@@ -39,7 +40,7 @@ export async function listProperties(ctx: Ctx, f: PropertyFilters) {
     const rows = (await tx`
       select p.id, p.reference, p.transaction, p.property_type, p.status, p.price, p.currency, p.rooms, p.area_built, p.floor, p.floors_total, p.street, p.house_number,
         p.address_visibility, p.mamad, p.parking_count, p.elevator, p.mandate, p.created_at, p.agent_id, ag.full_name as agent_name,
-        g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
+        g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, coalesce(p.lat, g.lat) as lat, coalesce(p.lng, g.lng) as lng, (p.lat is null) as approx,
         (select t.title from public.property_translations t where t.property_id = p.id order by (t.locale = ${ctx.locale}) desc limit 1) as title,
         (select pm.thumb_path from public.property_media pm where pm.property_id = p.id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb,
         count(*) over() as total
@@ -59,7 +60,7 @@ export async function getProperty(ctx: Ctx, id: string) {
       where p.id = ${id} and p.deleted_at is null`;
     if (!p || (!seesAllProperties(ctx) && p.agent_id !== ctx.userId)) return null;
     const translations = await tx`select locale, title, description, origin, reviewed from public.property_translations where property_id = ${id}`;
-    const owners = await tx`select c.id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.phones, pc.relation from public.property_contacts pc join public.contacts c on c.id = pc.contact_id where pc.property_id = ${id}`;
+    const owners = await tx`select c.id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.phones, c.preferred_locale, pc.relation from public.property_contacts pc join public.contacts c on c.id = pc.contact_id where pc.property_id = ${id}`;
     const matches = await tx`
       select m.contact_id, m.score, m.reasons, c.first_name, c.last_name, c.first_name_he, c.last_name_he, c.preferred_locale, c.phones, c.emails
       from public.match_contacts_for_property(${id}) m join public.contacts c on c.id = m.contact_id order by m.score desc, c.last_name limit 30`;

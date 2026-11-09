@@ -59,7 +59,8 @@
     "intake": "Assisted entry",
     "import": "Import",
     "tasks": "Tasks",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "automations": "Automations"
   },
   "today": {
     "title": "Today",
@@ -90,7 +91,16 @@
       "activeProps": "Active properties",
       "contacts": "Clients",
       "openDeals": "Open deals",
-      "weighted": "Weighted value"
+      "weighted": "Weighted value",
+      "fees": "Commissions this month",
+      "feesSpark": "Commissions over the last 6 months",
+      "vsLast": "{v} last month",
+      "feesSub": "Deals closed this month",
+      "weightedSub": "Value weighted by stage",
+      "leads7": "New clients, 7 days",
+      "leadsSpark": "New clients per day",
+      "vsWeek": "{n} vs last week",
+      "contactsN": "{n} clients followed"
     },
     "matches": {
       "title": "New properties with matching clients",
@@ -110,6 +120,42 @@
       "month": "+{n} this month",
       "stale": "{n} to follow up",
       "won": "{v} won in 30 days"
+    },
+    "prio": {
+      "title": "Do first",
+      "sub": "ranked by your deadlines and your clients' activity",
+      "empty": "Nothing urgent. Have a good day.",
+      "overdue": "Overdue",
+      "done": "Done",
+      "call": "Call {name} back",
+      "opened": "Opened your selection of {n} properties in the last few days",
+      "open": "Open",
+      "mandate": "Renew the exclusive, {place}",
+      "deal": "Follow up with {name} ({stage})",
+      "dealSub": "No movement for {days} days · {value}",
+      "cold": "Revive the listing {place}",
+      "coldSub": "Online for {days} days, no viewing"
+    },
+    "day": {
+      "title": "Your day",
+      "empty": "No viewing today.",
+      "nextOn": "Next: {when}.",
+      "noClient": "No client"
+    },
+    "pipe": {
+      "title": "Deals by stage",
+      "aria": "The {n} open deals by stage",
+      "promise": "{n} at contract · {v} expected commissions"
+    },
+    "feed": {
+      "title": "Agency feed",
+      "empty": "No activity in the last 14 days.",
+      "note": "Note on {name}",
+      "share": "Selection sent to {name}",
+      "stage_change": "{name}'s deal moved",
+      "visit": "Viewing with {name}",
+      "status_change": "Property status changed",
+      "other": "Activity on {name}"
     }
   },
   "login": {
@@ -255,7 +301,29 @@
     "empty": "No deals yet",
     "emptyHint": "Create a deal here or from a client page. Scheduling a viewing with a client creates or advances their deal automatically.",
     "updated": "Updated",
-    "stale": "Follow up"
+    "stale": "Follow up",
+    "v2": {
+      "forecast": "Expected commissions, weighted by stage",
+      "atPromise": "of which {v} at contract",
+      "byStage": "Deal value by stage",
+      "toFollow": "{n} to follow up",
+      "showAll": "Show all",
+      "undo": "Undo",
+      "wonToast": "Deal won with {name}",
+      "lostToast": "Deal with {name} marked lost",
+      "movedToast": "{name}: moved to \"{stage}\"",
+      "feeTip": "Estimated commission",
+      "emptyCol": "No deal",
+      "drawer": "Deal details",
+      "since": "for {days} d",
+      "fee": "Commission ({pct}%)",
+      "proba": "Probability",
+      "nextStep": "Next step:",
+      "noNext": "No task planned on this deal.",
+      "moveTo": "Move to \"{stage}\"",
+      "markLost": "Lost",
+      "call": "Call"
+    }
   },
   "public": {
     "title": "Your property selection",
@@ -428,7 +496,19 @@
       "partner": "Other agency",
       "coBrokeTag": "Shituf pe’ula"
     },
-    "taskTitle": "Add a task"
+    "taskTitle": "Add a task",
+    "map": {
+      "view": "Map",
+      "label": "Property map",
+      "approx": "approximate position (city centre)",
+      "zoomIn": "Zoom in",
+      "zoomOut": "Zoom out"
+    },
+    "ask": {
+      "label": "Plain-language search",
+      "placeholder": "Describe the property: \"4 rooms Raanana under 3.5M with mamad\"",
+      "miss": "No city, rooms or budget recognised. Try \"4 rooms Raanana under 3.5M\"."
+    }
   },
   "clients": {
     "kind": {
@@ -1333,5 +1413,127 @@
     "reopen": "Reopen",
     "markDone": "Mark as done",
     "delete": "Delete"
+  },
+  "notifs": {
+    "label": "Notifications",
+    "labelNew": "Notifications, {n} new",
+    "markRead": "Mark all as read",
+    "empty": "Nothing new this week.",
+    "k": {
+      "lead": "New client assigned: {name}",
+      "opened": "{name} opened your selection ({extra} properties)",
+      "task": "Task received: {name}",
+      "mandate": "Exclusive mandate {name} expires in {extra} d",
+      "stage": "{extra} moved {name}'s deal forward",
+      "visit": "{extra} scheduled a viewing with {name}"
+    }
+  },
+  "propV2": {
+    "tabs": "Listing sections",
+    "tab": {
+      "overview": "Overview",
+      "clients": "Matching clients",
+      "activity": "Activity",
+      "owner": "Owner"
+    },
+    "perf": {
+      "title": "Listing reach",
+      "sub": "last 30 days",
+      "sent": "sent to clients",
+      "opened": "selections opened",
+      "visits": "viewings",
+      "offers": "deals at offer or beyond",
+      "total": "Since going live: {sent} sends, {visits} viewings."
+    },
+    "sentOpened": "Sent · opened",
+    "sentOn": "Sent on {d}",
+    "notSent": "Never sent",
+    "seeAll": "See all",
+    "noMatch": "No matching client yet.",
+    "q": {
+      "title": "Listing quality",
+      "photos": "At least 5 photos ({n} now)",
+      "languages": "Description in French and Hebrew",
+      "price": "Price set",
+      "mandate": "Exclusive mandate with an end date",
+      "owner": "Owner linked to the property",
+      "address": "Full address",
+      "fix": "Complete"
+    },
+    "median": "Median of your comparable listings ({n})",
+    "fee": "Estimated commission (2% + VAT)",
+    "nextVisit": "Next viewing",
+    "public": "Public page",
+    "tl": {
+      "empty": "No activity on this property yet.",
+      "visit": {
+        "planned": "Viewing scheduled with {name}",
+        "done": "Viewing done with {name}",
+        "cancelled": "Viewing cancelled with {name}",
+        "no_show": "{name} did not show up"
+      },
+      "share": "Sent to {name}",
+      "shareOpened": "Sent to {name}, opened",
+      "deal": "Deal opened with {name}",
+      "status": "Status changed",
+      "note": "Note",
+      "other": "Activity"
+    },
+    "owner": {
+      "title": "Owner",
+      "none": "No owner is linked to this property.",
+      "call": "Call"
+    },
+    "report": {
+      "title": "Owner report",
+      "sub": "last 30 days, in {lang}",
+      "copy": "Copy",
+      "copied": "Copied",
+      "wa": "Send via WhatsApp",
+      "hint": "The message opens in WhatsApp: nothing is sent until you click.",
+      "body": "Hello {name},\n\nHere is the update on your property, {place}, for the last 30 days:\n• {sent} sends to buyers\n• {opened} of them opened\n• {visits} viewings\n• {offers} client(s) at offer stage or beyond\n\nHappy to talk about it.\n{agent} · {agency}"
+    }
+  },
+  "clientV2": {
+    "heat": {
+      "hot": "Hot",
+      "warm": "Warm",
+      "cold": "Cold",
+      "none": "No activity",
+      "last": "Last activity {days} d ago"
+    },
+    "noEvents": "No activity yet.",
+    "opened": "Opened a selection of {n} properties",
+    "visit": {
+      "planned": "Viewing scheduled, {place}",
+      "done": "Viewing done, {place}",
+      "cancelled": "Viewing cancelled, {place}",
+      "no_show": "No-show, {place}"
+    },
+    "next": {
+      "title": "Next action",
+      "due": "Due {d}",
+      "noDate": "No date",
+      "callOpened": "Call while the selection is fresh",
+      "callOpenedSub": "The client opened your send in the last 3 days.",
+      "sendFirst": "Send a first selection ({n} properties match)",
+      "sendFirstSub": "No property has been sent to this client yet.",
+      "revive": "Get back in touch",
+      "reviveSub": "No activity for {days} days.",
+      "visit": "Viewing"
+    },
+    "sel": {
+      "title": "Their selection",
+      "sent": "sent {d}",
+      "visited": "viewed {d}",
+      "opened": "Opened",
+      "notOpened": "Not opened"
+    },
+    "deal": {
+      "title": "Open deal",
+      "open": "Open",
+      "step": "Stage {i} of {n}",
+      "since": "No movement for {days} d · estimated commission {fee}"
+    }
   }
 }

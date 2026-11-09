@@ -59,7 +59,8 @@
     "intake": "Saisie assistée",
     "import": "Import",
     "tasks": "Tâches",
-    "signOut": "Se déconnecter"
+    "signOut": "Se déconnecter",
+    "automations": "Automatisations"
   },
   "today": {
     "title": "Aujourd'hui",
@@ -90,7 +91,16 @@
       "activeProps": "Biens actifs",
       "contacts": "Clients",
       "openDeals": "Affaires ouvertes",
-      "weighted": "Valeur pondérée"
+      "weighted": "Valeur pondérée",
+      "fees": "Commissions du mois",
+      "feesSpark": "Commissions des 6 derniers mois",
+      "vsLast": "{v} le mois dernier",
+      "feesSub": "Affaires conclues ce mois",
+      "weightedSub": "Valeur pondérée par étape",
+      "leads7": "Nouveaux clients, 7 jours",
+      "leadsSpark": "Nouveaux clients par jour",
+      "vsWeek": "{n} par rapport à la semaine dernière",
+      "contactsN": "{n} clients suivis"
     },
     "matches": {
       "title": "Nouveaux biens avec clients intéressés",
@@ -110,6 +120,42 @@
       "month": "+{n} ce mois",
       "stale": "{n} à relancer",
       "won": "{v} conclus sur 30 j"
+    },
+    "prio": {
+      "title": "À faire en premier",
+      "sub": "classé selon vos échéances et l'activité de vos clients",
+      "empty": "Rien d'urgent. Bonne journée.",
+      "overdue": "En retard",
+      "done": "Fait",
+      "call": "Rappeler {name}",
+      "opened": "A ouvert votre sélection de {n} biens ces derniers jours",
+      "open": "Ouvrir",
+      "mandate": "Renouveler l'exclusivité, {place}",
+      "deal": "Relancer {name} ({stage})",
+      "dealSub": "Sans mouvement depuis {days} jours · {value}",
+      "cold": "Relancer le bien {place}",
+      "coldSub": "En ligne depuis {days} jours, aucune visite"
+    },
+    "day": {
+      "title": "Votre journée",
+      "empty": "Aucune visite aujourd'hui.",
+      "nextOn": "Prochaine : {when}.",
+      "noClient": "Sans client"
+    },
+    "pipe": {
+      "title": "Affaires par étape",
+      "aria": "Répartition des {n} affaires ouvertes par étape",
+      "promise": "{n} en promesse · {v} de commissions attendues"
+    },
+    "feed": {
+      "title": "Fil de l'agence",
+      "empty": "Aucune activité ces 14 derniers jours.",
+      "note": "Note sur {name}",
+      "share": "Sélection envoyée à {name}",
+      "stage_change": "Affaire de {name} déplacée",
+      "visit": "Visite avec {name}",
+      "status_change": "Statut d'un bien modifié",
+      "other": "Activité sur {name}"
     }
   },
   "login": {
@@ -255,7 +301,29 @@
     "empty": "Aucune affaire pour l'instant",
     "emptyHint": "Créez une affaire ici ou depuis la fiche d'un client. Une visite planifiée avec un client crée ou fait avancer son affaire automatiquement.",
     "updated": "Mise à jour",
-    "stale": "À relancer"
+    "stale": "À relancer",
+    "v2": {
+      "forecast": "Commissions attendues, pondérées par étape",
+      "atPromise": "dont {v} en promesse",
+      "byStage": "Valeur des affaires par étape",
+      "toFollow": "{n} à relancer",
+      "showAll": "Tout afficher",
+      "undo": "Annuler",
+      "wonToast": "Affaire conclue avec {name}",
+      "lostToast": "Affaire avec {name} classée perdue",
+      "movedToast": "{name} : passée en « {stage} »",
+      "feeTip": "Commission estimée",
+      "emptyCol": "Aucune affaire",
+      "drawer": "Détail de l'affaire",
+      "since": "depuis {days} j",
+      "fee": "Commission ({pct} %)",
+      "proba": "Probabilité",
+      "nextStep": "Prochaine étape :",
+      "noNext": "Aucune tâche prévue sur cette affaire.",
+      "moveTo": "Passer à « {stage} »",
+      "markLost": "Perdue",
+      "call": "Appeler"
+    }
   },
   "public": {
     "title": "Votre sélection de biens",
@@ -428,7 +496,19 @@
       "partner": "Autre agence",
       "coBrokeTag": "Shitouf peoula"
     },
-    "taskTitle": "Ajouter une tâche"
+    "taskTitle": "Ajouter une tâche",
+    "map": {
+      "view": "Carte",
+      "label": "Carte des biens",
+      "approx": "position approximative (centre de la ville)",
+      "zoomIn": "Zoomer",
+      "zoomOut": "Dézoomer"
+    },
+    "ask": {
+      "label": "Recherche en langage courant",
+      "placeholder": "Décrivez le bien : « 4 pièces Raanana moins de 3,5 M avec mamad »",
+      "miss": "Je n'ai reconnu ni ville, ni pièces, ni budget. Essayez « 4 pièces Raanana moins de 3,5 M »."
+    }
   },
   "clients": {
     "kind": {
@@ -1333,5 +1413,127 @@
     "reopen": "Rouvrir",
     "markDone": "Marquer comme faite",
     "delete": "Supprimer"
+  },
+  "notifs": {
+    "label": "Notifications",
+    "labelNew": "Notifications, {n} nouvelles",
+    "markRead": "Tout marquer comme lu",
+    "empty": "Rien de neuf cette semaine.",
+    "k": {
+      "lead": "Nouveau client attribué : {name}",
+      "opened": "{name} a ouvert votre sélection ({extra} biens)",
+      "task": "Tâche reçue : {name}",
+      "mandate": "Le mandat exclusif {name} expire dans {extra} j",
+      "stage": "{extra} a fait avancer l'affaire de {name}",
+      "visit": "{extra} a planifié une visite avec {name}"
+    }
+  },
+  "propV2": {
+    "tabs": "Sections de la fiche",
+    "tab": {
+      "overview": "Vue d'ensemble",
+      "clients": "Clients correspondants",
+      "activity": "Activité",
+      "owner": "Propriétaire"
+    },
+    "perf": {
+      "title": "Diffusion de l'annonce",
+      "sub": "30 derniers jours",
+      "sent": "envois à des clients",
+      "opened": "sélections ouvertes",
+      "visits": "visites",
+      "offers": "affaires en offre ou plus",
+      "total": "Depuis la mise en ligne : {sent} envois, {visits} visites."
+    },
+    "sentOpened": "Envoyé · ouvert",
+    "sentOn": "Envoyé le {d}",
+    "notSent": "Jamais envoyé",
+    "seeAll": "Tout voir",
+    "noMatch": "Aucun client ne correspond pour l'instant.",
+    "q": {
+      "title": "Qualité de l'annonce",
+      "photos": "Au moins 5 photos ({n} aujourd'hui)",
+      "languages": "Description en français et en hébreu",
+      "price": "Prix renseigné",
+      "mandate": "Mandat exclusif avec date de fin",
+      "owner": "Propriétaire lié au bien",
+      "address": "Adresse complète",
+      "fix": "Compléter"
+    },
+    "median": "Médiane de vos biens comparables ({n})",
+    "fee": "Commission estimée (2 % + TVA)",
+    "nextVisit": "Prochaine visite",
+    "public": "Fiche publique",
+    "tl": {
+      "empty": "Aucune activité sur ce bien pour l'instant.",
+      "visit": {
+        "planned": "Visite planifiée avec {name}",
+        "done": "Visite faite avec {name}",
+        "cancelled": "Visite annulée avec {name}",
+        "no_show": "{name} ne s'est pas présenté"
+      },
+      "share": "Envoyé à {name}",
+      "shareOpened": "Envoyé à {name}, ouvert",
+      "deal": "Affaire ouverte avec {name}",
+      "status": "Statut modifié",
+      "note": "Note",
+      "other": "Activité"
+    },
+    "owner": {
+      "title": "Propriétaire",
+      "none": "Aucun propriétaire n'est lié à ce bien.",
+      "call": "Appeler"
+    },
+    "report": {
+      "title": "Rapport propriétaire",
+      "sub": "30 derniers jours, en {lang}",
+      "copy": "Copier",
+      "copied": "Copié",
+      "wa": "Envoyer par WhatsApp",
+      "hint": "Le message s'ouvre dans WhatsApp : rien ne part sans votre clic.",
+      "body": "Bonjour {name},\n\nVoici le point sur votre bien, {place}, pour les 30 derniers jours :\n• {sent} envois à des clients acheteurs\n• {opened} ouvertures de ces envois\n• {visits} visites\n• {offers} client(s) au stade de l'offre ou plus\n\nJe reste disponible pour en parler.\n{agent} · {agency}"
+    }
+  },
+  "clientV2": {
+    "heat": {
+      "hot": "Chaud",
+      "warm": "Tiède",
+      "cold": "Froid",
+      "none": "Aucune activité",
+      "last": "Dernière activité il y a {days} j"
+    },
+    "noEvents": "Aucune activité pour l'instant.",
+    "opened": "A ouvert une sélection de {n} biens",
+    "visit": {
+      "planned": "Visite planifiée, {place}",
+      "done": "Visite faite, {place}",
+      "cancelled": "Visite annulée, {place}",
+      "no_show": "Absent à la visite, {place}"
+    },
+    "next": {
+      "title": "Prochaine action",
+      "due": "Prévue le {d}",
+      "noDate": "Sans date",
+      "callOpened": "Appeler pendant que la sélection est fraîche",
+      "callOpenedSub": "Le client a ouvert votre envoi ces 3 derniers jours.",
+      "sendFirst": "Envoyer une première sélection ({n} biens correspondent)",
+      "sendFirstSub": "Aucun bien n'a encore été envoyé à ce client.",
+      "revive": "Reprendre contact",
+      "reviveSub": "Aucune activité depuis {days} jours.",
+      "visit": "Visite"
+    },
+    "sel": {
+      "title": "Sa sélection",
+      "sent": "envoyé le {d}",
+      "visited": "visité le {d}",
+      "opened": "Ouvert",
+      "notOpened": "Pas ouvert"
+    },
+    "deal": {
+      "title": "Affaire en cours",
+      "open": "Ouvrir",
+      "step": "Étape {i} sur {n}",
+      "since": "Sans mouvement depuis {days} j · commission estimée {fee}"
+    }
   }
 }

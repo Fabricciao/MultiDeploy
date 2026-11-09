@@ -12,6 +12,8 @@ import { getBrandKit } from "@/lib/data/brand";
 import { avatarSrc } from "@/lib/data/profile-input";
 import { themeCss } from "@/lib/theme";
 import { stopImpersonation } from "../platform/actions";
+import { NotifBell } from "@/components/notif-bell";
+import { getNotifications } from "@/lib/data/cockpit";
 
 export const dynamic = "force-dynamic";
 
@@ -30,7 +32,10 @@ export default async function AppLayout({ children, params }: { children: React.
   const brand = await getBrandKit(ctx);
   const [vp, vc] = await Promise.all([listViews(ctx, "properties"), listViews(ctx, "contacts")]);
   const views = [...vp.map((v) => ({ id: v.id, name: v.name, href: `/properties?${v.qs}` })), ...vc.map((v) => ({ id: v.id, name: v.name, href: `/clients?${v.qs}` }))];
-  const mini = (await cookies()).get("rail")?.value === "mini";
+  const store = await cookies();
+  const mini = store.get("rail")?.value === "mini";
+  const notifs = await getNotifications(ctx).catch(() => []);
+  const seen = store.get("notif_seen")?.value ?? null;
   return (
     <div className="app">
       <style dangerouslySetInnerHTML={{ __html: themeCss(brand.colors.primary, brand.style.radius, brand.style.density) }} />
@@ -45,6 +50,7 @@ export default async function AppLayout({ children, params }: { children: React.
           <Crumbs />
           <PaletteButton label={t("common.search")} />
           <DevUserSwitcher current={ctx.userId} />
+          <NotifBell items={notifs} seen={seen && /^\d{4}-\d\d-\d\dT[\d:.]+Z$/.test(seen) ? seen : null} />
           <HelpButton label={t("common.help")} />
           <ThemeToggle />
           <LocaleSwitcher />

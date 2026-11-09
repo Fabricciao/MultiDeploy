@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Columns3, Plus, Rows3 } from "lucide-react";
+import { AlarmClock, ArrowRight, Award, Columns3, ListChecks, MessageCircle, Phone, Plus, Rows3, User, House, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx, db, seesAllProperties } from "@/lib/session";
 import { getBoard } from "@/lib/data/deals";
@@ -7,14 +7,15 @@ import { contactName } from "@/lib/data/contacts";
 import { cityName, listAgents } from "@/lib/data/geo";
 import { pickName } from "@/lib/data/types";
 import { dateShort, initials, money } from "@/lib/format";
-import { Avatar, Badge, PageHeader } from "@/components/ui";
+import { Avatar, Badge, PageHeader, StageBar } from "@/components/ui";
+import { PeekKeys } from "@/components/shell";
 import { DealBoard } from "@/components/deal-board";
 import { AutoSubmit } from "@/components/shell";
-import { createDealFormAction } from "./actions";
+import { createDealFormAction, moveDealFormAction } from "./actions";
 
 const uuid = /^[0-9a-f-]{36}$/i;
 
-export default async function DealsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ agent?: string; view?: string; new?: string; err?: string }> }) {
+export default async function DealsPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ agent?: string; view?: string; new?: string; err?: string; deal?: string; stale?: string }> }) {
   const { locale } = await params; const sp = await searchParams;
   setRequestLocale(locale);
   const ctx = await getCtx(locale);
@@ -23,7 +24,9 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
   const { stages, deals: all } = await getBoard(ctx);
   const canWrite = ctx.caps.has("deals.write") && !ctx.impersonating;
   const agentFilter = sp.agent && uuid.test(sp.agent) ? sp.agent : null;
-  const deals = agentFilter ? all.filter((d) => d.agent_id === agentFilter) : all;
+  const isStale = (d: (typeof all)[number]) => Date.now() - new Date(d.updated_at).getTime() > 7 * 86_400_000;
+  const staleOnly = sp.stale === "1";
+  const deals = all.filter((d) => (!agentFilter || d.agent_id === agentFilter) && (!staleOnly || isStale(d)));
   const list = sp.view === "list";
   const [agents, options] = await Promise.all([
     listAgents(ctx),
@@ -38,7 +41,9 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
   const weighted = deals.reduce((a, d) => a + Number(d.value ?? 0) * ((stageOf(d.stage_id)?.probability ?? 0) / 100), 0);
   const won = deals.filter((d) => stageOf(d.stage_id)?.kind === "won");
   const city = (d: (typeof deals)[number]) => cityName({ name_fr: d.city_fr, name_he: d.city_he, name_en: d.city_en }, locale);
-  const q = (o: { agent?: string | null; view?: string; new?: string }) => { const u = new URLSearchParams(); if (o.agent) u.set("agent", o.agent); if (o.view) u.set("view", o.view); if (o.new) u.set("new", o.new); const s = u.toString(); return s ? `/deals?${s}` : "/deals"; };
+  const q = (o: { agent?: string | null; view?: string; new?: string; stale?: string; deal?: string }) => { const u = new URLSearchParams(); if (o.agent) u.set("agent", o.agent); if (o.view) u.set("view", o.view); if (o.new) u.set("new", o.new); if (o.stale) u.set("stale", o.stale); if (o.deal) u.set("deal", o.deal); const s = u.toString(); return s ? `/deals?${s}` : "/deals"; };
+  const baseQs = q({ agent: agentFilter, stale: staleOnly ? "1" : undefined }).replace("/deals", "");
+  const cur = sp.deal && uuid.test(sp.deal) ? all.find((d) => d.id === sp.deal) ?? null : null;
   const viewParam = list ? "list" : undefined;
   return (
     <>
@@ -64,6 +69,24 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
         </form>
       )}
 
+      {all.length > 0 && !list && (() => {
+        const openDeals = deals.filter((d) => stageOf(d.stage_id)?.kind === "open");
+        const fee = (d: (typeof deals)[number]) => Number(d.value ?? 0) * (Number(d.commission_pct ?? 2) / 100);
+        const expected = openDeals.reduce((a, d) => a + fee(d) * ((stageOf(d.stage_id)?.probability ?? 0) / 100), 0);
+        const last = open.at(-1);
+        const atPromise = openDeals.filter((d) => d.stage_id === last?.id).reduce((a, d) => a + fee(d), 0);
+        const staleN = all.filter((d) => stageOf(d.stage_id)?.kind === "open" && isStale(d) && (!agentFilter || d.agent_id === agentFilter)).length;
+        const sums = open.map((s) => openDeals.filter((d) => d.stage_id === s.id).reduce((a, d) => a + Number(d.value ?? 0), 0));
+        return (
+          <section className="card fcast" aria-label={t("v2.forecast")}>
+            <div><div className="note">{t("v2.forecast")}</div><div className="t-price tab" style={{ fontSize: 24, lineHeight: "30px" }}>{money(locale, expected)}</div>{atPromise > 0 && <div className="note">{t("v2.atPromise", { v: money(locale, atPromise) })}</div>}</div>
+            <div className="col" style={{ gap: 8 }}><StageBar label={t("v2.byStage")} parts={open.map((s, i) => ({ label: pickName(s.name, locale), value: sums[i]!, tip: `${pickName(s.name, locale)} · ${money(locale, sums[i])}` }))} />
+              <div className="legend">{open.map((s, i) => <span key={s.id}><i style={{ background: `var(--stage-${Math.min(6, Math.max(1, Math.round(((i + 1) / open.length) * 6)))})` }} />{pickName(s.name, locale)}</span>)}</div></div>
+            {staleN > 0 || staleOnly ? <Link href={q({ agent: agentFilter, stale: staleOnly ? undefined : "1" })} className={`btn ${staleOnly ? "pri" : ""}`}><AlarmClock size={14} aria-hidden />{staleOnly ? t("v2.showAll") : t("v2.toFollow", { n: staleN })}</Link> : <span />}
+          </section>
+        );
+      })()}
+
       {agents.length > 1 && (
         <form id="dfilters" method="get" className="row wrap" style={{ marginBottom: 10 }}>
           {list && <input type="hidden" name="view" value="list" />}
@@ -86,14 +109,52 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
               <td className="note">{dateShort(locale, d.updated_at)}</td>
               <td>{d.agent_name ? <Avatar text={initials(d.agent_name)} cls="sm" /> : "—"}</td></tr>); })}</tbody></table></div>
       ) : (
-        <DealBoard canMove={canWrite}
-          stages={stages.filter((s) => s.kind !== "lost").map((s) => ({ id: s.id, name: pickName(s.name, locale), kind: s.kind, probability: s.probability }))}
-          deals={deals.filter((d) => stageOf(d.stage_id)?.kind !== "lost").map((d) => ({
-            id: d.id, stageId: d.stage_id, contactId: d.contact_id, client: contactName(d, locale), value: d.value ? Number(d.value) : null, agent: initials(d.agent_name ?? ""),
-            sub: d.reference ? `${d.reference} · ${city(d)}` : t("noProperty"),
-            stale: stageOf(d.stage_id)?.kind === "open" && Date.now() - new Date(d.updated_at).getTime() > 7 * 86_400_000,
+        <DealBoard canMove={canWrite} current={cur?.id ?? null} query={baseQs.replace(/^\?/, "")}
+          stages={stages.map((s) => ({ id: s.id, name: pickName(s.name, locale), kind: s.kind, probability: s.probability }))}
+          deals={deals.filter((d) => stageOf(d.stage_id)?.kind === "open").map((d) => ({
+            id: d.id, stageId: d.stage_id, contactId: d.contact_id, client: contactName(d, locale), value: d.value ? Number(d.value) : null, fee: d.value ? Number(d.value) * Number(d.commission_pct ?? 2) / 100 : null,
+            agent: initials(d.agent_name ?? ""), agentName: d.agent_name ?? "", cover: d.cover_thumb,
+            sub: d.street ? `${d.street}${city(d) ? ` · ${city(d)}` : ""}` : d.reference ? `${d.reference} · ${city(d)}` : t("noProperty"),
+            stale: isStale(d), next: d.next_title, nextDue: d.next_due ? dateShort(locale, d.next_due) : null,
           }))} />
       )}
+      {cur && (() => {
+        const st = stageOf(cur.stage_id); const idx = open.findIndex((s) => s.id === cur.stage_id);
+        const nextStage = idx >= 0 && idx < open.length - 1 ? open[idx + 1] : stages.find((s) => s.kind === "won");
+        const lostStage = stages.find((s) => s.kind === "lost");
+        const fee = Number(cur.value ?? 0) * Number(cur.commission_pct ?? 2) / 100;
+        const days = Math.floor((Date.now() - new Date(cur.updated_at).getTime()) / 86_400_000);
+        const ph = cur.phones?.[0]?.e164;
+        const close = q({ agent: agentFilter, stale: staleOnly ? "1" : undefined });
+        const stageForm = (stage: { id: string } | undefined, label: React.ReactNode, cls: string) => stage && canWrite ? <form action={moveDealFormAction}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="deal" value={cur.id} /><input type="hidden" name="stage" value={stage.id} /><input type="hidden" name="back" value={baseQs} /><button className={cls}>{label}</button></form> : null;
+        return (
+          <aside className="peek drawer" aria-label={t("v2.drawer")}>
+            <div className="peek-bar"><Badge tone={st?.kind === "won" ? "ok" : st?.kind === "lost" ? "bad" : "acc"}>{st ? pickName(st.name, locale) : "—"}</Badge><span className="note">{t("v2.since", { days })}</span><span className="sp" />
+              <Link href={close as "/"} scroll={false} className="iconbtn" aria-label={tc("close")}><X size={17} aria-hidden /></Link><PeekKeys closeHref={close} /></div>
+            <div className="peek-b">
+              <div className="row gap12"><Avatar text={initials(contactName(cur, locale))} cls="lg" /><div className="grow" style={{ minWidth: 0 }}><h2 className="t-h2 trunc">{contactName(cur, locale)}</h2><div className="note trunc">{cur.street ? `${cur.street} · ${city(cur)}` : t("noProperty")}</div></div></div>
+              {st?.kind === "open" && <div className="stepper">{open.map((s, i) => <div key={s.id} className={i < idx ? "dn" : i === idx ? "dn cur" : ""}>{pickName(s.name, locale)}</div>)}</div>}
+              <div className="kv" style={{ gridTemplateColumns: "1fr 1fr" }}>
+                <div><div className="k">{t("value")}</div><div className="v tab">{money(locale, cur.value, cur.currency)}</div></div>
+                <div><div className="k">{t("v2.fee", { pct: Number(cur.commission_pct ?? 2) })}</div><div className="v tab">{money(locale, fee)}</div></div>
+                <div><div className="k">{t("v2.proba")}</div><div className="v tab">{st?.probability ?? 0} %</div></div>
+                <div><div className="k">{t("agent")}</div><div className="v">{cur.agent_name ?? "—"}</div></div>
+              </div>
+              <div className={`banner ${days > 7 && st?.kind === "open" ? "" : "info"}`}>{days > 7 && st?.kind === "open" ? <AlarmClock size={15} aria-hidden /> : <ListChecks size={15} aria-hidden />}<span className="grow">{cur.next_title ? <><b style={{ fontWeight: 600 }}>{t("v2.nextStep")}</b> {cur.next_title}{cur.next_due ? ` · ${dateShort(locale, cur.next_due)}` : ""}</> : t("v2.noNext")}</span></div>
+              <div className="row wrap">
+                {nextStage && stageForm(nextStage, <>{nextStage.kind === "won" ? <Award size={14} aria-hidden /> : null}{t("v2.moveTo", { stage: pickName(nextStage.name, locale) })}<span className="flip"><ArrowRight size={14} aria-hidden /></span></>, "btn pri")}
+                {st?.kind === "open" && stageForm(lostStage, <><X size={14} aria-hidden />{t("v2.markLost")}</>, "btn ghost")}
+              </div>
+              <div className="row wrap">
+                {ph && <a className="btn" href={`tel:${ph}`}><Phone size={14} aria-hidden />{t("v2.call")}</a>}
+                {ph && <a className="btn" href={`https://wa.me/${ph.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={14} aria-hidden />WhatsApp</a>}
+                <Link className="btn" href={`/clients/${cur.contact_id}`}><User size={14} aria-hidden />{t("client")}</Link>
+                {cur.property_id && <Link className="btn" href={`/properties/${cur.property_id}`}><House size={14} aria-hidden />{t("property")}</Link>}
+              </div>
+            </div>
+          </aside>
+        );
+      })()}
       {won.length > 0 && <p className="note" style={{ marginTop: 12 }}>{t("wonLine", { count: won.length, value: money(locale, won.reduce((a, d) => a + Number(d.value ?? 0), 0)) })}</p>}
     </>
   );

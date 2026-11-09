@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Clock, Handshake, Mail, MessageCircle, Pencil, Phone, Plus, Send, Sparkles, StickyNote } from "lucide-react";
+import { CalendarCheck, CalendarPlus, Clock, Eye, Flame, Handshake, Mail, MessageCircle, Pencil, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, Sun } from "lucide-react";
+import { getContactInsights } from "@/lib/data/insights";
+import { Cover } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { contactName, getContact } from "@/lib/data/contacts";
@@ -54,6 +56,22 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
   );
   const act = (href: string, icon: React.ReactNode, label: string, ext = false) => <a className="act" href={href} {...(ext ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ fontSize: 11.5 }}><span style={{ width: 40, height: 40 }}>{icon}</span>{label}</a>;
   const icon = (k: string) => ({ note: <StickyNote size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, stage_change: <Handshake size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <Clock size={14} aria-hidden />;
+  const tv = await getTranslations("clientV2");
+  const ins = await getContactInsights(ctx, id);
+  const lastDays = ins.last ? Math.floor((Date.now() - new Date(ins.last).getTime()) / 86_400_000) : null;
+  const heat = lastDays === null ? "cold" : lastDays <= 3 ? "hot" : lastDays <= 14 ? "warm" : "cold";
+  const openTask = data.tasks.find((k) => !k.done_at);
+  const recentOpen = ins.opened && Date.now() - new Date(ins.opened).getTime() < 3 * 86_400_000;
+  const nextAction = openTask ? { title: openTask.title as string, sub: openTask.due_at ? tv("next.due", { d: dateShort(locale, openTask.due_at) }) : tv("next.noDate") }
+    : recentOpen ? { title: tv("next.callOpened"), sub: tv("next.callOpenedSub") }
+    : items.length > 0 && data.shares.length === 0 ? { title: tv("next.sendFirst", { n: items.length }), sub: tv("next.sendFirstSub") }
+    : lastDays !== null && lastDays > 14 ? { title: tv("next.revive"), sub: tv("next.reviveSub", { days: lastDays }) } : null;
+  type Ev = { key: string; at: Date; icon: React.ReactNode; tone: string; title: string; sub: string };
+  const events: Ev[] = [
+    ...data.activities.filter((a) => a.kind !== "visit").map((a) => ({ key: `a${a.id}`, at: new Date(a.occurred_at), icon: icon(a.kind), tone: a.kind === "share" ? "acc" : "", title: actLabel(a), sub: a.actor_name ?? "" })),
+    ...ins.visits.map((v) => ({ key: `v${v.id}`, at: new Date(v.starts_at), icon: <CalendarCheck size={14} aria-hidden />, tone: v.status === "done" ? "ok" : "acc", title: tv(`visit.${["planned", "done", "cancelled", "no_show"].includes(v.status) ? v.status : "planned"}`, { place: v.street ?? v.reference }), sub: v.actor ?? "" })),
+    ...data.shares.filter((s) => s.opened_at).map((s) => ({ key: `o${s.id}`, at: new Date(s.opened_at), icon: <Eye size={14} aria-hidden />, tone: "sig", title: tv("opened", { n: Number(s.n) }), sub: "" })),
+  ].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 30);
   return (
     <div className="client">
       <div className="col" style={{ gap: 16 }}>
@@ -62,6 +80,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
           <div className="row wrap" style={{ gap: 6, marginBlockStart: 10 }}>
             {(c.kinds as string[]).map((k) => <Badge key={k} tone="acc">{t(`kind.${k}`)}</Badge>)}
             {c.aliyah_status && c.aliyah_status !== "none" && <Badge>{t(`aliyah.${c.aliyah_status}`)}</Badge>}
+            <span className={`temp ${heat}`} title={lastDays === null ? tv("heat.none") : tv("heat.last", { days: lastDays })}>{heat === "hot" ? <Flame size={12} aria-hidden /> : heat === "warm" ? <Sun size={12} aria-hidden /> : <Snowflake size={12} aria-hidden />}{tv(`heat.${heat}`)}</span>
             <Badge>{String(c.preferred_locale).toUpperCase()}</Badge>
             {consent?.granted ? <Badge tone="ok">{t("optIn")}</Badge> : <Badge tone="warn">{t("noConsent")}</Badge>}
           </div>
@@ -96,10 +115,11 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
             <button className="btn sm" style={{ alignSelf: "flex-end" }}>{t("addNoteBtn")}</button>
           </form>
           <div className="tl">
-            {data.activities.map((a) => (
-              <div key={a.id} className="tl-i" style={{ gridTemplateColumns: "28px 1fr" }}>
-                <span className={`tl-d ${a.kind === "share" ? "acc" : ""}`}>{icon(a.kind)}</span>
-                <div><b>{actLabel(a)}</b><p>{dateTime(locale, a.occurred_at)}{a.actor_name ? ` · ${a.actor_name}` : ""}</p></div>
+            {events.length === 0 && <p className="muted">{tv("noEvents")}</p>}
+            {events.map((e) => (
+              <div key={e.key} className="tl-i" style={{ gridTemplateColumns: "28px 1fr auto" }}>
+                <span className={`tl-d ${e.tone}`}>{e.icon}</span>
+                <div style={{ minWidth: 0 }}><b>{e.title}</b>{e.sub && <p>{e.sub}</p>}</div><time>{dateShort(locale, e.at)}</time>
               </div>
             ))}
           </div>
@@ -111,6 +131,22 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
       </div>
 
       <div className="col" style={{ gap: 16 }}>
+        {nextAction && <div className="card"><h2><Sparkles size={15} aria-hidden style={{ color: "var(--signal-text)" }} />{tv("next.title")}</h2><div className="card-b col" style={{ gap: 10 }}>
+          <div><b style={{ fontWeight: 500 }}>{nextAction.title}</b><p className="note">{nextAction.sub}</p></div>
+          <div className="row wrap">{phone && <a className="btn sm pri" href={`tel:${phone}`}><Phone size={13} aria-hidden />{t("call")}</a>}{phone && <a className="btn sm" href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={13} aria-hidden />WhatsApp</a>}<Link className="btn sm" href="/agenda"><CalendarPlus size={13} aria-hidden />{tv("next.visit")}</Link></div>
+        </div></div>}
+        {ins.selection.length > 0 && <div className="card"><h2>{tv("sel.title")}<span className="cnt-b">{ins.selection.length}</span></h2>
+          {ins.selection.map((p) => (
+            <Link key={p.id} href={`/properties/${p.id}`} className="sel-i"><span className="thumb"><Cover path={p.cover_thumb} /></span>
+              <div style={{ minWidth: 0 }}><b className="trunc">{p.street ?? p.reference}{p.city_fr ? ` · ${cityName({ name_fr: p.city_fr, name_he: p.city_he, name_en: p.city_en }, locale)}` : ""}</b><small className="tab">{money(locale, p.price, p.currency)} · {p.visit_at ? tv("sel.visited", { d: dateShort(locale, p.visit_at) }) : tv("sel.sent", { d: dateShort(locale, p.sent_at) })}</small></div>
+              {p.opened_at ? <Badge tone="sig"><Eye size={11} aria-hidden />{tv("sel.opened")}</Badge> : <Badge>{tv("sel.notOpened")}</Badge>}
+            </Link>))}
+        </div>}
+        {ins.deal && <div className="card"><h2><Handshake size={15} aria-hidden />{tv("deal.title")}<Link href={`/deals?deal=${ins.deal.id}`} className="sp">{tv("deal.open")}</Link></h2><div className="card-b col" style={{ gap: 8 }}>
+          <div className="row"><b style={{ fontWeight: 500 }} className="grow">{pickName(ins.deal.stage, locale)}</b><span className="tab strong">{money(locale, ins.deal.value, ins.deal.currency)}</span></div>
+          <div className="progress" role="img" aria-label={tv("deal.step", { i: ins.deal.idx, n: ins.deal.total })}>{Array.from({ length: Number(ins.deal.total) }, (_, i) => <i key={i} className={i < Number(ins.deal!.idx) ? "on" : ""} />)}</div>
+          <div className="note">{tv("deal.since", { days: Number(ins.deal.days), fee: money(locale, Number(ins.deal.value ?? 0) * Number(ins.deal.commission_pct ?? 2) / 100) })}</div>
+        </div></div>}
         <div className="card"><h2><Sparkles size={15} aria-hidden />{ts("matchingProperties")}<span className="badge sig">{items.length}</span></h2>
           <SendForm mode="contact" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /></div>
         <div className="card"><h2>{t("tasks")}</h2><div className="card-b col" style={{ gap: 8 }}>

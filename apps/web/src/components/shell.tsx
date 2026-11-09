@@ -4,7 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
-const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "marketing", "reports", "settings", "intake", "import"] as const;
+const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "marketing", "automations", "reports", "settings", "intake", "import"] as const;
 
 /** Fil d'Ariane déduit de l'URL : module, puis sous-page. */
 export function Crumbs() {

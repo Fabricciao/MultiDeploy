@@ -1,5 +1,7 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ChevronLeft, ChevronRight, Clock, LayoutGrid, Plus, Rows3, SlidersHorizontal, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, Clock, LayoutGrid, Map as MapIcon, Plus, Rows3, SlidersHorizontal, X } from "lucide-react";
+import { PropertyMap } from "@/components/property-map";
+import { AskBar } from "@/components/ask-bar";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { listProperties } from "@/lib/data/properties";
@@ -23,7 +25,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
   const tc = await getTranslations("common");
   const [{ rows, total }, cities, agents, views] = await Promise.all([listProperties(ctx, f), listCities(ctx), listAgents(ctx), listViews(ctx, "properties")]);
 
-  const view = sp.view === "grid" ? "grid" : undefined;
+  const view = sp.view === "grid" ? "grid" : sp.view === "map" ? "map" : undefined;
   const peekId = typeof sp.peek === "string" && /^[0-9a-f-]{36}$/i.test(sp.peek) ? sp.peek : null;
   const base = { view, page: f.page > 1 ? f.page : undefined, q: f.q, tx: f.transaction, status: f.status, city: f.cityIds, rmin: f.roomsMin, rmax: f.roomsMax, pmin: f.priceMin, pmax: f.priceMax, has: f.has, agent: f.agent, mandate: f.mandate, sort: f.sort === "recent" ? undefined : f.sort };
   const without = (...keys: (keyof typeof base)[]) => toQuery({ ...base, ...Object.fromEntries(keys.map((k) => [k, undefined])) });
@@ -55,6 +57,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
       </PageHeader>
 
       <SavedViews scope="properties" views={views} currentQs={toQuery({ ...base, page: undefined }).replace(/^\?/, "")} locale={locale} canShare={ctx.caps.has("org.manage")} />
+      <AskBar view={view} />
       <form id="filters" method="get" className="row wrap" style={{ marginBottom: 10 }}>
         {view && <input type="hidden" name="view" value={view} />}
         <input name="q" type="search" defaultValue={f.q} placeholder={t("filters.q")} className="input" style={{ width: 220, height: 34 }} aria-label={t("filters.q")} />
@@ -104,7 +107,8 @@ export default async function PropertiesPage({ params, searchParams }: { params:
         {chips.length > 0 && <Link href="/properties" className="btn ghost sm">{tc("reset")}</Link>}
         <div className="seg sp" role="group" aria-label={t("viewLabel")}>
           <Link href={`/properties${toQuery({ ...base, view: undefined })}`} className={view ? "" : "on"} aria-label={t("viewTable")} title={t("viewTable")}><Rows3 size={14} aria-hidden /></Link>
-          <Link href={`/properties${toQuery({ ...base, view: "grid" })}`} className={view ? "on" : ""} aria-label={t("viewGrid")} title={t("viewGrid")}><LayoutGrid size={14} aria-hidden /></Link>
+          <Link href={`/properties${toQuery({ ...base, view: "grid" })}`} className={view === "grid" ? "on" : ""} aria-label={t("viewGrid")} title={t("viewGrid")}><LayoutGrid size={14} aria-hidden /></Link>
+          <Link href={`/properties${toQuery({ ...base, view: "map" })}`} className={view === "map" ? "on" : ""} aria-label={t("map.view")} title={t("map.view")}><MapIcon size={14} aria-hidden /></Link>
         </div>
       </form>
       <AutoSubmit formId="filters" />
@@ -117,7 +121,18 @@ export default async function PropertiesPage({ params, searchParams }: { params:
 
       {rows.length === 0 ? (
         <div className="card empty"><h3>{t("empty")}</h3>{chips.length > 0 && <Link href="/properties" className="btn">{tc("reset")}</Link>}</div>
-      ) : view ? (
+      ) : view === "map" ? (
+        <div className="split2">
+          <div className="card plist">{rows.map((p) => (
+            <Link key={p.id} href={peekHref(p.id)} scroll={false} data-pid={p.id} className={`prow ${p.id === peekId ? "hot" : ""}`}>
+              <span className="thumb"><Cover path={p.cover_thumb} /></span>
+              <div style={{ minWidth: 0 }}><b className="trunc">{name(p)}</b><span className="note trunc" style={{ display: "block" }}>{city(p)} · {num(locale, p.rooms)} {t("rooms").toLowerCase()} · {num(locale, p.area_built, 0)} {t("sqm")}</span><div className="row" style={{ marginBlockStart: 6 }}>{tag(p)}</div></div>
+              <div className="pr"><b>{money(locale, p.price, p.currency)}</b>{p.price && p.area_built ? <small className="note tab" style={{ display: "block" }}>{money(locale, Number(p.price) / Number(p.area_built))} / {t("sqm")}</small> : null}</div>
+            </Link>))}</div>
+          <PropertyMap points={rows.filter((p) => p.lat !== null && p.lng !== null).map((p) => ({ id: p.id, lat: Number(p.lat), lng: Number(p.lng), approx: !!p.approx, href: peekHref(p.id), title: `${name(p)} · ${money(locale, p.price, p.currency)}`,
+            label: p.price ? (Number(p.price) >= 1_000_000 ? `${num(locale, Number(p.price) / 1_000_000, 2)} M` : `${num(locale, Number(p.price) / 1000, 0)} k`) : "—" }))} />
+        </div>
+      ) : view === "grid" ? (
         <div className="pgrid">
           {rows.map((p) => (
             <Link key={p.id} href={peekHref(p.id)} scroll={false} className="pcard">

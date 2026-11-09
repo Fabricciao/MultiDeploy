@@ -25,3 +25,11 @@ export async function createDealFormAction(fd: FormData) {
   revalidatePath(`/${locale}`, "layout");
   redirect(`/${locale}/deals${id ? "" : "?err=deal"}`);
 }
+
+/** Tiroir d'affaire : passer à une étape (suivante, conclue, perdue) depuis un formulaire, sans JavaScript. */
+export async function moveDealFormAction(fd: FormData) {
+  const locale = ["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr";
+  const deal = String(fd.get("deal") ?? ""), stage = String(fd.get("stage") ?? ""), back = String(fd.get("back") ?? "");
+  await moveDealAction(locale, deal, stage);
+  redirect(`/${locale}/deals${back.startsWith("?") ? back : ""}`);
+}

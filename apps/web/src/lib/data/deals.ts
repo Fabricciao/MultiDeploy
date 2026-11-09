@@ -3,16 +3,21 @@ import type { Names } from "./types";
 
 export type Stage = { id: string; name: Names; position: number; kind: "open" | "won" | "lost"; probability: number };
 export type DealCard = { id: string; stage_id: string; value: string | null; currency: string; contact_id: string; first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null;
-  property_id: string | null; reference: string | null; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; agent_id: string | null; agent_name: string | null; expected_close: string | null; position: string; updated_at: Date };
+  property_id: string | null; reference: string | null; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; agent_id: string | null; agent_name: string | null; expected_close: string | null; position: string; updated_at: Date;
+  commission_pct: string | null; cover_thumb: string | null; next_title: string | null; next_due: Date | null; phones: { e164?: string }[] | null };
 
 export async function getBoard(ctx: Ctx) {
   return db(ctx, async (tx) => {
     const stages = (await tx`select id, name, position, kind, probability from public.pipeline_stages order by position`) as unknown as Stage[];
     const deals = (await tx`
       select d.id, d.stage_id, d.value, d.currency, d.contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, d.property_id, p.reference, p.street,
-        g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, d.agent_id, a.full_name as agent_name, d.expected_close, d.position, d.updated_at
+        g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, d.agent_id, a.full_name as agent_name, d.expected_close, d.position, d.updated_at,
+        d.commission_pct, c.phones,
+        (select pm.thumb_path from public.property_media pm where pm.property_id = d.property_id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb,
+        nt.title as next_title, nt.due_at as next_due
       from public.deals d join public.contacts c on c.id = d.contact_id left join public.properties p on p.id = d.property_id
       left join public.geo_places g on g.id = p.city_id left join public.profiles a on a.id = d.agent_id
+      left join lateral (select t.title, t.due_at from public.tasks t where t.done_at is null and (t.deal_id = d.id or (t.deal_id is null and t.contact_id = d.contact_id)) order by (t.deal_id = d.id) desc, t.due_at nulls last limit 1) nt on true
       where d.deleted_at is null order by d.position, d.created_at`) as unknown as DealCard[];
     return { stages, deals };
   });
