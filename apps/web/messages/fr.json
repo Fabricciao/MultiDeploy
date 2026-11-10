@@ -1772,5 +1772,56 @@
       "already_signed": "Ce mandat est déjà signé.",
       "invalid_token": "Ce lien n'est plus valable."
     }
+  },
+  "siteImport": {
+    "title": "Importer depuis votre site internet",
+    "sub": "récupère les biens à vendre et à louer déjà publiés sur votre site",
+    "url": "Adresse de votre site",
+    "scan": "Analyser le site",
+    "scanning": "Analyse en cours…",
+    "scanningHint": "Lecture du plan du site et des fiches de biens. Cela peut prendre jusqu'à 2 minutes.",
+    "found": "{n, plural, one {# bien détecté} other {# biens détectés}} sur {site} : {sale} à vendre, {rent} à louer.",
+    "f": {
+      "all": "Tous",
+      "sale": "À vendre",
+      "rent": "À louer",
+      "check": "À vérifier"
+    },
+    "checkAll": "Tout cocher",
+    "uncheckAll": "Tout décocher",
+    "col": {
+      "pick": "Importer",
+      "property": "Bien",
+      "tx": "Type",
+      "price": "Prix",
+      "rooms": "Pièces",
+      "area": "Surface",
+      "city": "Ville",
+      "photos": "Photos"
+    },
+    "already": "Déjà importé",
+    "unknown": "À préciser",
+    "sale": "À vendre",
+    "rent": "À louer",
+    "cityUnknown": "{city} : ville à choisir",
+    "noCity": "Ville à compléter",
+    "import": "{n, plural, =0 {Cochez les biens à importer} one {Importer # bien} other {Importer # biens}}",
+    "importing": "Import en cours…",
+    "importHint": "Les fiches sont créées en brouillon avec leurs photos. Rien n'est publié.",
+    "importingHint": "Création des fiches et téléchargement des photos : cela peut prendre quelques minutes.",
+    "done": "{created, plural, =0 {Aucune fiche créée} one {# fiche créée} other {# fiches créées}}, {photos, plural, =0 {sans photo} one {# photo importée} other {# photos importées}}.",
+    "skipped": "{n, plural, one {# bien était déjà importé} other {# biens étaient déjà importés}} : ignoré.",
+    "failed": "{n, plural, one {# bien n'a pas pu être créé} other {# biens n'ont pas pu être créés}}.",
+    "drafts": "Les biens sont en brouillon : vérifiez chaque fiche (prix, ville, adresse) avant de la mettre en ligne.",
+    "seeDrafts": "Voir les brouillons",
+    "errors": {
+      "forbidden": "Vous n'avez pas le droit de créer des biens.",
+      "rate": "Trop d'analyses récentes. Réessayez dans quelques minutes.",
+      "invalid_url": "Adresse de site invalide.",
+      "blocked": "Cette adresse ne peut pas être lue.",
+      "unreachable": "Le site ne répond pas. Vérifiez l'adresse.",
+      "none_found": "Aucune fiche de bien trouvée sur ce site. Il est peut-être construit d'une façon que l'outil ne sait pas lire.",
+      "empty": "Aucun bien sélectionné."
+    }
   }
 }

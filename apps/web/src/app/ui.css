@@ -429,3 +429,4 @@ button.swi{border:0;padding:0;cursor:pointer}
 .stars{display:inline-flex;gap:1px;color:var(--warning)}.stars svg{fill:currentColor}.stars .off{color:var(--border-control);fill:none}
 .fb{display:grid;gap:4px;padding:12px 16px;border-block-end:1px solid var(--border)}.fb:last-child{border-block-end:0}
 .fb audio{height:32px;max-width:100%}
+.banner.ok{background:var(--success-soft);color:var(--success)}

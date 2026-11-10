@@ -1772,5 +1772,56 @@
       "already_signed": "This agreement is already signed.",
       "invalid_token": "This link is no longer valid."
     }
+  },
+  "siteImport": {
+    "title": "Import from your website",
+    "sub": "brings in the properties for sale and for rent already listed on your site",
+    "url": "Your website address",
+    "scan": "Analyse the site",
+    "scanning": "Analysing…",
+    "scanningHint": "Reading the sitemap and listing pages. This can take up to 2 minutes.",
+    "found": "{n, plural, one {# property found} other {# properties found}} on {site}: {sale} for sale, {rent} for rent.",
+    "f": {
+      "all": "All",
+      "sale": "For sale",
+      "rent": "For rent",
+      "check": "To check"
+    },
+    "checkAll": "Tick all",
+    "uncheckAll": "Untick all",
+    "col": {
+      "pick": "Import",
+      "property": "Property",
+      "tx": "Type",
+      "price": "Price",
+      "rooms": "Rooms",
+      "area": "Area",
+      "city": "City",
+      "photos": "Photos"
+    },
+    "already": "Already imported",
+    "unknown": "To specify",
+    "sale": "For sale",
+    "rent": "For rent",
+    "cityUnknown": "{city}: pick the city",
+    "noCity": "City missing",
+    "import": "{n, plural, =0 {Tick the properties to import} one {Import # property} other {Import # properties}}",
+    "importing": "Importing…",
+    "importHint": "Listings are created as drafts with their photos. Nothing is published.",
+    "importingHint": "Creating listings and downloading photos: this can take a few minutes.",
+    "done": "{created, plural, =0 {No listing created} one {# listing created} other {# listings created}}, {photos, plural, =0 {no photos} one {# photo imported} other {# photos imported}}.",
+    "skipped": "{n, plural, one {# property was already imported} other {# properties were already imported}}: skipped.",
+    "failed": "{n, plural, one {# property could not be created} other {# properties could not be created}}.",
+    "drafts": "Properties are drafts: check each listing (price, city, address) before publishing it.",
+    "seeDrafts": "See drafts",
+    "errors": {
+      "forbidden": "You are not allowed to create properties.",
+      "rate": "Too many recent analyses. Try again in a few minutes.",
+      "invalid_url": "Invalid website address.",
+      "blocked": "This address cannot be read.",
+      "unreachable": "The site does not respond. Check the address.",
+      "none_found": "No property listing found on this site. It may be built in a way the tool cannot read.",
+      "empty": "No property selected."
+    }
   }
 }
