@@ -49,7 +49,7 @@ export async function getContact(ctx: Ctx, id: string) {
 
 export type ContactInput = {
   first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null; kinds: string[];
-  phone: string | null; email: string | null; preferred_locale: string; aliyah_status: string | null; budget_max: number | null; notes: string | null;
+  phone: string | null; email: string | null; preferred_locale: string; aliyah_status: string | null; budget_max: number | null; notes: string | null; commission_pct: number | null; co_broke: boolean;
   marketing_opt_in: boolean; source_id: string | null;
   profile: null | { transaction: "sale" | "rent"; city_ids: string[]; price_max: number | null; rooms_min: number | null; rooms_max: number | null; must_have: string[]; nice_to_have: string[] };
 };
@@ -66,8 +66,8 @@ export async function createContact(ctx: Ctx, i: ContactInput) {
     const emails = i.email ? [{ email: i.email }] : [];
     const consent = { granted: i.marketing_opt_in, at: new Date().toISOString(), channel: "crm_manual" };
     const [row] = await tx`
-      insert into public.contacts (organization_id, kinds, first_name, last_name, first_name_he, last_name_he, phones, emails, preferred_locale, aliyah_status, budget_max, budget_currency, notes, marketing_consent, source_id)
-      values (${ctx.orgId}, ${i.kinds}::public.contact_kind[], ${i.first_name}, ${i.last_name}, ${i.first_name_he}, ${i.last_name_he}, ${tx.json(phones)}, ${tx.json(emails)}, ${i.preferred_locale}, ${i.aliyah_status}, ${i.budget_max}, 'ILS', ${i.notes}, ${tx.json(consent)}, ${i.source_id})
+      insert into public.contacts (organization_id, kinds, first_name, last_name, first_name_he, last_name_he, phones, emails, preferred_locale, aliyah_status, budget_max, budget_currency, notes, marketing_consent, source_id, commission_pct, co_broke)
+      values (${ctx.orgId}, ${i.kinds}::public.contact_kind[], ${i.first_name}, ${i.last_name}, ${i.first_name_he}, ${i.last_name_he}, ${tx.json(phones)}, ${tx.json(emails)}, ${i.preferred_locale}, ${i.aliyah_status}, ${i.budget_max}, 'ILS', ${i.notes}, ${tx.json(consent)}, ${i.source_id}, ${i.commission_pct}, ${i.co_broke})
       returning id`;
     if (i.profile) {
       const p = i.profile;
@@ -89,7 +89,7 @@ export async function updateContactCore(ctx: Ctx, id: string, i: Omit<ContactInp
     const emails = i.email ? [{ email: i.email }] : [];
     const rows = await tx`update public.contacts set first_name = ${i.first_name}, last_name = ${i.last_name}, first_name_he = ${i.first_name_he}, last_name_he = ${i.last_name_he},
       kinds = ${i.kinds}::public.contact_kind[], phones = ${tx.json(phones)}, emails = ${tx.json(emails)}, preferred_locale = ${i.preferred_locale}, aliyah_status = ${i.aliyah_status},
-      budget_max = ${i.budget_max}, notes = ${i.notes} where id = ${id} returning id`;
+      budget_max = ${i.budget_max}, notes = ${i.notes}, commission_pct = ${i.commission_pct}, co_broke = ${i.co_broke} where id = ${id} returning id`;
     return rows.length > 0;
   });
 }

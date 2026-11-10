@@ -11,7 +11,8 @@ import { money, num, timeOnly } from "@/lib/format";
 import { Badge, Cover, PageHeader, Ring, Spark, StageBar } from "@/components/ui";
 import { toggleTaskAction } from "./clients/actions";
 import { TaskAdd } from "@/components/task-add";
-import { signLinkAction } from "./agenda/actions";
+import { SlipActions } from "@/components/slip-actions";
+import { slipMap } from "@/lib/data/slips";
 
 type Row = Record<string, any>;
 
@@ -26,6 +27,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const [d, c] = await Promise.all([getToday(ctx, mine), getCockpit(ctx, mine)]);
   const contacts = sp.add === "task" ? (await db(ctx, (tx) => tx`select id, first_name, last_name, first_name_he, last_name_he from public.contacts where deleted_at is null order by updated_at desc limit 300`)) as unknown as Row[] : [];
   const onboarding = await getOnboarding(ctx);
+  const slips = await slipMap(ctx, c.day.filter((v) => v.contact_id).map((v) => v.id as string));
   const to = await getTranslations("onboarding");
   const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" }).format(new Date());
   const city = (r: Row) => cityName({ name_fr: r.city_fr, name_he: r.city_he, name_en: r.city_en }, locale);
@@ -100,8 +102,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
                       {i === nextIdx && <div className="row">
                         <a className="btn pri sm" href={`https://waze.com/ul?q=${encodeURIComponent(place(v))}`} target="_blank" rel="noopener noreferrer"><Navigation size={13} aria-hidden />{t("next.route")}</a>
                         {ph && <a className="btn sm icon" href={`tel:${ph}`} aria-label={t("next.call")}><Phone size={13} aria-hidden /></a>}
-                        <form action={signLinkAction.bind(null, v.id)}><input type="hidden" name="locale" value={locale} /><button className="btn sm"><FileSignature size={13} aria-hidden />{t("next.sheet")}</button></form>
                       </div>}
+                      {slips.has(v.id) && <div className="slipl"><FileSignature size={13} aria-hidden className="note" /><SlipActions s={slips.get(v.id)!} sm /></div>}
                     </div>
                   </div>);
               })}</div>

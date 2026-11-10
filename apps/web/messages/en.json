@@ -60,7 +60,8 @@
     "import": "Import",
     "tasks": "Tasks",
     "signOut": "Sign out",
-    "automations": "Automations"
+    "automations": "Automations",
+    "visit-slips": "Viewing forms"
   },
   "today": {
     "title": "Today",
@@ -322,7 +323,8 @@
       "noNext": "No task planned on this deal.",
       "moveTo": "Move to \"{stage}\"",
       "markLost": "Lost",
-      "call": "Call"
+      "call": "Call",
+      "feeSplit": "Property {seller}% + client {buyer}%"
     }
   },
   "public": {
@@ -435,7 +437,11 @@
       "partnerPlaceholder": "Partner agency name",
       "coBroke": "Open to shituf pe’ula (co-brokerage with other agencies)",
       "coBrokeHint": "Other agencies may offer it to their clients, commission shared.",
-      "coBrokeShort": "Shituf pe’ula"
+      "coBrokeShort": "Shituf pe’ula",
+      "commission": "Property-side fee (%)",
+      "commissionHint": "Leave empty: 2% for an agency or exclusive listing, 0% for a co-brokerage (shitouf).",
+      "commissionAuto": "Automatic",
+      "commissionAutoShort": "auto"
     },
     "title": "Properties",
     "count": "{count, plural, one {# property} other {# properties}}",
@@ -532,7 +538,9 @@
       "unsubscribed": "Unsubscribed from mailings",
       "share": "Selection sent ({channel})",
       "stage_change": "Deal moved to another stage",
-      "visit_planned": "Viewing scheduled"
+      "visit_planned": "Viewing scheduled",
+      "slipSent": "Viewing form sent by {channel}",
+      "visitSigned": "Viewing form signed"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -594,7 +602,15 @@
       "mustHave": "Must have",
       "notes": "Notes",
       "optIn": "The client agreed to receive property selections (email)",
-      "optInHint": "Without consent, email sending is blocked. Consent is stored with the date."
+      "optInHint": "Without consent, email sending is blocked. Consent is stored with the date.",
+      "commissionTitle": "Fee",
+      "commission": "Client-side fee (%)",
+      "commissionHint": "Leave empty: 2%, or 0% if the client comes from another agent in co-brokerage (shitouf).",
+      "commissionAuto": "Automatic",
+      "commissionAutoShort": "auto",
+      "coBroke": "Client brought by another agent (shitouf)",
+      "coBrokeHint": "The client-side fee then defaults to 0%.",
+      "coBrokeShort": "Shitouf"
     },
     "privacy": {
       "title": "Personal data",
@@ -1168,7 +1184,11 @@
     "signHint": "The visitor signs on their phone; a time-stamped PDF is archived on the visit.",
     "subline": "{n, plural, =0 {No visits} one {# visit} other {# visits}} this week",
     "viewWeek": "Week",
-    "viewList": "List"
+    "viewList": "List",
+    "slipsTitle": "Viewing forms to send",
+    "slipsNone": "All of this week's viewing forms are sent or signed.",
+    "slipsAll": "See all viewing forms",
+    "slipNow": "Viewing scheduled. Send the viewing form to the client:"
   },
   "import": {
     "title": "Import data",
@@ -1479,7 +1499,7 @@
       "fix": "Complete"
     },
     "median": "Median of your comparable listings ({n})",
-    "fee": "Estimated commission (2% + VAT)",
+    "fee": "Estimated fee ({pct}% + VAT)",
     "nextVisit": "Next viewing",
     "public": "Public page",
     "tl": {
@@ -1495,7 +1515,9 @@
       "deal": "Deal opened with {name}",
       "status": "Status changed",
       "note": "Note",
-      "other": "Activity"
+      "other": "Activity",
+      "slipSent": "Viewing form sent to {name}",
+      "signed": "{name} signed the viewing form"
     },
     "owner": {
       "title": "Owner",
@@ -1510,6 +1532,11 @@
       "wa": "Send via WhatsApp",
       "hint": "The message opens in WhatsApp: nothing is sent until you click.",
       "body": "Hello {name},\n\nHere is the update on your property, {place}, for the last 30 days:\n• {sent} sends to buyers\n• {opened} of them opened\n• {visits} viewings\n• {offers} client(s) at offer stage or beyond\n\nHappy to talk about it.\n{agent} · {agency}"
+    },
+    "slips": {
+      "title": "Viewing forms",
+      "all": "See all",
+      "empty": "No viewing with a client on this property."
     }
   },
   "clientV2": {
@@ -1552,6 +1579,10 @@
       "open": "Open",
       "step": "Stage {i} of {n}",
       "since": "No movement for {days} d · estimated commission {fee}"
+    },
+    "slips": {
+      "title": "Viewing forms",
+      "empty": "No viewing scheduled for this client."
     }
   },
   "automations": {
@@ -1590,5 +1621,43 @@
         "then": "A follow-up task for the agent, at most every 7 days."
       }
     }
+  },
+  "slips": {
+    "title": "Viewing forms",
+    "sub": "{signed} signed · {pending} awaiting signature",
+    "tabs": {
+      "signed": "Signed",
+      "pending": "Awaiting signature",
+      "all": "All"
+    },
+    "search": "Search a property or a client",
+    "empty": "No signed viewing form yet.",
+    "emptyPending": "No viewing form awaiting signature.",
+    "how": "Schedule a viewing with a client: the viewing form goes out in one click by WhatsApp or email, and the signed PDF is filed here.",
+    "col": {
+      "visit": "Viewing",
+      "property": "Property",
+      "client": "Client",
+      "agent": "Agent",
+      "slip": "Viewing form"
+    },
+    "signer": "Signed by {name}",
+    "prev": "Previous",
+    "next": "Next",
+    "signedOn": "Signed on {date}",
+    "signed": "Signed",
+    "pdf": "Signed PDF",
+    "noContact": "No client on this viewing",
+    "pending": "To sign",
+    "whatsapp": "WhatsApp",
+    "noPhone": "No phone",
+    "email": "Email",
+    "emailSent": "Sent",
+    "sending": "Sending…",
+    "copied": "Copied",
+    "copy": "Copy link",
+    "emailFailed": "The email did not go out. Try again or use WhatsApp.",
+    "noEmail": "This client has no email.",
+    "sentOn": "Sent on {date}"
   }
 }

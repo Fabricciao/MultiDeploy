@@ -67,6 +67,7 @@ export function PropertyForm({ action, cities, d = {}, missing, hints, canTransl
         <Field label={t("form.mandateEnd")} error={e("mandate_end")}><input name="mandate_end" type="date" className="input" defaultValue={mandate.end ?? ""} /></Field>
         <Field label={t("form.origin")} hint={t("form.originHint")}><select name="mandate_origin" className="input" defaultValue={mandate.origin ?? "own"}><option value="own">{t("origin.own")}</option><option value="partner">{t("origin.partner")}</option></select></Field>
         <Field label={t("form.partnerAgency")}><input name="mandate_partner" className="input" maxLength={120} defaultValue={mandate.partner ?? ""} placeholder={t("form.partnerPlaceholder")} /></Field>
+        <Field label={t("form.commission")} error={e("commission_pct")} hint={t("form.commissionHint")}><input name="commission_pct" type="number" min="0" max="20" step="0.1" inputMode="decimal" className="input" defaultValue={d.commission_pct ?? ""} placeholder={t("form.commissionAuto")} /></Field>
         <div style={{ gridColumn: "1 / -1" }}><label className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name="mandate_co_broke" defaultChecked={!!mandate.co_broke} />{t("form.coBroke")}</label><div className="note" style={{ marginBlockStart: 4 }}>{t("form.coBrokeHint")}</div></div>
         <div style={{ gridColumn: "1 / -1" }}><Field label={t("form.internalNotes")}><textarea name="internal_notes" className="input" defaultValue={d.internal_notes ?? ""} /></Field></div>
       </div></section>

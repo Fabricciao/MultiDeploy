@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarCheck, CalendarPlus, Clock, Eye, Flame, Handshake, Mail, MessageCircle, Pencil, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, Sun } from "lucide-react";
+import { FileSignature, CalendarCheck, CalendarPlus, Clock, Eye, Flame, Handshake, Mail, MessageCircle, Pencil, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, Sun } from "lucide-react";
 import { getContactInsights } from "@/lib/data/insights";
 import { Cover } from "@/components/ui";
 import { Link } from "@/i18n/navigation";
@@ -13,6 +13,8 @@ import { formatPhone } from "@/lib/phone";
 import { Avatar, Badge } from "@/components/ui";
 import { SendForm, type SendItem } from "@/components/send-form";
 import { hasWhatsApp } from "@/lib/data/connections";
+import { SlipActions } from "@/components/slip-actions";
+import { listSlips, siteBase, slipInfo } from "@/lib/data/slips";
 import { addNoteAction, addTaskAction, anonymizeAction, openDealAction, toggleTaskAction } from "../actions";
 
 export default async function ClientPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
@@ -37,7 +39,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
     sub: `${cityName({ name_fr: m.city_fr, name_he: m.city_he, name_en: m.city_en }, locale)} · ${money(locale, m.price, m.currency)} · ${num(locale, m.rooms)} ${tp("rooms").toLowerCase()}`,
     warn: (m.reasons as { code: string; pct?: number }[]).find((r) => r.code === "over_budget") ? tp("match.overBudget", { pct: (m.reasons as { code: string; pct?: number }[]).find((r) => r.code === "over_budget")!.pct ?? 0 }) : undefined,
   }));
-  const actLabel = (a: Record<string, any>) => (a.kind === "note" ? a.summary : a.kind === "share" ? t("activity.share", { channel: a.summary }) : a.kind === "stage_change" ? t("activity.stage_change") : t(`activity.${a.summary}`));
+  const actLabel = (a: Record<string, any>) => (a.kind === "note" ? a.summary : a.kind === "share" ? t("activity.share", { channel: a.summary }) : a.kind === "stage_change" ? t("activity.stage_change") : a.kind === "visit_slip_sent" ? t("activity.slipSent", { channel: a.summary === "email" ? "e-mail" : "WhatsApp" }) : a.kind === "visit_signed" ? t("activity.visitSigned") : t(`activity.${a.summary}`));
   const kv = (k: string, v: React.ReactNode) => <div><div className="k">{k}</div><div className="v">{v}</div></div>;
 
   const criteria = (
@@ -57,7 +59,8 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
   const act = (href: string, icon: React.ReactNode, label: string, ext = false) => <a className="act" href={href} {...(ext ? { target: "_blank", rel: "noopener noreferrer" } : {})} style={{ fontSize: 11.5 }}><span style={{ width: 40, height: 40 }}>{icon}</span>{label}</a>;
   const icon = (k: string) => ({ note: <StickyNote size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, stage_change: <Handshake size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <Clock size={14} aria-hidden />;
   const tv = await getTranslations("clientV2");
-  const ins = await getContactInsights(ctx, id);
+  const [ins, slipList, base] = await Promise.all([getContactInsights(ctx, id), listSlips(ctx, { contactId: id, state: "all", limit: 10 }), siteBase()]);
+  const buyerFee = c.commission_pct != null ? Number(c.commission_pct) : c.co_broke ? 0 : 2;
   const lastDays = ins.last ? Math.floor((Date.now() - new Date(ins.last).getTime()) / 86_400_000) : null;
   const heat = lastDays === null ? "cold" : lastDays <= 3 ? "hot" : lastDays <= 14 ? "warm" : "cold";
   const openTask = data.tasks.find((k) => !k.done_at);
@@ -96,8 +99,14 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
           {email && <div className="row"><Mail size={14} aria-hidden /><span className="ltr trunc">{email}</span></div>}
           <div className="row"><span className="muted">{t("agent")}</span><span className="sp">{c.owner_name ?? "—"}</span></div>
           {c.source_name && <div className="row"><span className="muted">{t("form.source")}</span><span className="sp">{pickName(c.source_name, locale)}</span></div>}
+          <div className="row"><span className="muted">{t("form.commission")}</span><span className="sp tab">{num(locale, buyerFee, 1)} %{c.commission_pct == null && <span className="note"> · {t("form.commissionAutoShort")}</span>}</span></div>
+          {c.co_broke && <div className="row"><Badge tone="sig">{t("form.coBrokeShort")}</Badge></div>}
           {c.notes && <p style={{ whiteSpace: "pre-wrap", fontSize: 13 }}>{c.notes}</p>}
         </div></div>
+        <div className="card" id="slips"><h2><FileSignature size={15} aria-hidden />{tv("slips.title")}<span className="badge">{slipList.counts.signed} / {slipList.counts.signed + slipList.counts.pending}</span></h2>
+          {slipList.rows.length === 0 ? <p className="muted card-b">{tv("slips.empty")}</p> : slipList.rows.map((r) => (
+            <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}><Link href={`/properties/${r.property_id}`} style={{ fontWeight: 500 }} className="trunc">{r.title ?? r.street ?? r.reference}</Link><small>{dateTime(locale, r.starts_at)}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
+        </div>
         {ctx.caps.has("contacts.write") && (
           <div className="card"><h2>{t("privacy.title")}</h2><div className="card-b col" style={{ gap: 10 }}>
             <a className="btn sm" href={`/api/export/contact/${id}`}>{t("privacy.export")}</a>
@@ -145,7 +154,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
         {ins.deal && <div className="card"><h2><Handshake size={15} aria-hidden />{tv("deal.title")}<Link href={`/deals?deal=${ins.deal.id}`} className="sp">{tv("deal.open")}</Link></h2><div className="card-b col" style={{ gap: 8 }}>
           <div className="row"><b style={{ fontWeight: 500 }} className="grow">{pickName(ins.deal.stage, locale)}</b><span className="tab strong">{money(locale, ins.deal.value, ins.deal.currency)}</span></div>
           <div className="progress" role="img" aria-label={tv("deal.step", { i: ins.deal.idx, n: ins.deal.total })}>{Array.from({ length: Number(ins.deal.total) }, (_, i) => <i key={i} className={i < Number(ins.deal!.idx) ? "on" : ""} />)}</div>
-          <div className="note">{tv("deal.since", { days: Number(ins.deal.days), fee: money(locale, Number(ins.deal.value ?? 0) * Number(ins.deal.commission_pct ?? 2) / 100) })}</div>
+          <div className="note">{tv("deal.since", { days: Number(ins.deal.days), fee: money(locale, Number(ins.deal.value ?? 0) * Number(ins.deal.fee_pct ?? 0) / 100) })}</div>
         </div></div>}
         <div className="card"><h2><Sparkles size={15} aria-hidden />{ts("matchingProperties")}<span className="badge sig">{items.length}</span></h2>
           <SendForm mode="contact" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /></div>

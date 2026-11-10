@@ -4,7 +4,7 @@ import type { Names } from "./types";
 export type Stage = { id: string; name: Names; position: number; kind: "open" | "won" | "lost"; probability: number };
 export type DealCard = { id: string; stage_id: string; value: string | null; currency: string; contact_id: string; first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null;
   property_id: string | null; reference: string | null; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; agent_id: string | null; agent_name: string | null; expected_close: string | null; position: string; updated_at: Date;
-  commission_pct: string | null; cover_thumb: string | null; next_title: string | null; next_due: Date | null; phones: { e164?: string }[] | null };
+  commission_pct: string | null; fee_pct: number; seller_pct: number | null; buyer_pct: number | null; cover_thumb: string | null; next_title: string | null; next_due: Date | null; phones: { e164?: string }[] | null };
 
 export async function getBoard(ctx: Ctx) {
   return db(ctx, async (tx) => {
@@ -12,7 +12,7 @@ export async function getBoard(ctx: Ctx) {
     const deals = (await tx`
       select d.id, d.stage_id, d.value, d.currency, d.contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, d.property_id, p.reference, p.street,
         g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, d.agent_id, a.full_name as agent_name, d.expected_close, d.position, d.updated_at,
-        d.commission_pct, c.phones,
+        public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id)::float as fee_pct, public.property_fee_pct(d.property_id)::float as seller_pct, public.contact_fee_pct(d.contact_id)::float as buyer_pct, d.commission_pct, c.phones,
         (select pm.thumb_path from public.property_media pm where pm.property_id = d.property_id and pm.kind = 'photo' order by pm.is_cover desc, pm.position limit 1) as cover_thumb,
         nt.title as next_title, nt.due_at as next_due
       from public.deals d join public.contacts c on c.id = d.contact_id left join public.properties p on p.id = d.property_id
@@ -42,7 +42,7 @@ export async function createDeal(ctx: Ctx, contactId: string, propertyId: string
     const [first] = stageId ? await tx`select id from public.pipeline_stages where id = ${stageId} and kind = 'open'` : await tx`select id from public.pipeline_stages where kind = 'open' order by position limit 1`;
     if (!first) return null;
     const [row] = await tx`insert into public.deals (organization_id, contact_id, property_id, stage_id, value, commission_pct, position)
-      values (${ctx.orgId}, ${contactId}, ${propertyId}, ${first.id}, coalesce(${value}::numeric, (select price from public.properties where id = ${propertyId})), 2, coalesce((select max(position) from public.deals where stage_id = ${first.id}), 0) + 1) returning id`;
+      values (${ctx.orgId}, ${contactId}, ${propertyId}, ${first.id}, coalesce(${value}::numeric, (select price from public.properties where id = ${propertyId})), null, coalesce((select max(position) from public.deals where stage_id = ${first.id}), 0) + 1) returning id`;
     return row!.id as string;
   });
 }
@@ -66,7 +66,7 @@ export async function syncDealOnVisit(ctx: Ctx, contactId: string, propertyId: s
     if (!open.length) {
       const [p] = propertyId ? await tx`select price from public.properties where id = ${propertyId}` : [];
       await tx`insert into public.deals (organization_id, contact_id, property_id, stage_id, value, commission_pct, position)
-        values (${ctx.orgId}, ${contactId}, ${propertyId}, ${st.id}, ${p?.price ?? null}, 2, coalesce((select max(position) from public.deals where stage_id = ${st.id}), 0) + 1)`;
+        values (${ctx.orgId}, ${contactId}, ${propertyId}, ${st.id}, ${p?.price ?? null}, null, coalesce((select max(position) from public.deals where stage_id = ${st.id}), 0) + 1)`;
       return;
     }
     const d = open[0]!;

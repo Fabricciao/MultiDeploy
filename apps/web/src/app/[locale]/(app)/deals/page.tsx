@@ -6,7 +6,7 @@ import { getBoard } from "@/lib/data/deals";
 import { contactName } from "@/lib/data/contacts";
 import { cityName, listAgents } from "@/lib/data/geo";
 import { pickName } from "@/lib/data/types";
-import { dateShort, initials, money } from "@/lib/format";
+import { dateShort, initials, money, num } from "@/lib/format";
 import { Avatar, Badge, PageHeader, StageBar } from "@/components/ui";
 import { PeekKeys } from "@/components/shell";
 import { DealBoard } from "@/components/deal-board";
@@ -71,7 +71,7 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
 
       {all.length > 0 && !list && (() => {
         const openDeals = deals.filter((d) => stageOf(d.stage_id)?.kind === "open");
-        const fee = (d: (typeof deals)[number]) => Number(d.value ?? 0) * (Number(d.commission_pct ?? 2) / 100);
+        const fee = (d: (typeof deals)[number]) => Number(d.value ?? 0) * (Number(d.fee_pct) / 100);
         const expected = openDeals.reduce((a, d) => a + fee(d) * ((stageOf(d.stage_id)?.probability ?? 0) / 100), 0);
         const last = open.at(-1);
         const atPromise = openDeals.filter((d) => d.stage_id === last?.id).reduce((a, d) => a + fee(d), 0);
@@ -112,7 +112,7 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
         <DealBoard canMove={canWrite} current={cur?.id ?? null} query={baseQs.replace(/^\?/, "")}
           stages={stages.map((s) => ({ id: s.id, name: pickName(s.name, locale), kind: s.kind, probability: s.probability }))}
           deals={deals.filter((d) => stageOf(d.stage_id)?.kind === "open").map((d) => ({
-            id: d.id, stageId: d.stage_id, contactId: d.contact_id, client: contactName(d, locale), value: d.value ? Number(d.value) : null, fee: d.value ? Number(d.value) * Number(d.commission_pct ?? 2) / 100 : null,
+            id: d.id, stageId: d.stage_id, contactId: d.contact_id, client: contactName(d, locale), value: d.value ? Number(d.value) : null, fee: d.value ? Number(d.value) * Number(d.fee_pct) / 100 : null,
             agent: initials(d.agent_name ?? ""), agentName: d.agent_name ?? "", cover: d.cover_thumb,
             sub: d.street ? `${d.street}${city(d) ? ` · ${city(d)}` : ""}` : d.reference ? `${d.reference} · ${city(d)}` : t("noProperty"),
             stale: isStale(d), next: d.next_title, nextDue: d.next_due ? dateShort(locale, d.next_due) : null,
@@ -122,7 +122,7 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
         const st = stageOf(cur.stage_id); const idx = open.findIndex((s) => s.id === cur.stage_id);
         const nextStage = idx >= 0 && idx < open.length - 1 ? open[idx + 1] : stages.find((s) => s.kind === "won");
         const lostStage = stages.find((s) => s.kind === "lost");
-        const fee = Number(cur.value ?? 0) * Number(cur.commission_pct ?? 2) / 100;
+        const fee = Number(cur.value ?? 0) * Number(cur.fee_pct) / 100;
         const days = Math.floor((Date.now() - new Date(cur.updated_at).getTime()) / 86_400_000);
         const ph = cur.phones?.[0]?.e164;
         const close = q({ agent: agentFilter, stale: staleOnly ? "1" : undefined });
@@ -136,10 +136,11 @@ export default async function DealsPage({ params, searchParams }: { params: Prom
               {st?.kind === "open" && <div className="stepper">{open.map((s, i) => <div key={s.id} className={i < idx ? "dn" : i === idx ? "dn cur" : ""}>{pickName(s.name, locale)}</div>)}</div>}
               <div className="kv" style={{ gridTemplateColumns: "1fr 1fr" }}>
                 <div><div className="k">{t("value")}</div><div className="v tab">{money(locale, cur.value, cur.currency)}</div></div>
-                <div><div className="k">{t("v2.fee", { pct: Number(cur.commission_pct ?? 2) })}</div><div className="v tab">{money(locale, fee)}</div></div>
+                <div><div className="k">{t("v2.fee", { pct: num(locale, cur.fee_pct, 2) })}</div><div className="v tab">{money(locale, fee)}</div></div>
                 <div><div className="k">{t("v2.proba")}</div><div className="v tab">{st?.probability ?? 0} %</div></div>
                 <div><div className="k">{t("agent")}</div><div className="v">{cur.agent_name ?? "—"}</div></div>
               </div>
+              {!cur.commission_pct && <div className="note">{t("v2.feeSplit", { seller: num(locale, cur.seller_pct ?? 0, 2), buyer: num(locale, cur.buyer_pct ?? 0, 2) })}</div>}
               <div className={`banner ${days > 7 && st?.kind === "open" ? "" : "info"}`}>{days > 7 && st?.kind === "open" ? <AlarmClock size={15} aria-hidden /> : <ListChecks size={15} aria-hidden />}<span className="grow">{cur.next_title ? <><b style={{ fontWeight: 600 }}>{t("v2.nextStep")}</b> {cur.next_title}{cur.next_due ? ` · ${dateShort(locale, cur.next_due)}` : ""}</> : t("v2.noNext")}</span></div>
               <div className="row wrap">
                 {nextStage && stageForm(nextStage, <>{nextStage.kind === "won" ? <Award size={14} aria-hidden /> : null}{t("v2.moveTo", { stage: pickName(nextStage.name, locale) })}<span className="flip"><ArrowRight size={14} aria-hidden /></span></>, "btn pri")}

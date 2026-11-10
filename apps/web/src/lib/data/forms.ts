@@ -38,6 +38,7 @@ export function parsePropertyForm(fd: FormData): Parsed<PropertyInput> {
     registration_type: str(fd, "registration_type") && ["tabu", "minhal", "company", "other"].includes(str(fd, "registration_type")!) ? str(fd, "registration_type") : null,
     mandate_type: oneOf(str(fd, "mandate_type"), ["exclusive", "non_exclusive"] as const, "non_exclusive"), mandate_end: str(fd, "mandate_end"),
     mandate_origin: oneOf(str(fd, "mandate_origin"), ["own", "partner"] as const, "own"), mandate_partner: str(fd, "mandate_partner")?.slice(0, 120) ?? null, mandate_co_broke: bool(fd, "mandate_co_broke"),
+    commission_pct: numOrNull(fd, "commission_pct", errors, { min: 0, max: 20 }),
     internal_notes: str(fd, "internal_notes"),
     titles: { fr: str(fd, "title_fr") ?? "", he: str(fd, "title_he") ?? "", en: str(fd, "title_en") ?? "" },
     descriptions: { fr: str(fd, "desc_fr") ?? "", he: str(fd, "desc_he") ?? "", en: str(fd, "desc_en") ?? "" },
@@ -69,7 +70,7 @@ export function parseContactForm(fd: FormData): Parsed<ContactInput> {
     first_name, last_name, first_name_he, last_name_he, kinds: kinds.length ? kinds : ["buyer"], phone, email,
     preferred_locale: oneOf(str(fd, "preferred_locale"), ["fr", "he", "en"] as const, "fr"),
     aliyah_status: str(fd, "aliyah_status") && ["pre_aliyah", "recent", "resident", "none"].includes(str(fd, "aliyah_status")!) ? str(fd, "aliyah_status") : null,
-    budget_max, notes: str(fd, "notes"), marketing_opt_in: bool(fd, "marketing_opt_in"), source_id: src && uuidRe.test(src) ? src : null,
+    budget_max, notes: str(fd, "notes"), commission_pct: numOrNull(fd, "commission_pct", errors, { min: 0, max: 20 }), co_broke: bool(fd, "co_broke"), marketing_opt_in: bool(fd, "marketing_opt_in"), source_id: src && uuidRe.test(src) ? src : null,
     profile: wantsProfile ? { transaction: oneOf(str(fd, "transaction"), ["sale", "rent"] as const, "sale"), city_ids: cities, price_max: budget_max, rooms_min, rooms_max, must_have: must, nice_to_have: [] } : null,
   };
   return Object.keys(errors).length ? { ok: false, errors } : { ok: true, data };

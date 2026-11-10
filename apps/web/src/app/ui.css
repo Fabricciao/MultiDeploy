@@ -337,6 +337,8 @@ div.ltr{display:block}
 .slot.done>*{opacity:.55}
 .slot .b{padding-block:10px;border-block-end:1px solid var(--border);display:flex;gap:12px;align-items:center;min-width:0}
 .slot:last-child .b{border-block-end:0}
+.slot .b{flex-wrap:wrap}.slot .b>.slipl{flex-basis:100%;display:flex;align-items:center;gap:8px;padding-inline-start:60px}
+@media (max-width:600px){.slot .b>.slipl{padding-inline-start:0}}
 .slot .thumb{width:56px;height:40px}
 .slot b{font-weight:500;display:block;line-height:19px}.slot small{display:block;font-size:12px;color:var(--text-muted);line-height:17px}
 .stagebar{display:flex;gap:2px;height:10px}.stagebar i{display:block;height:100%;min-width:6px}

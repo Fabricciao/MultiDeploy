@@ -18,7 +18,7 @@ export async function importContacts(ctx: Ctx, rows: MappedRow<string>[]): Promi
     const phone = v.phone ? normalizePhone(v.phone) : null; if (v.phone && !phone) { rep.errors.push({ line, code: "invalid_phone" }); continue; }
     if (v.email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email)) { rep.errors.push({ line, code: "invalid_email" }); continue; }
     const input: ContactInput = { first_name: v.first_name ?? null, last_name: v.last_name ?? null, first_name_he: v.first_name_he ?? null, last_name_he: v.last_name_he ?? null, kinds: [KIND[(v.kind ?? "").toLowerCase()] ?? "buyer"], phone, email: v.email ?? null,
-      preferred_locale: LOC[(v.preferred_locale ?? "").toLowerCase()] ?? "fr", aliyah_status: null, budget_max: v.budget_max ? csvNumber(v.budget_max) : null, notes: v.notes?.slice(0, 2000) ?? null, marketing_opt_in: false, source_id: null, profile: null };
+      preferred_locale: LOC[(v.preferred_locale ?? "").toLowerCase()] ?? "fr", aliyah_status: null, budget_max: v.budget_max ? csvNumber(v.budget_max) : null, notes: v.notes?.slice(0, 2000) ?? null, marketing_opt_in: false, source_id: null, commission_pct: null, co_broke: false, profile: null };
     try { await createContact(ctx, input); rep.created++; } catch (e) { if (e instanceof DuplicatePhoneError) rep.duplicates++; else rep.errors.push({ line, code: "failed" }); }
   }
   return rep;
@@ -34,7 +34,7 @@ export async function importProperties(ctx: Ctx, rows: MappedRow<string>[], citi
     const type = TYPE.find(([re]) => re.test(v.property_type ?? ""))?.[1] ?? "apartment";
     const input: PropertyInput = { transaction: rent ? "rent" : "sale", property_type: type, status: "draft", city_id: city.id, street: v.street ?? null, house_number: v.house_number ?? null, address_visibility: "street", price, currency: "ILS", rooms,
       area_built: v.area_built ? csvNumber(v.area_built) : null, floor: v.floor ? csvNumber(v.floor) : null, floors_total: v.floors_total ? csvNumber(v.floors_total) : null, mamad: v.mamad ? csvYes(v.mamad) : false, parking_count: v.parking_count ? Math.max(0, Math.min(20, csvNumber(v.parking_count) ?? 0)) : 0, elevator: v.elevator ? csvYes(v.elevator) : false, sukkah_balcony: false, storage: false, ac: false,
-      arnona_monthly: null, vaad_bayit_monthly: null, registration_type: null, mandate_type: "non_exclusive", mandate_end: null, mandate_origin: "own", mandate_partner: null, mandate_co_broke: false, internal_notes: null, titles: { [locale]: v.title ?? "" } as Record<string, string>, descriptions: { [locale]: v.description ?? "" } as Record<string, string> };
+      arnona_monthly: null, vaad_bayit_monthly: null, registration_type: null, mandate_type: "non_exclusive", mandate_end: null, mandate_origin: "own", mandate_partner: null, mandate_co_broke: false, commission_pct: null, internal_notes: null, titles: { [locale]: v.title ?? "" } as Record<string, string>, descriptions: { [locale]: v.description ?? "" } as Record<string, string> };
     try { await createProperty(ctx, input, locale); rep.created++; } catch { rep.errors.push({ line, code: "failed" }); }
   }
   return rep;

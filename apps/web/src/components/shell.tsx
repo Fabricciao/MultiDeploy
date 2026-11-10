@@ -1,10 +1,10 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X, Zap } from "lucide-react";
+import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X, Zap, FileSignature } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
-const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "marketing", "automations", "reports", "settings", "intake", "import"] as const;
+const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "visit-slips", "marketing", "automations", "reports", "settings", "intake", "import"] as const;
 
 /** Fil d'Ariane déduit de l'URL : module, puis sous-page. */
 export function Crumbs() {
@@ -90,6 +90,7 @@ export function MobileNav() {
           {line("/tasks", t("tasks"), <CircleCheck size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/deals", t("deals"), <Handshake size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/agenda", t("agenda"), <CalendarDays size={20} strokeWidth={1.75} aria-hidden />)}
+          {line("/visit-slips", t("visit-slips"), <FileSignature size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/marketing", t("marketing"), <Megaphone size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/automations", t("automations"), <Zap size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/reports", t("reports"), <ChartNoAxesColumn size={20} strokeWidth={1.75} aria-hidden />)}

@@ -54,6 +54,11 @@ export function ContactForm({ action, cities, sources, d, edit = false, hints, m
       )}
       {edit && <Field label={t("form.budgetMax")} error={e("budget_max")}><input name="budget_max" type="number" min="0" step="10000" className="input" style={{ maxWidth: 240 }} defaultValue={g("budget_max")} /></Field>}
 
+      <section className="card"><h2>{t("form.commissionTitle")}</h2><div className="card-b" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(220px,1fr))", gap: 14 }}>
+        <Field label={t("form.commission")} error={e("commission_pct")} hint={t("form.commissionHint")}><input name="commission_pct" type="number" min="0" max="20" step="0.1" inputMode="decimal" className="input" defaultValue={g("commission_pct")} placeholder={t("form.commissionAuto")} /></Field>
+        <div><label className="row" style={{ gap: 8, marginBlockStart: 22 }}><input type="checkbox" className="ck" name="co_broke" defaultChecked={!!d?.co_broke} />{t("form.coBroke")}</label><div className="note" style={{ marginBlockStart: 4 }}>{t("form.coBrokeHint")}</div></div>
+      </div></section>
+
       <section className="card"><h2>{t("form.notes")}</h2><div className="card-b col" style={{ gap: 12 }}>
         <textarea name="notes" className="input" defaultValue={g("notes")} />
         {!edit && <label className="row" style={{ gap: 8 }}><input type="checkbox" className="ck" name="marketing_opt_in" />{t("form.optIn")}</label>}

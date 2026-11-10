@@ -6,13 +6,14 @@ import { headers } from "next/headers";
 import { createVisit, setVisitStatus } from "@/lib/data/visits";
 import { syncDealOnVisit } from "@/lib/data/deals";
 import { visitSignLink } from "@/lib/data/signature";
+import { getSlip, siteBase, slipInfo, type SlipInfo } from "@/lib/data/slips";
 import { getUserTokens, saveUserTokens } from "@/lib/data/connections";
 import { insertEvent } from "@/lib/integrations/google";
 import { db } from "@/lib/session";
 import { jerusalemToDate } from "@/lib/calendar/week";
 import { quietReason } from "@/lib/calendar/jewish";
 
-export type VisitState = { ok?: boolean; error?: string; warning?: { kind: string; key?: string } } | null;
+export type VisitState = { ok?: boolean; error?: string; warning?: { kind: string; key?: string }; slip?: SlipInfo } | null;
 const loc = (fd: FormData) => (["fr", "he", "en"].includes(String(fd.get("locale"))) ? String(fd.get("locale")) : "fr");
 const uuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
 
@@ -37,7 +38,10 @@ export async function createVisitAction(_p: VisitState, fd: FormData): Promise<V
     }
   } catch { /* connexion Google expirée ou indisponible */ }
   revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`); revalidatePath(`/${locale}/deals`);
-  return { ok: true };
+  // Bon de visite prêt à envoyer tout de suite (WhatsApp / e-mail / lien), sans quitter le formulaire.
+  let slip: SlipInfo | undefined;
+  if (contact && r.id) { try { const row = await getSlip(ctx, r.id); if (row) slip = slipInfo(ctx, row, await siteBase()); } catch { /* le bon reste disponible dans l'agenda */ } }
+  return { ok: true, slip };
 }
 export async function visitStatusAction(id: string, status: "done" | "cancelled" | "no_show" | "planned", fd: FormData) {
   const locale = loc(fd); const ctx = await getCtx(locale);

@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarDays, ChevronLeft, ChevronRight, Download, List, MapPin } from "lucide-react";
+import { CalendarDays, FileSignature, ChevronLeft, ChevronRight, Download, List, MapPin } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx, db } from "@/lib/session";
 import { listVisits } from "@/lib/data/visits";
@@ -7,15 +7,17 @@ import { contactName } from "@/lib/data/contacts";
 import { cityName } from "@/lib/data/geo";
 import { addDays, dayKey, weekStart } from "@/lib/calendar/week";
 import { quietReason } from "@/lib/calendar/jewish";
-import { intlLocale, timeOnly } from "@/lib/format";
+import { dateTime, intlLocale, timeOnly } from "@/lib/format";
 import { Badge, PageHeader } from "@/components/ui";
 import { VisitForm } from "@/components/visit-form";
-import { signLinkAction, visitStatusAction } from "./actions";
+import { SlipActions } from "@/components/slip-actions";
+import { slipMap } from "@/lib/data/slips";
+import { visitStatusAction } from "./actions";
 
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 08:00 → 19:00
 const hourIn = (d: Date) => Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", hourCycle: "h23" }).format(d));
 
-export default async function AgendaPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ w?: string; sign?: string; view?: string }> }) {
+export default async function AgendaPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<{ w?: string; view?: string }> }) {
   const { locale } = await params; const sp = await searchParams;
   setRequestLocale(locale);
   const ctx = await getCtx(locale);
@@ -28,6 +30,8 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
     db(ctx, (tx) => tx`select p.id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en from public.properties p left join public.geo_places g on g.id = p.city_id where p.status in ('active','under_offer') and p.deleted_at is null order by p.created_at desc limit 200`),
     db(ctx, (tx) => tx`select id, first_name, last_name, first_name_he, last_name_he from public.contacts where deleted_at is null order by created_at desc limit 150`),
   ]);
+  const slips = await slipMap(ctx, visits.filter((v) => v.contact_id && v.status !== "cancelled").map((v) => v.id));
+  const toSend = visits.filter((v) => slips.get(v.id)?.url);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const fmtDay = new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" });
   const fmtHead = new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "Asia/Jerusalem", weekday: "short" });
@@ -46,7 +50,6 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
         <div className="seg"><Link href={q({ w: off })} className={list ? "" : "on"}><CalendarDays size={14} aria-hidden />{t("viewWeek")}</Link><Link href={q({ w: off, view: "list" })} className={list ? "on" : ""}><List size={14} aria-hidden />{t("viewList")}</Link></div>
         <a href="/api/ics/agenda" className="btn hide-m"><Download size={14} aria-hidden />{t("ics")}</a>
       </PageHeader>
-      {sp.sign && /^https?:\/\/[^\s]+\/(fr|he|en)\/sign\/[\w%.-]+$/.test(sp.sign) && <div role="status" className="card card-b col" style={{ gap: 6, marginBottom: 12 }}><b style={{ fontWeight: 500 }}>{t("signReady")}</b><input readOnly className="input ltr" dir="ltr" value={sp.sign} aria-label={t("signLink")} /><span className="note">{t("signHint")}</span></div>}
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 320px", gap: 16, alignItems: "start" }} className="split">
         {!list ? (
           <div style={{ overflowX: "auto" }}>
@@ -82,7 +85,7 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
                       <b className="tab" style={{ width: 52 }}>{timeOnly(locale, v.starts_at)}</b>
                       <div className="grow"><Link href={`/properties/${v.property_id}`} style={{ fontWeight: 500 }}>{v.title ?? v.street ?? v.reference}</Link><div className="note"><MapPin size={11} aria-hidden style={{ display: "inline" }} /> {cityName({ name_fr: v.city_fr, name_he: v.city_he, name_en: v.city_en }, locale)}{v.contact_id ? <> · <Link href={`/clients/${v.contact_id}`}>{contactName(v, locale)}</Link></> : null} · {v.agent_name}</div></div>
                       <Badge tone={v.status === "done" ? "ok" : v.status === "planned" ? "acc" : "bad"}>{t(`status.${v.status}`)}</Badge>
-                      {v.document_path ? <a href={`/api/files/${v.document_path}`} className="btn sm" target="_blank" rel="noreferrer">{t("signedDoc")}</a> : v.status !== "cancelled" && v.agent_id === ctx.userId ? <form action={signLinkAction.bind(null, v.id)}><input type="hidden" name="locale" value={locale} /><button className="btn sm ghost">{t("signLink")}</button></form> : null}
+                      {slips.has(v.id) && <SlipActions s={slips.get(v.id)!} sm />}
                       <a href={`/api/ics/visit/${v.id}`} className="btn sm ghost" aria-label={t("ics")}><Download size={13} aria-hidden /></a>
                       {v.status === "planned" && v.agent_id === ctx.userId && (<>
                         <form action={visitStatusAction.bind(null, v.id, "done")}><input type="hidden" name="locale" value={locale} /><button className="btn sm">{t("markDone")}</button></form>
@@ -92,7 +95,14 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
             })}
           </div>
         )}
+        <div className="col" style={{ gap: 16 }}>
+        <section className="card"><h2><FileSignature size={15} aria-hidden />{t("slipsTitle")}<span className="cnt-b sp">{toSend.length}</span></h2>
+          {toSend.length === 0 ? <p className="note card-b">{t("slipsNone")}</p> : toSend.map((v) => (
+            <div key={v.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}><b className="trunc">{contactName(v, locale)}</b><small className="trunc">{dateTime(locale, v.starts_at)} · {v.title ?? v.street ?? v.reference}</small></div><SlipActions s={slips.get(v.id)!} sm /></div>))}
+          <div className="card-b"><Link href="/visit-slips" className="note" style={{ textDecoration: "underline" }}>{t("slipsAll")}</Link></div>
+        </section>
         <VisitForm properties={props.map((p) => ({ id: p.id, label: `${p.reference} · ${p.street ?? ""} ${cityName({ name_fr: p.city_fr, name_he: p.city_he, name_en: p.city_en }, locale)}` }))} contacts={contacts.map((c) => ({ id: c.id, label: contactName(c, locale) }))} />
+        </div>
       </div>
     </>
   );

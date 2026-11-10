@@ -3,12 +3,14 @@ import { useActionState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { CalendarPlus } from "lucide-react";
 import { createVisitAction, type VisitState } from "@/app/[locale]/(app)/agenda/actions";
+import { SlipActions } from "@/components/slip-actions";
 
 export function VisitForm({ properties, contacts }: { properties: { id: string; label: string }[]; contacts: { id: string; label: string }[] }) {
   const t = useTranslations("agenda");
   const locale = useLocale();
   const [state, action, pending] = useActionState<VisitState, FormData>(createVisitAction, null);
   return (
+    <>
     <form action={action} className="card"><h2><CalendarPlus size={15} aria-hidden />{t("newVisit")}</h2><div className="card-b col" style={{ gap: 10 }}>
       <input type="hidden" name="locale" value={locale} />
       <select name="property" required className="input" aria-label={t("property")}><option value="">{t("property")}</option>{properties.map((p) => <option key={p.id} value={p.id}>{p.label}</option>)}</select>
@@ -20,5 +22,7 @@ export function VisitForm({ properties, contacts }: { properties: { id: string; 
       {state?.ok && <div role="status" style={{ color: "var(--ok)" }}>{t("created")}</div>}
       <button className="btn pri" disabled={pending}>{t("plan")}</button>
     </div></form>
+    {state?.ok && state.slip?.url && <div className="card card-b col" role="status" style={{ gap: 8, marginBlockStart: 12, borderColor: "var(--accent)" }}><b style={{ fontWeight: 500 }}>{t("slipNow")}</b><SlipActions s={state.slip} sm /></div>}
+    </>
   );
 }

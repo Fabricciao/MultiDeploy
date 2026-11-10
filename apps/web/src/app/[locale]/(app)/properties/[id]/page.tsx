@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
+import { FileSignature, Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
 import { getPropertyInsights } from "@/lib/data/insights";
 import { CopyButton } from "@/components/copy-button";
 import { Link } from "@/i18n/navigation";
@@ -19,6 +19,8 @@ import { hasWhatsApp } from "@/lib/data/connections";
 import { PhotoGallery } from "@/components/photo-gallery";
 import { listMedia } from "@/lib/data/media";
 import { archivePropertyAction } from "../actions";
+import { SlipActions } from "@/components/slip-actions";
+import { listSlips, siteBase, slipInfo } from "@/lib/data/slips";
 
 export default async function PropertyPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: Promise<{ send?: string; tab?: string }> }) {
   const { locale, id } = await params; const sp = await searchParams;
@@ -56,7 +58,8 @@ export default async function PropertyPage({ params, searchParams }: { params: P
   const yes = (b: boolean | null) => (b ? tc("yes") : tc("no"));
   const tv = await getTranslations("propV2");
   const tab = ["overview", "clients", "activity", "owner"].includes(sp.tab ?? "") ? sp.tab! : "overview";
-  const ins = await getPropertyInsights(ctx, id);
+  const [ins, slipList, base] = await Promise.all([getPropertyInsights(ctx, id), listSlips(ctx, { propertyId: id, state: "all", limit: 8 }), siteBase()]);
+  const fee = p.commission_pct != null ? Number(p.commission_pct) : m?.co_broke || m?.origin === "partner" ? 0 : 2;
   const tabHref = (k: string) => `/properties/${id}${k === "overview" ? "" : `?tab=${k}`}`;
   const sharedTo = new Map(ins.shared.map((s) => [s.contact_id as string, s]));
   const quality = [
@@ -77,7 +80,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
     sent: ins.k.sent, opened: ins.k.opened, visits: ins.k.visits, offers: ins.k.offers, agent: ctx.fullName, agency: pickName(ctx.orgName, ownerLocale) }) : "";
   const ownerPhone = owner?.phones?.[0]?.e164 as string | undefined;
   const tlIcon = (k: string) => ({ visit: <CalendarCheck size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, deal: <Handshake size={14} aria-hidden />, note: <StickyNote size={14} aria-hidden />, stage_change: <ArrowRightLeft size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <ArrowRightLeft size={14} aria-hidden />;
-  const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
+  const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "visit_slip_sent" ? tv("tl.slipSent", { name: n }) : r.kind === "visit_signed" ? tv("tl.signed", { name: n }) : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
 
   return (
     <>
@@ -111,6 +114,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
               {spec(t("mandateLabel"), m?.type === "exclusive" ? `${t("mandate.exclusive")}${m.end ? ` · ${relDays(locale, m.end)}` : ""}` : t("mandate.non_exclusive"))}
               {spec(t("form.origin"), m?.origin === "partner" ? `${t("origin.partner")}${m.partner ? ` · ${m.partner}` : ""}` : t("origin.own"))}
               {spec(t("form.coBrokeShort"), yes(!!m?.co_broke))}
+              {spec(t("form.commission"), <span className="tab">{num(locale, fee, 1)} %{p.commission_pct == null && <span className="note"> · {t("form.commissionAutoShort")}</span>}</span>)}
             </div></div></div>
 
             <div className="card"><h2>{tv("perf.title")}<small>{tv("perf.sub")}</small></h2><div className="card-b col" style={{ gap: 10 }}>
@@ -122,6 +126,11 @@ export default async function PropertyPage({ params, searchParams }: { params: P
               </div>
               <p className="note">{tv("perf.total", { sent: ins.k.sent_all, visits: ins.k.visits_all })}</p>
             </div></div>
+
+            <div className="card" id="slips"><h2><FileSignature size={15} aria-hidden />{tv("slips.title")}<span className="badge">{slipList.counts.signed} / {slipList.counts.signed + slipList.counts.pending}</span><span className="sp" /><Link href="/visit-slips" className="note">{tv("slips.all")}</Link></h2>
+              {slipList.rows.length === 0 ? <p className="muted card-b">{tv("slips.empty")}</p> : slipList.rows.map((r) => (
+                <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}>{r.contact_id ? <Link href={`/clients/${r.contact_id}`} style={{ fontWeight: 500 }}>{contactName(r, locale)}</Link> : "—"}<small>{dateTime(locale, r.starts_at)}{r.agent_name ? ` · ${r.agent_name}` : ""}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
+            </div>
 
             <div className="card"><h2>{t("form.description")}</h2><div className="card-b col" style={{ gap: 10 }}>
               {desc ? <p style={{ maxWidth: "68ch", lineHeight: 1.7 }}>{desc}</p> : <p className="muted">{t("noDescription")}</p>}
@@ -162,7 +171,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
             <div><div className="note">{t("askingPrice")}</div><div className="t-price tab">{money(locale, p.price, p.currency)}</div>
               {sqm && <div className="note tab">{money(locale, sqm, p.currency)} / {t("sqm")}</div>}</div>
             {ins.median && sqm && <div className="row" style={{ fontSize: 12.5 }}><span className="muted grow">{tv("median", { n: ins.medianN })}</span><b className="tab">{money(locale, ins.median)} / {t("sqm")}</b></div>}
-            {p.price && <div className="row" style={{ fontSize: 12.5 }}><span className="muted grow">{tv("fee")}</span><b className="tab">{money(locale, Number(p.price) * 0.02 * 1.18)}</b></div>}
+            {p.price && <div className="row" style={{ fontSize: 12.5 }}><span className="muted grow">{tv("fee", { pct: num(locale, fee, 1) })}</span><b className="tab">{money(locale, Number(p.price) * fee / 100 * 1.18)}</b></div>}
             <hr className="sw" />
             <div className="row">{p.agent_name && <Avatar text={initials(p.agent_name)} />}<div className="grow"><div style={{ fontWeight: 500 }}>{p.agent_name ?? "—"}</div><div className="note">{t("agent")}</div></div></div>
           </div></div>

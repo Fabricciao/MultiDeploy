@@ -27,7 +27,7 @@ export async function getReports(ctx: Ctx, o: { days: number; agent?: string | n
       where ${all ? tx`true` : tx`u.id = ${ctx.userId}`} order by 7 desc, 3 desc, 2`;
     const age = await tx`select width_bucket(extract(day from now() - p.published_at), array[15, 30, 60, 90])::int as b, count(*)::int as n from public.properties p where p.status = 'active' and p.deleted_at is null and p.published_at is not null ${pW} group by 1 order by 1`;
     const [k] = await tx`select
-        (select coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0), 0) from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null and d.closed_at > ${since} ${dW})::float as commissions,
+        (select coalesce(sum(d.value * public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id) / 100.0), 0) from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null and d.closed_at > ${since} ${dW})::float as commissions,
         (select count(*) from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null and d.closed_at > ${since} ${dW})::int as won,
         (select count(*) from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind in ('won','lost') and d.deleted_at is null and d.closed_at > ${since} ${dW})::int as closed,
         (select avg(extract(day from now() - p.published_at)) from public.properties p where p.status = 'active' and p.deleted_at is null and p.published_at is not null ${pW})::float as avg_age,
@@ -38,14 +38,14 @@ export async function getReports(ctx: Ctx, o: { days: number; agent?: string | n
       where p.deleted_at is null and p.status in ('active','under_offer') and p.mandate->>'type' = 'exclusive' and (p.mandate->>'end')::date between current_date and current_date + 45 ${pW}
       order by (p.mandate->>'end')::date limit 6`;
     const monthly = (await tx`
-      select to_char(m, 'YYYY-MM') as k, coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0), 0)::float as v, count(d.id)::int as n
+      select to_char(m, 'YYYY-MM') as k, coalesce(sum(d.value * public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id) / 100.0), 0)::float as v, count(d.id)::int as n
       from generate_series(date_trunc('month', now()) - interval '11 months', date_trunc('month', now()), interval '1 month') m
       left join (select d.* from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null ${dW}) d on date_trunc('month', d.closed_at) = m
       group by m order by m`) as unknown as { k: string; v: number; n: number }[];
     const sourceRoi = (await tx`
       select coalesce(ls.name, '{"fr":"—","he":"—","en":"—"}'::jsonb) as name, count(distinct c.id)::int as leads,
         count(distinct d.id) filter (where s.kind = 'won')::int as won,
-        coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0) filter (where s.kind = 'won'), 0)::float as fees
+        coalesce(sum(d.value * public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id) / 100.0) filter (where s.kind = 'won'), 0)::float as fees
       from public.contacts c left join public.lead_sources ls on ls.id = c.source_id
       left join public.deals d on d.contact_id = c.id and d.deleted_at is null left join public.pipeline_stages s on s.id = d.stage_id
       where c.deleted_at is null and c.created_at > ${since} ${cW} group by 1 order by 2 desc limit 8`) as unknown as { name: Record<string, string>; leads: number; won: number; fees: number }[];

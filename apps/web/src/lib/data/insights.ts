@@ -52,7 +52,7 @@ export async function getContactInsights(ctx: Ctx, id: string) {
         (select max(v.starts_at) from public.visits v where v.contact_id = ${id} and v.starts_at <= now())) as last,
       (select max(s.opened_at) from public.shares s where s.contact_id = ${id}) as opened`;
     const [deal] = await tx`select d.id, d.value, d.currency, st.name as stage, st.position, (select count(*) from public.pipeline_stages x where x.kind = 'open')::int as total,
-        (select count(*) from public.pipeline_stages x where x.kind = 'open' and x.position <= st.position)::int as idx, extract(day from now() - d.updated_at)::int as days, d.commission_pct
+        (select count(*) from public.pipeline_stages x where x.kind = 'open' and x.position <= st.position)::int as idx, extract(day from now() - d.updated_at)::int as days, public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id)::float as fee_pct
       from public.deals d join public.pipeline_stages st on st.id = d.stage_id where d.contact_id = ${id} and d.deleted_at is null and st.kind = 'open' order by d.updated_at desc limit 1`;
     return { selection: selection.sort((a, b) => new Date(b.sent_at).getTime() - new Date(a.sent_at).getTime()).slice(0, 6), visits, last: (heat?.last as Date | null) ?? null, opened: (heat?.opened as Date | null) ?? null, deal: (deal as Row | undefined) ?? null };
   });

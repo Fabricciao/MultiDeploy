@@ -75,7 +75,7 @@ export type PropertyInput = {
   price: number | null; currency: string; rooms: number | null; area_built: number | null; floor: number | null; floors_total: number | null;
   mamad: boolean; parking_count: number; elevator: boolean; sukkah_balcony: boolean; storage: boolean; ac: boolean;
   arnona_monthly: number | null; vaad_bayit_monthly: number | null; registration_type: string | null;
-  mandate_type: "exclusive" | "non_exclusive"; mandate_end: string | null; mandate_origin: "own" | "partner"; mandate_partner: string | null; mandate_co_broke: boolean; internal_notes: string | null;
+  mandate_type: "exclusive" | "non_exclusive"; mandate_end: string | null; mandate_origin: "own" | "partner"; mandate_partner: string | null; mandate_co_broke: boolean; commission_pct: number | null; internal_notes: string | null;
   titles: Record<string, string>; descriptions: Record<string, string>; agent_id?: string | null;
 };
 
@@ -94,9 +94,9 @@ export async function createProperty(ctx: Ctx, i: PropertyInput, locale: string)
     const mandate = buildMandate(i);
     const [row] = await tx`
       insert into public.properties (organization_id, transaction, property_type, status, agent_id, city_id, street, house_number, address_visibility, price, currency, rooms, area_built, floor, floors_total,
-        mamad, parking_count, elevator, sukkah_balcony, storage, ac, arnona_monthly, vaad_bayit_monthly, registration_type, mandate, internal_notes, published_at, public_token)
+        mamad, parking_count, elevator, sukkah_balcony, storage, ac, arnona_monthly, vaad_bayit_monthly, registration_type, mandate, commission_pct, internal_notes, published_at, public_token)
       values (${ctx.orgId}, ${i.transaction}, ${i.property_type}, ${i.status}, ${i.agent_id ?? ctx.userId}, ${i.city_id}, ${i.street}, ${i.house_number}, ${i.address_visibility}, ${i.price}, ${i.currency}, ${i.rooms}, ${i.area_built}, ${i.floor}, ${i.floors_total},
-        ${i.mamad}, ${i.parking_count}, ${i.elevator}, ${i.sukkah_balcony}, ${i.storage}, ${i.ac}, ${i.arnona_monthly}, ${i.vaad_bayit_monthly}, ${i.registration_type}, ${tx.json(mandate)}, ${i.internal_notes},
+        ${i.mamad}, ${i.parking_count}, ${i.elevator}, ${i.sukkah_balcony}, ${i.storage}, ${i.ac}, ${i.arnona_monthly}, ${i.vaad_bayit_monthly}, ${i.registration_type}, ${tx.json(mandate)}, ${i.commission_pct}, ${i.internal_notes},
         ${i.status === "active" ? tx`now()` : null}, encode(extensions.gen_random_bytes(12), 'hex'))
       returning id`;
     await saveTranslations(tx, ctx.orgId, row!.id, locale, i);
@@ -111,7 +111,7 @@ export async function updateProperty(ctx: Ctx, id: string, i: PropertyInput, loc
       update public.properties set transaction = ${i.transaction}, property_type = ${i.property_type}, status = ${i.status}, city_id = ${i.city_id}, street = ${i.street}, house_number = ${i.house_number},
         address_visibility = ${i.address_visibility}, price = ${i.price}, currency = ${i.currency}, rooms = ${i.rooms}, area_built = ${i.area_built}, floor = ${i.floor}, floors_total = ${i.floors_total},
         mamad = ${i.mamad}, parking_count = ${i.parking_count}, elevator = ${i.elevator}, sukkah_balcony = ${i.sukkah_balcony}, storage = ${i.storage}, ac = ${i.ac},
-        arnona_monthly = ${i.arnona_monthly}, vaad_bayit_monthly = ${i.vaad_bayit_monthly}, registration_type = ${i.registration_type}, mandate = ${tx.json(mandate)}, internal_notes = ${i.internal_notes},
+        arnona_monthly = ${i.arnona_monthly}, vaad_bayit_monthly = ${i.vaad_bayit_monthly}, registration_type = ${i.registration_type}, mandate = ${tx.json(mandate)}, commission_pct = ${i.commission_pct}, internal_notes = ${i.internal_notes},
         published_at = coalesce(published_at, ${i.status === "active" ? tx`now()` : null})
       where id = ${id} returning id`;
     if (!rows.length) return false; // RLS : bien d'un autre agent sans droit write_all, ou inexistant

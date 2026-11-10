@@ -15,7 +15,7 @@ export async function getCockpit(ctx: Ctx, mine: boolean) {
     const cOwn = own ? tx`and c.owner_id = ${ctx.userId}` : tx``;
     // Commissions encaissées (affaires conclues) par mois, sur 6 mois, mois courant inclus.
     const months = (await tx`
-      select to_char(m, 'YYYY-MM') as k, coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0), 0)::float as v
+      select to_char(m, 'YYYY-MM') as k, coalesce(sum(d.value * public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id) / 100.0), 0)::float as v
       from generate_series(date_trunc('month', now()) - interval '5 months', date_trunc('month', now()), interval '1 month') m
       left join (select d.* from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null ${dOwn}) d on date_trunc('month', d.closed_at) = m
       group by m order by m`) as unknown as { k: string; v: number }[];
@@ -25,7 +25,7 @@ export async function getCockpit(ctx: Ctx, mine: boolean) {
       left join public.contacts c on c.deleted_at is null and c.created_at::date = g::date ${cOwn} group by g order by g`) as unknown as { v: number }[];
     const [prev] = await tx`select count(*)::int as n from public.contacts c where c.deleted_at is null and c.created_at >= current_date - 13 and c.created_at < current_date - 6 ${cOwn}`;
     const stages = (await tx`select s.id, s.name, s.position, s.probability, count(d.id)::int as n, coalesce(sum(d.value), 0)::float as value,
-        coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0), 0)::float as fee
+        coalesce(sum(d.value * public.deal_fee_pct(d.commission_pct, d.property_id, d.contact_id) / 100.0), 0)::float as fee
       from public.pipeline_stages s left join public.deals d on d.stage_id = s.id and d.deleted_at is null ${dOwn}
       where s.kind = 'open' group by s.id order by s.position`) as unknown as Row[];
 

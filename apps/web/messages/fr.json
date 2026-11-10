@@ -60,7 +60,8 @@
     "import": "Import",
     "tasks": "Tâches",
     "signOut": "Se déconnecter",
-    "automations": "Automatisations"
+    "automations": "Automatisations",
+    "visit-slips": "Bons de visite"
   },
   "today": {
     "title": "Aujourd'hui",
@@ -322,7 +323,8 @@
       "noNext": "Aucune tâche prévue sur cette affaire.",
       "moveTo": "Passer à « {stage} »",
       "markLost": "Perdue",
-      "call": "Appeler"
+      "call": "Appeler",
+      "feeSplit": "Bien {seller} % + client {buyer} %"
     }
   },
   "public": {
@@ -435,7 +437,11 @@
       "partnerPlaceholder": "Nom de l'agence partenaire",
       "coBroke": "Ouvert au shitouf peoula (co-courtage avec d'autres agences)",
       "coBrokeHint": "Les autres agences peuvent le proposer à leurs clients, commission partagée.",
-      "coBrokeShort": "Shitouf peoula"
+      "coBrokeShort": "Shitouf peoula",
+      "commission": "Commission côté bien (%)",
+      "commissionHint": "Laisser vide : 2 % si le bien est à l'agence ou en exclusivité, 0 % en shitouf.",
+      "commissionAuto": "Automatique",
+      "commissionAutoShort": "auto"
     },
     "title": "Biens",
     "count": "{count, plural, one {# bien} other {# biens}}",
@@ -532,7 +538,9 @@
       "unsubscribed": "Désinscrit des envois",
       "share": "Sélection envoyée ({channel})",
       "stage_change": "Affaire déplacée d'étape",
-      "visit_planned": "Visite planifiée"
+      "visit_planned": "Visite planifiée",
+      "slipSent": "Bon de visite envoyé par {channel}",
+      "visitSigned": "Bon de visite signé"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -594,7 +602,15 @@
       "mustHave": "Indispensable",
       "notes": "Notes",
       "optIn": "Le client a accepté de recevoir des sélections de biens (e-mail)",
-      "optInHint": "Sans consentement, l'envoi par e-mail est bloqué. Il est enregistré avec la date."
+      "optInHint": "Sans consentement, l'envoi par e-mail est bloqué. Il est enregistré avec la date.",
+      "commissionTitle": "Commission",
+      "commission": "Commission côté client (%)",
+      "commissionHint": "Laisser vide : 2 %, ou 0 % si le client vient d'un autre agent en shitouf.",
+      "commissionAuto": "Automatique",
+      "commissionAutoShort": "auto",
+      "coBroke": "Client apporté par un autre agent (shitouf)",
+      "coBrokeHint": "La commission côté client passe alors à 0 % par défaut.",
+      "coBrokeShort": "Shitouf"
     },
     "privacy": {
       "title": "Données personnelles",
@@ -1168,7 +1184,11 @@
     "signHint": "Le visiteur signe sur son téléphone ; un PDF horodaté est archivé sur la visite.",
     "subline": "{n, plural, =0 {Aucune visite} one {# visite} other {# visites}} cette semaine",
     "viewWeek": "Semaine",
-    "viewList": "Liste"
+    "viewList": "Liste",
+    "slipsTitle": "Bons de visite à envoyer",
+    "slipsNone": "Tous les bons de visite de la semaine sont envoyés ou signés.",
+    "slipsAll": "Voir tous les bons de visite",
+    "slipNow": "Visite programmée. Envoyez le bon de visite au client :"
   },
   "import": {
     "title": "Importer des données",
@@ -1479,7 +1499,7 @@
       "fix": "Compléter"
     },
     "median": "Médiane de vos biens comparables ({n})",
-    "fee": "Commission estimée (2 % + TVA)",
+    "fee": "Commission estimée ({pct} % + TVA)",
     "nextVisit": "Prochaine visite",
     "public": "Fiche publique",
     "tl": {
@@ -1495,7 +1515,9 @@
       "deal": "Affaire ouverte avec {name}",
       "status": "Statut modifié",
       "note": "Note",
-      "other": "Activité"
+      "other": "Activité",
+      "slipSent": "Bon de visite envoyé à {name}",
+      "signed": "{name} a signé le bon de visite"
     },
     "owner": {
       "title": "Propriétaire",
@@ -1510,6 +1532,11 @@
       "wa": "Envoyer par WhatsApp",
       "hint": "Le message s'ouvre dans WhatsApp : rien ne part sans votre clic.",
       "body": "Bonjour {name},\n\nVoici le point sur votre bien, {place}, pour les 30 derniers jours :\n• {sent} envois à des clients acheteurs\n• {opened} ouvertures de ces envois\n• {visits} visites\n• {offers} client(s) au stade de l'offre ou plus\n\nJe reste disponible pour en parler.\n{agent} · {agency}"
+    },
+    "slips": {
+      "title": "Bons de visite",
+      "all": "Tout voir",
+      "empty": "Aucune visite avec un client sur ce bien."
     }
   },
   "clientV2": {
@@ -1552,6 +1579,10 @@
       "open": "Ouvrir",
       "step": "Étape {i} sur {n}",
       "since": "Sans mouvement depuis {days} j · commission estimée {fee}"
+    },
+    "slips": {
+      "title": "Bons de visite",
+      "empty": "Aucune visite programmée pour ce client."
     }
   },
   "automations": {
@@ -1590,5 +1621,43 @@
         "then": "Une tâche de relance pour l'agent, au plus tous les 7 jours."
       }
     }
+  },
+  "slips": {
+    "title": "Bons de visite",
+    "sub": "{signed} signés · {pending} à faire signer",
+    "tabs": {
+      "signed": "Signés",
+      "pending": "À faire signer",
+      "all": "Tous"
+    },
+    "search": "Rechercher un bien ou un client",
+    "empty": "Aucun bon de visite signé pour l'instant.",
+    "emptyPending": "Aucun bon de visite en attente de signature.",
+    "how": "Programmez une visite avec un client : le bon de visite s'envoie en un clic par WhatsApp ou par e-mail, et le PDF signé est rangé ici.",
+    "col": {
+      "visit": "Visite",
+      "property": "Bien",
+      "client": "Client",
+      "agent": "Agent",
+      "slip": "Bon de visite"
+    },
+    "signer": "Signé par {name}",
+    "prev": "Précédent",
+    "next": "Suivant",
+    "signedOn": "Signé le {date}",
+    "signed": "Signé",
+    "pdf": "PDF signé",
+    "noContact": "Aucun client sur cette visite",
+    "pending": "À signer",
+    "whatsapp": "WhatsApp",
+    "noPhone": "Pas de téléphone",
+    "email": "E-mail",
+    "emailSent": "Envoyé",
+    "sending": "Envoi…",
+    "copied": "Copié",
+    "copy": "Copier le lien",
+    "emailFailed": "L'e-mail n'est pas parti. Réessayez ou utilisez WhatsApp.",
+    "noEmail": "Ce client n'a pas d'e-mail.",
+    "sentOn": "Envoyé le {date}"
   }
 }
