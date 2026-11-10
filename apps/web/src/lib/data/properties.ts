@@ -111,7 +111,7 @@ export async function updateProperty(ctx: Ctx, id: string, i: PropertyInput, loc
       update public.properties set transaction = ${i.transaction}, property_type = ${i.property_type}, status = ${i.status}, city_id = ${i.city_id}, street = ${i.street}, house_number = ${i.house_number},
         address_visibility = ${i.address_visibility}, price = ${i.price}, currency = ${i.currency}, rooms = ${i.rooms}, area_built = ${i.area_built}, floor = ${i.floor}, floors_total = ${i.floors_total},
         mamad = ${i.mamad}, parking_count = ${i.parking_count}, elevator = ${i.elevator}, sukkah_balcony = ${i.sukkah_balcony}, storage = ${i.storage}, ac = ${i.ac},
-        arnona_monthly = ${i.arnona_monthly}, vaad_bayit_monthly = ${i.vaad_bayit_monthly}, registration_type = ${i.registration_type}, mandate = ${tx.json(mandate)}, commission_pct = ${i.commission_pct}, internal_notes = ${i.internal_notes},
+        arnona_monthly = ${i.arnona_monthly}, vaad_bayit_monthly = ${i.vaad_bayit_monthly}, registration_type = ${i.registration_type}, mandate = ${tx.json(mandate)}::jsonb || jsonb_strip_nulls(jsonb_build_object('signed', mandate->'signed', 'mandate_id', mandate->'mandate_id', 'start', mandate->'start')), commission_pct = ${i.commission_pct}, internal_notes = ${i.internal_notes},
         published_at = coalesce(published_at, ${i.status === "active" ? tx`now()` : null})
       where id = ${id} returning id`;
     if (!rows.length) return false; // RLS : bien d'un autre agent sans droit write_all, ou inexistant

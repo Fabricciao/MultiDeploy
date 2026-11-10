@@ -34,6 +34,20 @@ export async function loadSignInfo(token: string, locale: string): Promise<SignI
 export type SignResult = { ok: true; documentKey: string } | { ok: false; error: "invalid_token" | "already_signed" | "invalid_signature" | "invalid_name" | "no_consent" };
 const PNG_URL = /^data:image\/png;base64,([A-Za-z0-9+/=]+)$/;
 
+/** Signature dessinée : PNG valide, taille raisonnable, et pas vide (au moins quelques pixels opaques). */
+export async function checkSignaturePng(dataUrl: string): Promise<Buffer | null> {
+  const m = PNG_URL.exec(dataUrl); if (!m || m[1]!.length > 400_000) return null;
+  try {
+    const raw = Buffer.from(m[1]!, "base64");
+    const meta = await sharp(raw).metadata();
+    if (meta.format !== "png" || !meta.width || !meta.height || meta.width > 2000 || meta.height > 1000) return null;
+    const { data } = await sharp(raw).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
+    let ink = 0; for (let k = 3; k < data.length; k += 4) if (data[k]! > 20) ink++;
+    if (ink < 80) return null;
+    return await sharp(raw).png().toBuffer();
+  } catch { return null; }
+}
+
 export async function submitSignature(token: string, locale: Loc, i: { name: string; dataUrl: string; consent: boolean; ip: string }): Promise<SignResult> {
   const info = await loadSignInfo(token, locale);
   if (!info) return { ok: false, error: "invalid_token" };
@@ -41,18 +55,8 @@ export async function submitSignature(token: string, locale: Loc, i: { name: str
   const name = i.name.trim().replace(/\s+/g, " ");
   if (name.length < 2 || name.length > 80) return { ok: false, error: "invalid_name" };
   if (!i.consent) return { ok: false, error: "no_consent" };
-  const m = PNG_URL.exec(i.dataUrl); if (!m || m[1]!.length > 400_000) return { ok: false, error: "invalid_signature" };
-  let png: Buffer;
-  try {
-    const raw = Buffer.from(m[1]!, "base64");
-    const meta = await sharp(raw).metadata();
-    if (meta.format !== "png" || !meta.width || !meta.height || meta.width > 2000 || meta.height > 1000) return { ok: false, error: "invalid_signature" };
-    // Signature vide (canvas intact) refusée : il faut au moins quelques pixels opaques.
-    const { data } = await sharp(raw).ensureAlpha().raw().toBuffer({ resolveWithObject: true });
-    let ink = 0; for (let k = 3; k < data.length; k += 4) if (data[k]! > 20) ink++;
-    if (ink < 80) return { ok: false, error: "invalid_signature" };
-    png = await sharp(raw).png().toBuffer();
-  } catch { return { ok: false, error: "invalid_signature" }; }
+  const png = await checkSignaturePng(i.dataUrl);
+  if (!png) return { ok: false, error: "invalid_signature" };
 
   const signedAt = new Date();
   const fingerprint = createHash("sha256").update(png).update(`|${info.visitId}|${name}|${signedAt.toISOString()}`).digest("hex");

@@ -39,7 +39,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
     sub: `${cityName({ name_fr: m.city_fr, name_he: m.city_he, name_en: m.city_en }, locale)} · ${money(locale, m.price, m.currency)} · ${num(locale, m.rooms)} ${tp("rooms").toLowerCase()}`,
     warn: (m.reasons as { code: string; pct?: number }[]).find((r) => r.code === "over_budget") ? tp("match.overBudget", { pct: (m.reasons as { code: string; pct?: number }[]).find((r) => r.code === "over_budget")!.pct ?? 0 }) : undefined,
   }));
-  const actLabel = (a: Record<string, any>) => (a.kind === "note" ? a.summary : a.kind === "share" ? t("activity.share", { channel: a.summary }) : a.kind === "stage_change" ? t("activity.stage_change") : a.kind === "visit_slip_sent" ? t("activity.slipSent", { channel: a.summary === "email" ? "e-mail" : "WhatsApp" }) : a.kind === "visit_signed" ? t("activity.visitSigned") : t(`activity.${a.summary}`));
+  const actLabel = (a: Record<string, any>) => (a.kind === "note" ? a.summary : a.kind === "share" ? t("activity.share", { channel: a.summary }) : a.kind === "stage_change" ? t("activity.stage_change") : a.kind === "visit_slip_sent" ? t("activity.slipSent", { channel: a.summary === "email" ? "e-mail" : "WhatsApp" }) : a.kind === "visit_signed" ? t("activity.visitSigned") : a.kind === "mandate_signed" ? t("activity.mandateSigned") : a.kind === "mandate_sent" ? t("activity.mandateSent") : a.kind === "mandate_created" ? t("activity.mandateCreated") : a.kind === "visit_feedback" ? t(`activity.feedback.${["offer", "yes", "no"].includes(a.summary) ? a.summary : "yes"}`) : t(`activity.${a.summary}`));
   const kv = (k: string, v: React.ReactNode) => <div><div className="k">{k}</div><div className="v">{v}</div></div>;
 
   const criteria = (
@@ -105,7 +105,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
         </div></div>
         <div className="card" id="slips"><h2><FileSignature size={15} aria-hidden />{tv("slips.title")}<span className="badge">{slipList.counts.signed} / {slipList.counts.signed + slipList.counts.pending}</span></h2>
           {slipList.rows.length === 0 ? <p className="muted card-b">{tv("slips.empty")}</p> : slipList.rows.map((r) => (
-            <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}><Link href={`/properties/${r.property_id}`} style={{ fontWeight: 500 }} className="trunc">{r.title ?? r.street ?? r.reference}</Link><small>{dateTime(locale, r.starts_at)}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
+            <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 160 }}><Link href={`/properties/${r.property_id}`} style={{ fontWeight: 500 }} className="trunc">{r.title ?? r.street ?? r.reference}</Link><small>{dateTime(locale, r.starts_at)}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
         </div>
         {ctx.caps.has("contacts.write") && (
           <div className="card"><h2>{t("privacy.title")}</h2><div className="card-b col" style={{ gap: 10 }}>

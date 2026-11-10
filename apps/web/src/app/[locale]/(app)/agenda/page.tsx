@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { CalendarDays, FileSignature, ChevronLeft, ChevronRight, Download, List, MapPin } from "lucide-react";
+import { CalendarDays, ClipboardCheck, FileSignature, ChevronLeft, ChevronRight, Download, List, MapPin } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx, db } from "@/lib/session";
 import { listVisits } from "@/lib/data/visits";
@@ -12,6 +12,8 @@ import { Badge, PageHeader } from "@/components/ui";
 import { VisitForm } from "@/components/visit-form";
 import { SlipActions } from "@/components/slip-actions";
 import { slipMap } from "@/lib/data/slips";
+import { pendingDebriefs } from "@/lib/data/visits";
+import { VisitDebrief } from "@/components/visit-debrief";
 import { visitStatusAction } from "./actions";
 
 const HOURS = Array.from({ length: 12 }, (_, i) => i + 8); // 08:00 → 19:00
@@ -32,6 +34,7 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
   ]);
   const slips = await slipMap(ctx, visits.filter((v) => v.contact_id && v.status !== "cancelled").map((v) => v.id));
   const toSend = visits.filter((v) => slips.get(v.id)?.url);
+  const debriefs = await pendingDebriefs(ctx);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
   const fmtDay = new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" });
   const fmtHead = new Intl.DateTimeFormat(intlLocale(locale), { timeZone: "Asia/Jerusalem", weekday: "short" });
@@ -96,6 +99,9 @@ export default async function AgendaPage({ params, searchParams }: { params: Pro
           </div>
         )}
         <div className="col" style={{ gap: 16 }}>
+        {debriefs.length > 0 && <section className="card"><h2><ClipboardCheck size={15} aria-hidden />{t("debriefTitle")}<span className="cnt-b sp">{debriefs.length}</span></h2>
+          {debriefs.map((v) => <div key={v.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}><b className="trunc">{contactName(v, locale)}</b><small className="trunc">{dateTime(locale, v.starts_at)} · {v.street ?? v.reference}</small></div><VisitDebrief visitId={v.id} name={contactName(v, locale)} /></div>)}
+        </section>}
         <section className="card"><h2><FileSignature size={15} aria-hidden />{t("slipsTitle")}<span className="cnt-b sp">{toSend.length}</span></h2>
           {toSend.length === 0 ? <p className="note card-b">{t("slipsNone")}</p> : toSend.map((v) => (
             <div key={v.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}><b className="trunc">{contactName(v, locale)}</b><small className="trunc">{dateTime(locale, v.starts_at)} · {v.title ?? v.street ?? v.reference}</small></div><SlipActions s={slips.get(v.id)!} sm /></div>))}

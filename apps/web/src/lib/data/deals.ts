@@ -48,7 +48,7 @@ export async function createDeal(ctx: Ctx, contactId: string, propertyId: string
 }
 
 /** Étape « Visites » de l'agence (nom par défaut, sinon la 3e étape ouverte). */
-async function visitStage(tx: any): Promise<{ id: string; position: number } | undefined> {
+export async function visitStage(tx: any): Promise<{ id: string; position: number } | undefined> {
   const [named] = await tx`select id, position from public.pipeline_stages where kind = 'open' and (name->>'fr' = 'Visites' or name->>'en' = 'Viewings') limit 1`;
   if (named) return named as { id: string; position: number };
   const [third] = await tx`select id, position from public.pipeline_stages where kind = 'open' order by position offset 2 limit 1`;

@@ -135,7 +135,8 @@
       "deal": "Follow up with {name} ({stage})",
       "dealSub": "No movement for {days} days · {value}",
       "cold": "Revive the listing {place}",
-      "coldSub": "Online for {days} days, no viewing"
+      "coldSub": "Online for {days} days, no viewing",
+      "debrief": "Viewing debrief: {name}"
     },
     "day": {
       "title": "Your day",
@@ -540,7 +541,15 @@
       "stage_change": "Deal moved to another stage",
       "visit_planned": "Viewing scheduled",
       "slipSent": "Viewing form sent by {channel}",
-      "visitSigned": "Viewing form signed"
+      "visitSigned": "Viewing form signed",
+      "feedback": {
+        "offer": "After the viewing: wants to make an offer",
+        "yes": "After the viewing: interested",
+        "no": "After the viewing: not interested"
+      },
+      "mandateSigned": "Exclusive agreement signed",
+      "mandateSent": "Exclusive agreement sent",
+      "mandateCreated": "Exclusive agreement prepared"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -1188,7 +1197,8 @@
     "slipsTitle": "Viewing forms to send",
     "slipsNone": "All of this week's viewing forms are sent or signed.",
     "slipsAll": "See all viewing forms",
-    "slipNow": "Viewing scheduled. Send the viewing form to the client:"
+    "slipNow": "Viewing scheduled. Send the viewing form to the client:",
+    "debriefTitle": "Debriefs to do"
   },
   "import": {
     "title": "Import data",
@@ -1517,7 +1527,11 @@
       "note": "Note",
       "other": "Activity",
       "slipSent": "Viewing form sent to {name}",
-      "signed": "{name} signed the viewing form"
+      "signed": "{name} signed the viewing form",
+      "feedback": "Debrief of {name}'s viewing",
+      "mandateSigned": "Exclusive agreement signed",
+      "mandateSent": "Agreement sent to the owner",
+      "mandateCreated": "Exclusive agreement prepared"
     },
     "owner": {
       "title": "Owner",
@@ -1537,6 +1551,29 @@
       "title": "Viewing forms",
       "all": "See all",
       "empty": "No viewing with a client on this property."
+    },
+    "fb": {
+      "title": "Visitor feedback",
+      "count": "{n, plural, one {# debrief} other {# debriefs}}",
+      "empty": "No viewing debrief yet.",
+      "i": {
+        "offer": "Wants to make an offer",
+        "yes": "Interested",
+        "no": "Not interested"
+      }
+    },
+    "mandate": {
+      "title": "Exclusive agreement",
+      "sub": "for the owner to sign online",
+      "sentOn": "sent on {d}",
+      "signedOn": "Signed on {d}",
+      "pdf": "Signed PDF",
+      "pending": "awaiting signature",
+      "cancel": "Cancel",
+      "new": "Prepare an agreement",
+      "none": "No agreement for this property.",
+      "signedShort": "signed agreement",
+      "toSign": "get the agreement signed"
     }
   },
   "clientV2": {
@@ -1659,5 +1696,81 @@
     "emailFailed": "The email did not go out. Try again or use WhatsApp.",
     "noEmail": "This client has no email.",
     "sentOn": "Sent on {date}"
+  },
+  "debrief": {
+    "open": "Debrief",
+    "rating": "Rating",
+    "interest": "Interest",
+    "i": {
+      "offer": "Wants to make an offer",
+      "yes": "Interested",
+      "no": "Not interested"
+    },
+    "note": "What they said (optional)",
+    "record": "Voice memo",
+    "again": "Record again",
+    "stop": "Stop",
+    "micDenied": "Microphone blocked by the browser.",
+    "close": "Close",
+    "saving": "Saving…",
+    "save": "Save",
+    "saved": "Debrief saved",
+    "savedMoved": "Saved · deal moved forward",
+    "errors": {
+      "audio": "Voice memo too long or format not supported.",
+      "generic": "Could not save. Pick a rating and an interest."
+    },
+    "task": {
+      "followUp": "Follow up with {name} after the viewing",
+      "otherProps": "Suggest other properties to {name}"
+    }
+  },
+  "mandate": {
+    "owner": "Owner",
+    "otherOwner": "Someone else…",
+    "ownerName": "Signatory's name",
+    "license": "Broker license no.",
+    "from": "Start",
+    "to": "End",
+    "price": "Asking price",
+    "commission": "Fee (%) excl. VAT",
+    "actions": "Marketing actions",
+    "a": {
+      "sign": "Sign on the property",
+      "internet": "Property websites (Yad2, Madlan…)",
+      "social": "Social media and agency website",
+      "newspaper": "Newspaper ad",
+      "open_house": "Open house",
+      "brokers": "Partner agencies (co-brokerage)",
+      "database": "Agency buyer database"
+    },
+    "actionsHint": "The law requires at least two marketing actions.",
+    "errors": {
+      "forbidden": "You cannot create an agreement on this property.",
+      "invalid": "Check the signatory's name and the fee.",
+      "dates": "Check the start and end dates.",
+      "too_long": "For a home, exclusivity cannot exceed 6 months.",
+      "actions": "Tick at least two marketing actions."
+    },
+    "created": "Agreement ready: send it to the owner above.",
+    "create": "Prepare the agreement",
+    "creating": "Preparing…",
+    "legal": "Template to be checked by your lawyer."
+  },
+  "mandateSign": {
+    "thanksSub": "The signed agreement has been sent to {org}.",
+    "consent": "I have read and accept this agreement. I acknowledge that my electronic signature is equivalent to a handwritten one.",
+    "submit": "Sign the agreement",
+    "privacy": "Your ID number and address only appear in the signed document.",
+    "errors": {
+      "rate": "Too many attempts. Try again in a few minutes.",
+      "invalid_name": "Enter your full name.",
+      "invalid_id": "Invalid ID number.",
+      "invalid_address": "Enter your address.",
+      "invalid_signature": "Sign in the box before sending.",
+      "no_consent": "Tick the acceptance box.",
+      "already_signed": "This agreement is already signed.",
+      "invalid_token": "This link is no longer valid."
+    }
   }
 }

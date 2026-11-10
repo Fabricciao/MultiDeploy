@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { FileSignature, Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
+import { ClipboardCheck, Star, FileSignature, Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
 import { getPropertyInsights } from "@/lib/data/insights";
 import { CopyButton } from "@/components/copy-button";
 import { Link } from "@/i18n/navigation";
@@ -21,6 +21,10 @@ import { listMedia } from "@/lib/data/media";
 import { archivePropertyAction } from "../actions";
 import { SlipActions } from "@/components/slip-actions";
 import { listSlips, siteBase, slipInfo } from "@/lib/data/slips";
+import { propertyFeedback } from "@/lib/data/visits";
+import { listMandates, mandateLinks } from "@/lib/data/mandates";
+import { MandateForm, MandateSend } from "@/components/mandate-panel";
+import { cancelMandateAction } from "./mandate-actions";
 
 export default async function PropertyPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: Promise<{ send?: string; tab?: string }> }) {
   const { locale, id } = await params; const sp = await searchParams;
@@ -58,7 +62,11 @@ export default async function PropertyPage({ params, searchParams }: { params: P
   const yes = (b: boolean | null) => (b ? tc("yes") : tc("no"));
   const tv = await getTranslations("propV2");
   const tab = ["overview", "clients", "activity", "owner"].includes(sp.tab ?? "") ? sp.tab! : "overview";
-  const [ins, slipList, base] = await Promise.all([getPropertyInsights(ctx, id), listSlips(ctx, { propertyId: id, state: "all", limit: 8 }), siteBase()]);
+  const [ins, slipList, base, fbs] = await Promise.all([getPropertyInsights(ctx, id), listSlips(ctx, { propertyId: id, state: "all", limit: 8 }), siteBase(), propertyFeedback(ctx, id)]);
+  const mandates = await listMandates(ctx, id);
+  const signedMandate = mandates.find((x) => x.status === "signed");
+  const openMandate = mandates.find((x) => x.status === "sent");
+  const fbAvg = fbs.length ? fbs.reduce((a, f) => a + Number(f.feedback.rating), 0) / fbs.length : null;
   const fee = p.commission_pct != null ? Number(p.commission_pct) : m?.co_broke || m?.origin === "partner" ? 0 : 2;
   const tabHref = (k: string) => `/properties/${id}${k === "overview" ? "" : `?tab=${k}`}`;
   const sharedTo = new Map(ins.shared.map((s) => [s.contact_id as string, s]));
@@ -80,7 +88,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
     sent: ins.k.sent, opened: ins.k.opened, visits: ins.k.visits, offers: ins.k.offers, agent: ctx.fullName, agency: pickName(ctx.orgName, ownerLocale) }) : "";
   const ownerPhone = owner?.phones?.[0]?.e164 as string | undefined;
   const tlIcon = (k: string) => ({ visit: <CalendarCheck size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, deal: <Handshake size={14} aria-hidden />, note: <StickyNote size={14} aria-hidden />, stage_change: <ArrowRightLeft size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <ArrowRightLeft size={14} aria-hidden />;
-  const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "visit_slip_sent" ? tv("tl.slipSent", { name: n }) : r.kind === "visit_signed" ? tv("tl.signed", { name: n }) : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
+  const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "visit_slip_sent" ? tv("tl.slipSent", { name: n }) : r.kind === "visit_signed" ? tv("tl.signed", { name: n }) : r.kind === "visit_feedback" ? tv("tl.feedback", { name: n }) : r.kind === "mandate_signed" ? tv("tl.mandateSigned") : r.kind === "mandate_sent" ? tv("tl.mandateSent") : r.kind === "mandate_created" ? tv("tl.mandateCreated") : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
 
   return (
     <>
@@ -111,7 +119,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
               {spec(t("has.mamad"), yes(p.mamad))}{spec(t("has.parking"), p.parking_count ?? 0)}{spec(t("has.elevator"), yes(p.elevator))}{spec(t("has.sukkah_balcony"), yes(p.sukkah_balcony))}
               {spec(t("form.arnona"), money(locale, p.arnona_monthly))}{spec(t("form.vaad"), money(locale, p.vaad_bayit_monthly))}
               {spec(t("form.registration"), p.registration_type ? t(`form.reg.${p.registration_type}`) : "—")}
-              {spec(t("mandateLabel"), m?.type === "exclusive" ? `${t("mandate.exclusive")}${m.end ? ` · ${relDays(locale, m.end)}` : ""}` : t("mandate.non_exclusive"))}
+              {spec(t("mandateLabel"), <>{m?.type === "exclusive" ? `${t("mandate.exclusive")}${m.end ? ` · ${relDays(locale, m.end)}` : ""}` : t("mandate.non_exclusive")}{m?.origin === "partner" ? null : signedMandate?.document_path ? <> · <a href={`/api/files/${signedMandate.document_path}`} target="_blank" rel="noreferrer" style={{ color: "var(--accent-text)" }}>{tv("mandate.signedShort")}</a></> : <> · <Link href={tabHref("owner") as "/"} scroll={false} style={{ color: "var(--accent-text)" }}>{openMandate ? tv("mandate.pending") : tv("mandate.toSign")}</Link></>}</>)}
               {spec(t("form.origin"), m?.origin === "partner" ? `${t("origin.partner")}${m.partner ? ` · ${m.partner}` : ""}` : t("origin.own"))}
               {spec(t("form.coBrokeShort"), yes(!!m?.co_broke))}
               {spec(t("form.commission"), <span className="tab">{num(locale, fee, 1)} %{p.commission_pct == null && <span className="note"> · {t("form.commissionAutoShort")}</span>}</span>)}
@@ -129,7 +137,19 @@ export default async function PropertyPage({ params, searchParams }: { params: P
 
             <div className="card" id="slips"><h2><FileSignature size={15} aria-hidden />{tv("slips.title")}<span className="badge">{slipList.counts.signed} / {slipList.counts.signed + slipList.counts.pending}</span><span className="sp" /><Link href="/visit-slips" className="note">{tv("slips.all")}</Link></h2>
               {slipList.rows.length === 0 ? <p className="muted card-b">{tv("slips.empty")}</p> : slipList.rows.map((r) => (
-                <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 0 }}>{r.contact_id ? <Link href={`/clients/${r.contact_id}`} style={{ fontWeight: 500 }}>{contactName(r, locale)}</Link> : "—"}<small>{dateTime(locale, r.starts_at)}{r.agent_name ? ` · ${r.agent_name}` : ""}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
+                <div key={r.id} className="li wrap" style={{ gap: 8 }}><div className="grow" style={{ minWidth: 160 }}>{r.contact_id ? <Link href={`/clients/${r.contact_id}`} style={{ fontWeight: 500 }}>{contactName(r, locale)}</Link> : "—"}<small>{dateTime(locale, r.starts_at)}{r.agent_name ? ` · ${r.agent_name}` : ""}</small></div><SlipActions s={slipInfo(ctx, r, base)} sm /></div>))}
+            </div>
+
+            <div className="card" id="feedback"><h2><ClipboardCheck size={15} aria-hidden />{tv("fb.title")}{fbAvg !== null && <span className="badge">{num(locale, fbAvg, 1)} / 5 · {tv("fb.count", { n: fbs.length })}</span>}</h2>
+              {fbs.length === 0 ? <p className="muted card-b">{tv("fb.empty")}</p> : fbs.map((f) => (
+                <div key={f.id} className="fb">
+                  <div className="row wrap" style={{ gap: 8 }}>{f.contact_id ? <Link href={`/clients/${f.contact_id}`} style={{ fontWeight: 500 }}>{contactName(f, locale)}</Link> : <b>—</b>}
+                    <span className="stars" role="img" aria-label={`${f.feedback.rating} / 5`}>{[1, 2, 3, 4, 5].map((n) => <Star key={n} size={13} aria-hidden className={n <= f.feedback.rating ? "" : "off"} />)}</span>
+                    <Badge tone={f.feedback.interest === "offer" ? "ok" : f.feedback.interest === "yes" ? "acc" : ""}>{tv(`fb.i.${f.feedback.interest}`)}</Badge>
+                    <span className="note sp">{dateShort(locale, f.starts_at)}{f.agent_name ? ` · ${f.agent_name}` : ""}</span></div>
+                  {f.feedback.note && <p style={{ fontSize: 13, whiteSpace: "pre-wrap" }}>{f.feedback.note}</p>}
+                  {f.feedback.audio_path && <audio controls preload="none" src={`/api/files/${f.feedback.audio_path}`} />}
+                </div>))}
             </div>
 
             <div className="card"><h2>{t("form.description")}</h2><div className="card-b col" style={{ gap: 10 }}>
@@ -163,6 +183,19 @@ export default async function PropertyPage({ params, searchParams }: { params: P
                 {ownerPhone && canSend && <a className="btn pri" href={`https://wa.me/${ownerPhone.replace(/\D/g, "")}?text=${encodeURIComponent(report)}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={14} aria-hidden />{tv("report.wa")}</a>}</div>
               <p className="note">{tv("report.hint")}</p>
             </div></div>}
+            <div className="card" id="mandate"><h2><FileSignature size={15} aria-hidden />{tv("mandate.title")}<small>{tv("mandate.sub")}</small></h2>
+              {mandates.filter((x) => x.status !== "cancelled").map((x) => (
+                <div key={x.id} className="li wrap" style={{ gap: 8 }}>
+                  <div className="grow" style={{ minWidth: 0 }}><b className="trunc">{x.owner_name}</b><small>{dateShort(locale, x.starts_on)} → {dateShort(locale, x.ends_on)} · {num(locale, x.commission_pct, 2)} %{x.sent_at ? ` · ${tv("mandate.sentOn", { d: dateShort(locale, x.sent_at) })}` : ""}</small></div>
+                  {x.status === "signed" ? <><Badge tone="ok"><CircleCheck size={12} aria-hidden />{tv("mandate.signedOn", { d: dateShort(locale, x.signed_at) })}</Badge>{x.document_path && <a className="btn sm" href={`/api/files/${x.document_path}`} target="_blank" rel="noreferrer">{tv("mandate.pdf")}</a>}</>
+                    : <><Badge tone="warn">{tv("mandate.pending")}</Badge><MandateSend id={x.id} links={mandateLinks(ctx, x, base)} />
+                      {canEdit && <form action={cancelMandateAction.bind(null, id, x.id)}><input type="hidden" name="locale" value={locale} /><button className="btn sm ghost">{tv("mandate.cancel")}</button></form>}</>}
+                </div>))}
+              {canEdit && !openMandate && <details className="card-b" open={!signedMandate}><summary className="btn sm" style={{ display: "inline-flex" }}>{tv("mandate.new")}</summary><div style={{ marginBlockStart: 12 }}>
+                <MandateForm propertyId={id} owners={data.owners.filter((o) => o.relation === "owner").map((o) => ({ id: o.id as string, name: contactName(o, locale) }))} price={p.price ? Number(p.price) : null} commission={fee}
+                  license={mandates.find((x) => x.broker_license && x.agent_id === ctx.userId)?.broker_license ?? ""} /></div></details>}
+              {!canEdit && mandates.length === 0 && <p className="muted card-b">{tv("mandate.none")}</p>}
+            </div>
           </>}
         </div>
 

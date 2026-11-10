@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { AlarmClock, ArrowRightLeft, CalendarCheck, Check, Clock, Eye, FileSignature, Hand, Handshake, MessageCircle, Navigation, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, TrendingDown, TrendingUp } from "lucide-react";
+import { AlarmClock, ArrowRightLeft, CalendarCheck, Check, ClipboardCheck, Clock, Eye, FileSignature, Hand, Handshake, MessageCircle, Navigation, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, TrendingDown, TrendingUp } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx, seesAllStats, db } from "@/lib/session";
 import { getOnboarding, getToday } from "@/lib/data/today";
@@ -7,12 +7,14 @@ import { getCockpit } from "@/lib/data/cockpit";
 import { contactName } from "@/lib/data/contacts";
 import { cityName } from "@/lib/data/geo";
 import { pickName } from "@/lib/data/types";
-import { money, num, timeOnly } from "@/lib/format";
+import { dateTime, money, num, timeOnly } from "@/lib/format";
 import { Badge, Cover, PageHeader, Ring, Spark, StageBar } from "@/components/ui";
 import { toggleTaskAction } from "./clients/actions";
 import { TaskAdd } from "@/components/task-add";
 import { SlipActions } from "@/components/slip-actions";
 import { slipMap } from "@/lib/data/slips";
+import { pendingDebriefs } from "@/lib/data/visits";
+import { VisitDebrief } from "@/components/visit-debrief";
 
 type Row = Record<string, any>;
 
@@ -27,6 +29,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const [d, c] = await Promise.all([getToday(ctx, mine), getCockpit(ctx, mine)]);
   const contacts = sp.add === "task" ? (await db(ctx, (tx) => tx`select id, first_name, last_name, first_name_he, last_name_he from public.contacts where deleted_at is null order by updated_at desc limit 300`)) as unknown as Row[] : [];
   const onboarding = await getOnboarding(ctx);
+  const debriefs = await pendingDebriefs(ctx);
   const slips = await slipMap(ctx, c.day.filter((v) => v.contact_id).map((v) => v.id as string));
   const to = await getTranslations("onboarding");
   const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" }).format(new Date());
@@ -45,6 +48,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   // Priorités, classées : retards, clients chauds, mandats, offres en attente, biens sans visite.
   type Prio = { key: string; tone: "bad" | "sig" | "warn" | ""; icon: React.ReactNode; title: string; sub: string; action: React.ReactNode };
   const prios: Prio[] = [
+    ...debriefs.map((v) => ({ key: `f${v.id}`, tone: "" as const, icon: <ClipboardCheck size={14} aria-hidden />, title: t("prio.debrief", { name: contactName(v, locale) }), sub: [v.street ?? v.reference, dateTime(locale, v.starts_at)].join(" · "),
+      action: <VisitDebrief visitId={v.id} name={contactName(v, locale)} /> })),
     ...c.overdue.map((k) => ({ key: `t${k.id}`, tone: "bad" as const, icon: <Clock size={14} aria-hidden />, title: k.title as string, sub: [t("prio.overdue"), k.contact_id ? contactName(k, locale) : null].filter(Boolean).join(" · "),
       action: <form action={toggleTaskAction.bind(null, k.id, true)}><input type="hidden" name="locale" value={locale} /><button className="btn sm"><Check size={13} aria-hidden />{t("prio.done")}</button></form> })),
     ...c.opened.map((o) => { const ph = o.phones?.[0]?.e164 as string | undefined; return { key: `o${o.contact_id}`, tone: "sig" as const, icon: <Eye size={14} aria-hidden />, title: t("prio.call", { name: contactName(o, locale) }), sub: t("prio.opened", { n: Number(o.n) }),

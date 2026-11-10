@@ -324,6 +324,7 @@ div.ltr{display:block}
 .card>h2 a.sp:not(.btn){font-size:12.5px;font-weight:500;color:var(--accent-text)}
 .prio{display:grid;grid-template-columns:28px minmax(0,1fr) auto;gap:12px;align-items:center;padding:12px 16px;border-block-end:1px solid var(--border)}
 .prio:last-child{border-block-end:0}
+.prio:has(.debrief){grid-template-columns:28px minmax(0,1fr)}.prio:has(.debrief)>:last-child{grid-column:1/-1}
 .prio .n{width:28px;height:28px;border-radius:50%;background:var(--accent-soft);color:var(--accent-text);display:grid;place-items:center}
 .prio .n.sig{background:var(--signal-soft);color:var(--signal-text)}.prio .n.warn{background:var(--warning-soft);color:var(--warning)}.prio .n.bad{background:var(--danger-soft);color:var(--danger)}
 .prio b{font-weight:500;display:block;line-height:19px}.prio small{display:block;font-size:12px;line-height:17px;color:var(--text-muted)}
@@ -420,3 +421,11 @@ button.swi{border:0;padding:0;cursor:pointer}
 @media (max-width:900px){.ph>.grow{flex-basis:100%}.kp .v{font-size:20px;line-height:26px}.prio{grid-template-columns:28px minmax(0,1fr);padding-inline:14px}.prio>:last-child{grid-column:2}.slot .b{flex-wrap:wrap}.dzs{inset-block-end:calc(80px + env(safe-area-inset-bottom))}.rec{grid-template-columns:34px minmax(0,1fr) auto}.rec>.note{display:none}}
 @media (max-width:600px){.card>h2 small{display:none}.kp .spark{display:none}.kp{grid-template-columns:minmax(0,1fr)}.fun>div{padding:10px}.fun b{font-size:17px}}
 @media (max-width:1000px){.split2>.mapw{order:-1}}
+
+/* Compte rendu de visite */
+.debrief{flex-basis:100%;display:flex;flex-direction:column;gap:10px;padding:12px;border:1px solid var(--border);border-radius:var(--radius);background:var(--surface)}
+.debrief .seg{align-self:flex-start;flex-wrap:wrap}.debrief .seg>button{border:0;background:none;cursor:pointer;font:inherit;font-size:12px;font-weight:500}
+.star{background:none;border:0;padding:2px;color:var(--border-control);cursor:pointer;display:inline-flex}.star.on{color:var(--warning)}.star.on svg{fill:currentColor}
+.stars{display:inline-flex;gap:1px;color:var(--warning)}.stars svg{fill:currentColor}.stars .off{color:var(--border-control);fill:none}
+.fb{display:grid;gap:4px;padding:12px 16px;border-block-end:1px solid var(--border)}.fb:last-child{border-block-end:0}
+.fb audio{height:32px;max-width:100%}

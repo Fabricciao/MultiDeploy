@@ -135,7 +135,8 @@
       "deal": "Relancer {name} ({stage})",
       "dealSub": "Sans mouvement depuis {days} jours · {value}",
       "cold": "Relancer le bien {place}",
-      "coldSub": "En ligne depuis {days} jours, aucune visite"
+      "coldSub": "En ligne depuis {days} jours, aucune visite",
+      "debrief": "Compte rendu de visite : {name}"
     },
     "day": {
       "title": "Votre journée",
@@ -540,7 +541,15 @@
       "stage_change": "Affaire déplacée d'étape",
       "visit_planned": "Visite planifiée",
       "slipSent": "Bon de visite envoyé par {channel}",
-      "visitSigned": "Bon de visite signé"
+      "visitSigned": "Bon de visite signé",
+      "feedback": {
+        "offer": "Après la visite : veut faire une offre",
+        "yes": "Après la visite : intéressé",
+        "no": "Après la visite : pas intéressé"
+      },
+      "mandateSigned": "Mandat d'exclusivité signé",
+      "mandateSent": "Mandat d'exclusivité envoyé",
+      "mandateCreated": "Mandat d'exclusivité préparé"
     },
     "title": "Clients",
     "count": "{count, plural, one {# client} other {# clients}}",
@@ -1188,7 +1197,8 @@
     "slipsTitle": "Bons de visite à envoyer",
     "slipsNone": "Tous les bons de visite de la semaine sont envoyés ou signés.",
     "slipsAll": "Voir tous les bons de visite",
-    "slipNow": "Visite programmée. Envoyez le bon de visite au client :"
+    "slipNow": "Visite programmée. Envoyez le bon de visite au client :",
+    "debriefTitle": "Comptes rendus à faire"
   },
   "import": {
     "title": "Importer des données",
@@ -1517,7 +1527,11 @@
       "note": "Note",
       "other": "Activité",
       "slipSent": "Bon de visite envoyé à {name}",
-      "signed": "{name} a signé le bon de visite"
+      "signed": "{name} a signé le bon de visite",
+      "feedback": "Compte rendu de la visite de {name}",
+      "mandateSigned": "Mandat d'exclusivité signé",
+      "mandateSent": "Mandat envoyé au propriétaire",
+      "mandateCreated": "Mandat d'exclusivité préparé"
     },
     "owner": {
       "title": "Propriétaire",
@@ -1537,6 +1551,29 @@
       "title": "Bons de visite",
       "all": "Tout voir",
       "empty": "Aucune visite avec un client sur ce bien."
+    },
+    "fb": {
+      "title": "Retours des visiteurs",
+      "count": "{n, plural, one {# retour} other {# retours}}",
+      "empty": "Aucun compte rendu de visite pour l'instant.",
+      "i": {
+        "offer": "Veut faire une offre",
+        "yes": "Intéressé",
+        "no": "Pas intéressé"
+      }
+    },
+    "mandate": {
+      "title": "Mandat d'exclusivité",
+      "sub": "à faire signer en ligne par le propriétaire",
+      "sentOn": "envoyé le {d}",
+      "signedOn": "Signé le {d}",
+      "pdf": "PDF signé",
+      "pending": "en attente de signature",
+      "cancel": "Annuler",
+      "new": "Préparer un mandat",
+      "none": "Aucun mandat pour ce bien.",
+      "signedShort": "mandat signé",
+      "toSign": "faire signer le mandat"
     }
   },
   "clientV2": {
@@ -1659,5 +1696,81 @@
     "emailFailed": "L'e-mail n'est pas parti. Réessayez ou utilisez WhatsApp.",
     "noEmail": "Ce client n'a pas d'e-mail.",
     "sentOn": "Envoyé le {date}"
+  },
+  "debrief": {
+    "open": "Compte rendu",
+    "rating": "Note",
+    "interest": "Intérêt",
+    "i": {
+      "offer": "Veut faire une offre",
+      "yes": "Intéressé",
+      "no": "Pas intéressé"
+    },
+    "note": "Ce qu'il a dit (facultatif)",
+    "record": "Mémo vocal",
+    "again": "Réenregistrer",
+    "stop": "Arrêter",
+    "micDenied": "Micro refusé par le navigateur.",
+    "close": "Fermer",
+    "saving": "Enregistrement…",
+    "save": "Enregistrer",
+    "saved": "Compte rendu enregistré",
+    "savedMoved": "Enregistré · affaire avancée",
+    "errors": {
+      "audio": "Mémo vocal trop long ou format non pris en charge.",
+      "generic": "Impossible d'enregistrer. Choisissez une note et un intérêt."
+    },
+    "task": {
+      "followUp": "Relancer {name} après la visite",
+      "otherProps": "Proposer d'autres biens à {name}"
+    }
+  },
+  "mandate": {
+    "owner": "Propriétaire",
+    "otherOwner": "Autre personne…",
+    "ownerName": "Nom du signataire",
+    "license": "N° de licence de l'agent",
+    "from": "Début",
+    "to": "Fin",
+    "price": "Prix demandé",
+    "commission": "Commission (%) hors TVA",
+    "actions": "Actions de commercialisation",
+    "a": {
+      "sign": "Panneau sur le bien",
+      "internet": "Sites immobiliers (Yad2, Madlan…)",
+      "social": "Réseaux sociaux et site de l'agence",
+      "newspaper": "Annonce dans la presse",
+      "open_house": "Portes ouvertes",
+      "brokers": "Agences partenaires (shitouf)",
+      "database": "Acheteurs de la base de l'agence"
+    },
+    "actionsHint": "La loi impose au moins deux actions de commercialisation.",
+    "errors": {
+      "forbidden": "Vous ne pouvez pas créer de mandat sur ce bien.",
+      "invalid": "Vérifiez le nom du signataire et la commission.",
+      "dates": "Vérifiez les dates de début et de fin.",
+      "too_long": "Pour un logement, l'exclusivité ne peut pas dépasser 6 mois.",
+      "actions": "Cochez au moins deux actions de commercialisation."
+    },
+    "created": "Mandat prêt : envoyez-le au propriétaire ci-dessus.",
+    "create": "Préparer le mandat",
+    "creating": "Préparation…",
+    "legal": "Modèle à faire valider par votre avocat."
+  },
+  "mandateSign": {
+    "thanksSub": "Le mandat signé a été transmis à {org}.",
+    "consent": "J'ai lu ce mandat et je l'accepte. Je reconnais que ma signature électronique vaut signature manuscrite.",
+    "submit": "Signer le mandat",
+    "privacy": "Votre numéro d'identité et votre adresse figurent uniquement dans le document signé.",
+    "errors": {
+      "rate": "Trop de tentatives. Réessayez dans quelques minutes.",
+      "invalid_name": "Indiquez votre nom complet.",
+      "invalid_id": "Numéro d'identité invalide.",
+      "invalid_address": "Indiquez votre adresse.",
+      "invalid_signature": "Signez dans le cadre avant d'envoyer.",
+      "no_consent": "Cochez la case d'acceptation.",
+      "already_signed": "Ce mandat est déjà signé.",
+      "invalid_token": "Ce lien n'est plus valable."
+    }
   }
 }
