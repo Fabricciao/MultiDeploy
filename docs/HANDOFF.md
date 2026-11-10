@@ -1,4 +1,4 @@
-# Passation de session — état au 8 novembre 2026 (retours de test de l'utilisateur)
+# Passation de session — état au 10 novembre 2026 (V2 déployée)
 
 > À lire en premier dans une nouvelle session. Aucun secret dans ce fichier : ils sont dans la configuration des projets Docker du VPS (lisibles par `vps_docker_get`, champ `environment`).
 
@@ -7,6 +7,18 @@
 2. **Branche** : tout le travail est sur `claude/zealous-allen-vhexg9` (dépôt `fabricciao/multideploy`) ; le VPS déploie cette branche (variable `BRANCH` du projet Docker `multideploy`). Une nouvelle session reçoit sa propre branche `claude/<nom>` : partir de la branche à jour (`git fetch origin claude/zealous-allen-vhexg9 && git checkout -B <branche-de-la-session> origin/claude/zealous-allen-vhexg9`). Pour déployer le travail d'une autre branche, **soit** changer `BRANCH` sur le VPS (`vps_docker_create` de `multideploy`, voir Procédures), **soit** pousser sur `claude/zealous-allen-vhexg9` **avec l'accord de l'utilisateur**. Pas de PR sauf demande.
 3. **Outils** : serveur MCP `Hostinger` (`search`, `execute`, `multi-execute`) ; s'il n'est pas connecté, relancer la session. Hôte `mcp.hostinger.com` autorisé dans l'environnement cloud. Les hôtes `admin.`, `eliezerimmo.`, `nadlanhub.cloud`, `www.` et le credential `api.resend.com` sont dans l'environnement cloud **« multideploy »** (secrets réseau propres à cet environnement : un autre environnement ne les a pas).
 4. Dire à l'utilisateur en une phrase où on en est (voir « À faire »), puis demander ce qu'il veut attaquer.
+
+## V2 (10/11) — déployée, commit `272ce10`
+Maquettes validées par l'utilisateur dans `NadlanHub.cloud CRM/V2/` (hors dépôt). Intégré (tout sauf la page Messages, écartée : l'API WhatsApp entrante est payante et complexe) :
+- **Aujourd'hui** : indicateurs avec courbes (`lib/data/cockpit.ts`), « À faire en premier » calculé par règles (retards, sélection ouverte < 3 j, mandat < 14 j, affaire ≥ offre sans mouvement 5 j, bien sans visite 45 j), journée en frise, affaires par étape, fil de l'agence.
+- **Cloche de notifications** (`components/notif-bell.tsx`) : leads attribués, sélections ouvertes, tâches reçues, mandats < 10 j, affaires/visites faites par d'autres ; « lu » = cookie `notif_seen`.
+- **Affaires** : prévision pondérée, cartes enrichies, zones Conclue/Perdue au glisser, annulation 8 s, tiroir `?deal=<id>`, filtre `?stale=1`.
+- **Fiche bien** : onglets `?tab=overview|clients|activity|owner`, diffusion (`lib/data/insights.ts`), qualité de l'annonce, médiane au m², rapport propriétaire (copier / lien wa.me, rien d'automatique).
+- **Fiche client** : température, prochaine action, sélection envoyée (ouvertures), affaire en cours, fil unifié.
+- **Biens** : `?view=map` (carte maison sur tuiles OpenStreetMap, sans dépendance ; position = coordonnées du bien sinon centre de la ville avec léger décalage) + barre de recherche par phrase (`/api/search` → `nlToPropertiesUrl`).
+- **Rapports** : commissions par mois sur 12 mois, rendement des sources, délai de vente médian par ville.
+- **Automatisations** (`/automations`, migration 20) : `tasks.source`, fonction `public.run_automations(org)` appelée par le cron quotidien et par « Lancer maintenant ». 4 règles (mandate, silent, cold, deal) qui créent seulement des tâches ; réglage `organizations.settings->'automations'`, **désactivées par défaut**, modifiables par `org.manage`.
+- Non fait / non vérifié : relecture hébreu des nouveaux textes, écrans V2 en RTL non vérifiés à l'œil, suite SQL non relancée avec la migration 20, pas de vraies photos dans les données de test locales.
 
 ## Retours de test de l'utilisateur (8/11) — fait
 Tout testé en local (Postgres Homebrew + `pnpm dev`, utilisateur de dev propriétaire puis agent) : lint, typecheck, 282 tests unitaires, tests SQL, build OK.
