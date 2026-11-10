@@ -1,4 +1,4 @@
-# Passation de session — état au 11 novembre 2026 (V2 + bons de visite et commissions déployés)
+# Passation de session — état au 11 novembre 2026 (V2, bons de visite, commissions, comptes rendus et mandats déployés)
 
 > À lire en premier dans une nouvelle session. Aucun secret dans ce fichier : ils sont dans la configuration des projets Docker du VPS (lisibles par `vps_docker_get`, champ `environment`).
 
@@ -8,8 +8,7 @@
 3. **Outils** : serveur MCP `Hostinger` (`search`, `execute`, `multi-execute`) ; s'il n'est pas connecté, relancer la session. Hôte `mcp.hostinger.com` autorisé dans l'environnement cloud. Les hôtes `admin.`, `eliezerimmo.`, `nadlanhub.cloud`, `www.` et le credential `api.resend.com` sont dans l'environnement cloud **« multideploy »** (secrets réseau propres à cet environnement : un autre environnement ne les a pas).
 4. Dire à l'utilisateur en une phrase où on en est (voir « À faire »), puis demander ce qu'il veut attaquer.
 
-## Compte rendu de visite et mandat d'exclusivité (11/11) — commit `8610d91`, poussé, PAS ENCORE DÉPLOYÉ
-- À déployer : `vps_docker_start multideploy` (migration `20261111000022_debrief_mandates.sql`) puis `vps_docker_update mdapp`. En attente de l'accord de l'utilisateur.
+## Compte rendu de visite et mandat d'exclusivité (11/11) — déployé, build `9cd786b` (migration 22 appliquée)
 - **Compte rendu** : `saveDebrief` / `pendingDebriefs` / `propertyFeedback` dans `lib/data/visits.ts`, action `app/[locale]/(app)/visits/actions.ts`, composant `components/visit-debrief.tsx`. `visits.feedback` = {rating, interest offer|yes|no, note, audio_path}. Mémo vocal stocké sous `org/<org>/visit_audio/<visite>.webm|m4a`. « offer » → affaire à l'étape suivant « Visites » ; « yes » → au moins « Visites » + tâche de relance (2 j) ; « no » → tâche « proposer d'autres biens » (1 j). Tâches dédupliquées par `tasks.source = 'debrief:<visite>'`.
 - **Mandat d'exclusivité** : table `property_mandates` (RLS ; côté agence, seule l'annulation d'un mandat non signé est possible). `lib/data/mandates.ts`, `lib/mandate/html.ts` (texte FR/HE/EN, **modèle à faire valider par un avocat**), page publique `/[locale]/mandate/[token]` (jeton 14 jours), envoi WhatsApp via `/api/mandates/[id]/whatsapp`. Le n° d'identité et l'adresse du propriétaire ne sont **pas** en base, seulement dans le PDF. À la signature : `properties.mandate` passe en `exclusive` avec start/end/signed/mandate_id et `properties.commission_pct` = taux du mandat ; l'automatisation « mandat » existante crée la tâche de renouvellement 30 jours avant la fin.
 - Testé en local de bout en bout (PDF hébreu rendu avec Chrome local : `CHROMIUM_PATH` dans `.claude/launch.json`). Non testé en production.
