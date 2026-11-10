@@ -1,4 +1,4 @@
-# Passation de session — état au 11 novembre 2026 (V2, bons de visite, commissions, comptes rendus et mandats déployés)
+# Passation de session — état au 11 novembre 2026 (V2, bons de visite, commissions, comptes rendus, mandats et import depuis un site déployés)
 
 > À lire en premier dans une nouvelle session. Aucun secret dans ce fichier : ils sont dans la configuration des projets Docker du VPS (lisibles par `vps_docker_get`, champ `environment`).
 
@@ -8,8 +8,7 @@
 3. **Outils** : serveur MCP `Hostinger` (`search`, `execute`, `multi-execute`) ; s'il n'est pas connecté, relancer la session. Hôte `mcp.hostinger.com` autorisé dans l'environnement cloud. Les hôtes `admin.`, `eliezerimmo.`, `nadlanhub.cloud`, `www.` et le credential `api.resend.com` sont dans l'environnement cloud **« multideploy »** (secrets réseau propres à cet environnement : un autre environnement ne les a pas).
 4. Dire à l'utilisateur en une phrase où on en est (voir « À faire »), puis demander ce qu'il veut attaquer.
 
-## Import depuis le site internet de l'agence (11/11) — commit `b89807c` (+ `7d6c174`), poussé, PAS ENCORE DÉPLOYÉ
-- Pas de migration. À déployer : `vps_docker_update mdapp` (un `vps_docker_start multideploy` avant ne fait pas de mal).
+## Import depuis le site internet de l'agence (11/11) — déployé, build `5274644` (pas de migration)
 - `lib/site-import/crawl.ts` : sitemap.xml / robots.txt / wp-sitemap (sous-plans « property, bien, listing… »), puis liens de l'accueil et des pages de listes (« à vendre », « à louer »…), 120 fiches max, 5 en parallèle, `safeFetch` (anti-SSRF de la charte). `parse.ts` : JSON-LD schema.org, Open Graph, champs étiquetés FR/HE/EN, photos (avant « biens similaires », tailles WordPress → original ; images présentes sur ≥ 30 % des fiches = décor, retirées). `apply.ts` : revalide les données renvoyées par le navigateur, crée des brouillons, télécharge 12 photos max par bien via `addPhotos` (quota respecté), `properties.custom.source_url` évite les doublons.
 - Écran : Importer › « Importer depuis votre site internet ». Limite : 6 analyses / 10 min par agence.
 - Testé en local sur eliezer.immo (WordPress + Estatik) : 15 biens, 4 à vendre, 3 à louer, 8 projets neufs « à vérifier » ; import de 2 biens avec 14 photos OK. Les sites construits entièrement en JavaScript (sans HTML côté serveur) ne seront pas lus.
