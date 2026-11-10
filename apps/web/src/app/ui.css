@@ -414,3 +414,7 @@ button.swi{border:0;padding:0;cursor:pointer}
 .nt.new p{font-weight:600}
 @media (max-width:1250px){.cock{grid-template-columns:minmax(0,1fr)}}
 @media (max-width:1000px){.fcast{grid-template-columns:1fr}.rgrid>*{grid-column:span 12!important}.split2{grid-template-columns:minmax(0,1fr);height:auto}.split2>.mapw{height:360px}.fun{grid-template-columns:1fr 1fr}}
+.nowrap{white-space:nowrap}
+@media (max-width:900px){.ph>.grow{flex-basis:100%}.kp .v{font-size:20px;line-height:26px}.prio{grid-template-columns:28px minmax(0,1fr);padding-inline:14px}.prio>:last-child{grid-column:2}.slot .b{flex-wrap:wrap}.dzs{inset-block-end:calc(80px + env(safe-area-inset-bottom))}.rec{grid-template-columns:34px minmax(0,1fr) auto}.rec>.note{display:none}}
+@media (max-width:600px){.card>h2 small{display:none}.kp .spark{display:none}.kp{grid-template-columns:minmax(0,1fr)}.fun>div{padding:10px}.fun b{font-size:17px}}
+@media (max-width:1000px){.split2>.mapw{order:-1}}

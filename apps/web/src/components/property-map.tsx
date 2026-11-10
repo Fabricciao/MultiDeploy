@@ -34,6 +34,8 @@ export function PropertyMap({ points }: { points: MapPoint[] }) {
   }, [pts, size.w, size.h]);
   const [view, setView] = useState(fit);
   const [hot, setHot] = useState<string | null>(null);
+  const [ready, setReady] = useState(false); // la carte dépend de la taille réelle : rendu côté navigateur seulement
+  useEffect(() => setReady(true), []);
   useEffect(() => setView(fit), [fit]);
   useEffect(() => {
     const el = box.current; if (!el) return;
@@ -58,10 +60,10 @@ export function PropertyMap({ points }: { points: MapPoint[] }) {
       onPointerMove={(e) => { const d = drag.current; if (d) setView((v) => ({ ...v, c: { x: d.c.x - (e.clientX - d.x), y: d.c.y - (e.clientY - d.y) } })); }}
       onPointerUp={() => { drag.current = null; }}
       onWheel={(e) => { if (Math.abs(e.deltaY) > 30) zoom(e.deltaY < 0 ? 1 : -1); }}>
-      <div className="tiles" aria-hidden>{tiles.map((q) => <img key={q.k} src={q.src} alt="" style={{ insetInlineStart: 0, transform: `translate(${q.x}px, ${q.y}px)` }} draggable={false} />)}</div>
-      {pts.map((p) => { const q = px(p.lng, p.lat, view.z); return (
+      {ready && <div className="tiles" aria-hidden>{tiles.map((q) => <img key={q.k} src={q.src} alt="" style={{ insetInlineStart: Math.round(q.x), insetBlockStart: Math.round(q.y) }} draggable={false} />)}</div>}
+      {ready && pts.map((p) => { const q = px(p.lng, p.lat, view.z); return (
         <button key={p.id} type="button" data-pid={p.id} className={`pin ${hot === p.id ? "hot" : ""}`} title={p.title + (p.approx ? ` · ${t("approx")}` : "")}
-          style={{ insetInlineStart: 0, insetBlockStart: 0, transform: `translate(calc(${q.x - ox}px - 50%), calc(${q.y - oy}px - 100%))` }} onClick={() => router.push(p.href as "/", { scroll: false })}>{p.label}</button>); })}
+          style={{ insetInlineStart: Math.round(q.x - ox), insetBlockStart: Math.round(q.y - oy) }} onClick={() => router.push(p.href as "/", { scroll: false })}>{p.label}</button>); })}
       <div className="ctl"><button type="button" className="btn icon" aria-label={t("zoomIn")} onClick={() => zoom(1)}><Plus size={15} aria-hidden /></button><button type="button" className="btn icon" aria-label={t("zoomOut")} onClick={() => zoom(-1)}><Minus size={15} aria-hidden /></button></div>
       <span className="attr ltr">© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener noreferrer">OpenStreetMap</a></span>
     </div>

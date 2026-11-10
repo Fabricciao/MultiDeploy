@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bookmark, CalendarDays, ChartNoAxesColumn, CircleCheck, Ellipsis, Handshake, House, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, Sun, UserRound, Users, type LucideIcon } from "lucide-react";
+import { Bookmark, CalendarDays, ChartNoAxesColumn, CircleCheck, Ellipsis, Handshake, House, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, Sun, UserRound, Users, Zap, type LucideIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Mark } from "@/components/logo";
@@ -9,7 +9,7 @@ import { Mark } from "@/components/logo";
 type Item = { key: string; href: string; icon: LucideIcon; ready?: boolean };
 const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "tasks", href: "/tasks", icon: CircleCheck }, { key: "agenda", href: "/agenda", icon: CalendarDays }];
 const PORTFOLIO: Item[] = [{ key: "properties", href: "/properties", icon: House }, { key: "clients", href: "/clients", icon: Users }, { key: "deals", href: "/deals", icon: Handshake }];
-const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
+const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "automations", href: "/automations", icon: Zap }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
 
 export type RailView = { id: string; name: string; href: string };
 

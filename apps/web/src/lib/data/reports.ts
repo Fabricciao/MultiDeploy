@@ -37,7 +37,23 @@ export async function getReports(ctx: Ctx, o: { days: number; agent?: string | n
       from public.properties p left join public.profiles ag on ag.id = p.agent_id
       where p.deleted_at is null and p.status in ('active','under_offer') and p.mandate->>'type' = 'exclusive' and (p.mandate->>'end')::date between current_date and current_date + 45 ${pW}
       order by (p.mandate->>'end')::date limit 6`;
-    return { all, days, agent: who, kpi: k as Record<string, any>, mandates: mandates as unknown as Record<string, any>[],
+    const monthly = (await tx`
+      select to_char(m, 'YYYY-MM') as k, coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0), 0)::float as v, count(d.id)::int as n
+      from generate_series(date_trunc('month', now()) - interval '11 months', date_trunc('month', now()), interval '1 month') m
+      left join (select d.* from public.deals d join public.pipeline_stages s on s.id = d.stage_id where s.kind = 'won' and d.deleted_at is null ${dW}) d on date_trunc('month', d.closed_at) = m
+      group by m order by m`) as unknown as { k: string; v: number; n: number }[];
+    const sourceRoi = (await tx`
+      select coalesce(ls.name, '{"fr":"—","he":"—","en":"—"}'::jsonb) as name, count(distinct c.id)::int as leads,
+        count(distinct d.id) filter (where s.kind = 'won')::int as won,
+        coalesce(sum(d.value * coalesce(d.commission_pct, 2) / 100.0) filter (where s.kind = 'won'), 0)::float as fees
+      from public.contacts c left join public.lead_sources ls on ls.id = c.source_id
+      left join public.deals d on d.contact_id = c.id and d.deleted_at is null left join public.pipeline_stages s on s.id = d.stage_id
+      where c.deleted_at is null and c.created_at > ${since} ${cW} group by 1 order by 2 desc limit 8`) as unknown as { name: Record<string, string>; leads: number; won: number; fees: number }[];
+    const cityDelay = (await tx`
+      select g.name_fr, g.name_he, g.name_en, percentile_cont(0.5) within group (order by extract(day from d.closed_at - coalesce(p.published_at, p.created_at)))::float as days, count(*)::int as n
+      from public.deals d join public.pipeline_stages s on s.id = d.stage_id join public.properties p on p.id = d.property_id join public.geo_places g on g.id = p.city_id
+      where s.kind = 'won' and d.deleted_at is null and d.closed_at is not null ${dW} group by g.id order by 4 limit 8`) as unknown as { name_fr: string; name_he: string; name_en: string; days: number; n: number }[];
+    return { monthly, sourceRoi, cityDelay, all, days, agent: who, kpi: k as Record<string, any>, mandates: mandates as unknown as Record<string, any>[],
       funnel: funnel as unknown as Record<string, any>[], sources: sources as unknown as Record<string, any>[], status: status as unknown as { status: string; n: number }[], agents: agents as unknown as Record<string, any>[], age: age as unknown as { b: number; n: number }[] };
   });
 }

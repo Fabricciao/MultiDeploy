@@ -3,10 +3,10 @@ import { Clock, Download, TriangleAlert } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { getReports, PERIODS } from "@/lib/data/reports";
-import { listAgents } from "@/lib/data/geo";
+import { cityName, listAgents } from "@/lib/data/geo";
 import { pickName } from "@/lib/data/types";
 import { money, num } from "@/lib/format";
-import { Badge, PageHeader } from "@/components/ui";
+import { Badge, BarChart, PageHeader } from "@/components/ui";
 import { AutoSubmit } from "@/components/shell";
 
 function Bars({ rows, fmt }: { rows: { label: string; n: number; sub?: string }[]; fmt?: (n: number) => string }) {
@@ -49,9 +49,37 @@ export default async function ReportsPage({ params, searchParams }: { params: Pr
         {tile(t("kpi.closeRate"), rate === null ? "—" : `${rate} %`, r.kpi.closed ? t("kpi.closeRateSub", { won: r.kpi.won, closed: r.kpi.closed }) : undefined)}
         {tile(t("kpi.avgAge"), r.kpi.avg_age === null ? "—" : `${num(locale, r.kpi.avg_age, 0)} ${t("daysShort")}`)}
       </div>
+      {(() => {
+        const tv = (k: string, v?: Record<string, string | number>) => t(`v2.${k}`, v);
+        const mf = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { month: "short", timeZone: "UTC" });
+        const mfl = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { month: "long", year: "numeric", timeZone: "UTC" });
+        const max = Math.max(...r.monthly.map((m) => m.v), 1), step = max > 200_000 ? 100_000 : max > 50_000 ? 25_000 : max > 10_000 ? 5_000 : 1_000;
+        const ticks = [0, step, step * 2, step * 3, step * 4].filter((x) => x <= max + step);
+        const year = r.monthly.reduce((a, m) => a + m.v, 0);
+        const bestRate = Math.max(1, ...r.sourceRoi.map((s) => (s.leads ? s.won / s.leads : 0)));
+        const dmax = Math.max(1, ...r.cityDelay.map((c) => c.days));
+        return (
+          <div className="rgrid" style={{ marginBlockEnd: 12 }}>
+            <section className="card c7"><h2>{tv("monthly")}<small>{tv("monthlySub", { v: money(locale, year) })}</small></h2><div className="card-b col" style={{ gap: 8 }}>
+              <div className="legend"><span><i style={{ background: "var(--accent)" }} />{tv("legendFees")}</span><span className="sp">{tv("current")}</span></div>
+              <BarChart label={tv("monthlyAria")} ticks={ticks} fmt={(n) => (n >= 1000 ? `${num(locale, n / 1000, 0)} k` : String(n))}
+                data={r.monthly.map((m, i) => { const d = new Date(`${m.k}-01T00:00:00Z`); return { l: mf.format(d), v: m.v, dim: i === r.monthly.length - 1, tip: `${mfl.format(d)} · ${money(locale, m.v)} · ${tv("deals", { n: m.n })}` }; })} />
+            </div></section>
+            <section className="card c5"><h2>{tv("cityDelay")}<small>{tv("cityDelaySub")}</small></h2><div className="card-b">
+              {r.cityDelay.length === 0 ? <p className="muted">{tv("cityDelayEmpty")}</p> : r.cityDelay.map((c) => (
+                <div key={c.name_fr} className="hbar" title={tv("cityTip", { days: Math.round(c.days), n: c.n })}><span className="trunc">{cityName(c, locale)}</span><div className="grow"><i style={{ width: `${(c.days / dmax) * 100}%` }} /></div><b className="tab">{Math.round(c.days)} {t("daysShort")}</b></div>))}
+            </div></section>
+            <section className="card c12" style={{ overflowX: "auto" }}><h2>{tv("sources")}<small>{t("period", { days: r.days })}</small></h2>
+              {r.sourceRoi.length === 0 ? <p className="muted card-b">{t("empty")}</p> : <table className="tbl"><thead><tr><th>{tv("source")}</th><th className="n">{tv("leads")}</th><th className="n">{tv("won")}</th><th style={{ width: "30%" }}>{tv("rate")}</th><th className="n">{tv("fees")}</th></tr></thead>
+                <tbody>{r.sourceRoi.map((s, i) => { const rate = s.leads ? s.won / s.leads : 0; return (
+                  <tr key={i}><td style={{ fontWeight: 500 }}>{pickName(s.name as never, locale)}</td><td className="n tab">{s.leads}</td><td className="n tab">{s.won}</td>
+                    <td><div className="cellbar"><div className="bar"><i style={{ width: `${(rate / bestRate) * 100}%` }} /></div><span className="tab" style={{ minWidth: 40, textAlign: "end" }}>{Math.round(rate * 100)} %</span></div></td><td className="n price tab">{money(locale, s.fees)}</td></tr>); })}</tbody></table>}
+            </section>
+          </div>
+        );
+      })()}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(min(100%,360px),1fr))", gap: 12, alignItems: "start" }}>
         <section className="card"><h2>{t("funnel")}</h2><div className="card-b"><Bars rows={r.funnel.filter((s) => s.kind !== "lost").map((s) => ({ label: pickName(s.name, locale), n: s.n, sub: s.value ? money(locale, s.value) : undefined }))} /></div></section>
-        <section className="card"><h2>{t("sourcesP", { days: r.days })}</h2><div className="card-b">{r.sources.length ? <Bars rows={r.sources.map((s) => ({ label: pickName(s.name, locale), n: s.n }))} /> : <p className="muted">{t("empty")}</p>}</div></section>
         {r.all && !r.agent && <section className="card"><h2>{t("wonByAgent")}</h2><div className="card-b">{r.agents.some((a) => a.won_n) ? <Bars rows={r.agents.filter((a) => a.won_n).map((a) => ({ label: a.full_name ?? "—", n: a.won_n, sub: money(locale, a.won_value) }))} /> : <p className="muted">{t("empty")}</p>}</div></section>}
         <section className="card"><h2><TriangleAlert size={15} aria-hidden />{t("mandates")}</h2>{r.mandates.length === 0 ? <p className="muted card-b">{t("noMandates")}</p> : r.mandates.map((m) => (
           <Link key={m.id} href={`/properties/${m.id}`} className="li"><div className="grow"><b className="trunc">{m.title ?? m.street ?? m.reference}</b><small>{m.agent_name ?? ""}</small></div><Badge tone="warn"><Clock size={11} aria-hidden />{tp("mandate.expiresIn", { days: Number(m.days) })}</Badge></Link>))}</section>

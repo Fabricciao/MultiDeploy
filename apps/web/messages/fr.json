@@ -1284,7 +1284,25 @@
     "myStats": "Mes statistiques",
     "visitsP": "Visites faites",
     "wonN": "Conclues",
-    "scopeAgent": "Vous voyez vos propres chiffres. Le gérant de l'agence voit ceux de toute l'équipe."
+    "scopeAgent": "Vous voyez vos propres chiffres. Le gérant de l'agence voit ceux de toute l'équipe.",
+    "v2": {
+      "monthly": "Commissions encaissées par mois",
+      "monthlySub": "{v} sur 12 mois",
+      "legendFees": "Commissions des affaires conclues",
+      "current": "Le mois en cours est plus clair",
+      "monthlyAria": "Commissions encaissées par mois sur les 12 derniers mois",
+      "deals": "{n} affaire(s)",
+      "cityDelay": "Délai de vente par ville",
+      "cityDelaySub": "médiane, de la mise en ligne à la conclusion",
+      "cityDelayEmpty": "Pas encore d'affaire conclue avec un bien.",
+      "cityTip": "{days} jours en médiane sur {n} affaire(s)",
+      "sources": "D'où viennent vos clients",
+      "source": "Source",
+      "leads": "Clients",
+      "won": "Conclues",
+      "rate": "Taux de conclusion",
+      "fees": "Commissions"
+    }
   },
   "connections": {
     "title": "Connexions",
@@ -1534,6 +1552,43 @@
       "open": "Ouvrir",
       "step": "Étape {i} sur {n}",
       "since": "Sans mouvement depuis {days} j · commission estimée {fee}"
+    }
+  },
+  "automations": {
+    "title": "Automatisations",
+    "sub": "{active} règle(s) active(s) · {total} tâche(s) créée(s) en 30 jours",
+    "runNow": "Lancer maintenant",
+    "ran": "{n} tâche(s) créée(s).",
+    "safe": "Les automatisations créent seulement des tâches pour vos agents. Elles n'envoient jamais de message à un client. Elles tournent chaque jour.",
+    "readOnly": "Seul le gérant de l'agence peut modifier ces règles.",
+    "rules": "Règles",
+    "paused": "En pause",
+    "count": "{n} en 30 j",
+    "log": "Dernières tâches créées",
+    "logSub": "toutes règles confondues",
+    "logEmpty": "Aucune tâche créée pour l'instant. Activez une règle puis « Lancer maintenant ».",
+    "done": "Faite",
+    "r": {
+      "mandate": {
+        "title": "Renouveler les exclusivités",
+        "when": "Quand un mandat exclusif expire dans 30 jours.",
+        "then": "Une tâche pour l'agent du bien, une seule fois par mandat."
+      },
+      "silent": {
+        "title": "Relancer les clients silencieux",
+        "when": "Quand un client qui cherche n'a eu ni activité, ni envoi, ni visite depuis 14 jours.",
+        "then": "Une tâche « Reprendre contact » pour son agent, au plus tous les 14 jours."
+      },
+      "cold": {
+        "title": "Réveiller les biens sans visite",
+        "when": "Quand un bien actif est en ligne depuis 45 jours sans aucune visite.",
+        "then": "Une tâche pour revoir le prix, les photos ou l'affiche, au plus tous les 30 jours."
+      },
+      "deal": {
+        "title": "Faire avancer les affaires",
+        "when": "Quand une affaire au stade de l'offre ou au-delà n'a pas bougé depuis 7 jours.",
+        "then": "Une tâche de relance pour l'agent, au plus tous les 7 jours."
+      }
     }
   }
 }

@@ -1284,7 +1284,25 @@
     "myStats": "My statistics",
     "visitsP": "Viewings done",
     "wonN": "Won",
-    "scopeAgent": "You see your own figures. The agency manager sees the whole team."
+    "scopeAgent": "You see your own figures. The agency manager sees the whole team.",
+    "v2": {
+      "monthly": "Commissions earned per month",
+      "monthlySub": "{v} over 12 months",
+      "legendFees": "Commissions from closed deals",
+      "current": "The current month is lighter",
+      "monthlyAria": "Commissions earned per month over the last 12 months",
+      "deals": "{n} deal(s)",
+      "cityDelay": "Time to sell by city",
+      "cityDelaySub": "median, from listing to close",
+      "cityDelayEmpty": "No closed deal with a property yet.",
+      "cityTip": "{days} days median over {n} deal(s)",
+      "sources": "Where your clients come from",
+      "source": "Source",
+      "leads": "Clients",
+      "won": "Closed",
+      "rate": "Close rate",
+      "fees": "Commissions"
+    }
   },
   "connections": {
     "title": "Connections",
@@ -1534,6 +1552,43 @@
       "open": "Open",
       "step": "Stage {i} of {n}",
       "since": "No movement for {days} d · estimated commission {fee}"
+    }
+  },
+  "automations": {
+    "title": "Automations",
+    "sub": "{active} active rule(s) · {total} task(s) created in 30 days",
+    "runNow": "Run now",
+    "ran": "{n} task(s) created.",
+    "safe": "Automations only create tasks for your agents. They never send a message to a client. They run every day.",
+    "readOnly": "Only the agency manager can change these rules.",
+    "rules": "Rules",
+    "paused": "Paused",
+    "count": "{n} in 30 d",
+    "log": "Latest tasks created",
+    "logSub": "all rules",
+    "logEmpty": "No task created yet. Turn on a rule, then \"Run now\".",
+    "done": "Done",
+    "r": {
+      "mandate": {
+        "title": "Renew exclusives",
+        "when": "When an exclusive mandate expires within 30 days.",
+        "then": "One task for the listing agent, once per mandate."
+      },
+      "silent": {
+        "title": "Follow up quiet clients",
+        "when": "When a searching client has had no activity, send or viewing for 14 days.",
+        "then": "A \"Get back in touch\" task for their agent, at most every 14 days."
+      },
+      "cold": {
+        "title": "Revive listings without viewings",
+        "when": "When an active listing has been online for 45 days with no viewing.",
+        "then": "A task to review price, photos or poster, at most every 30 days."
+      },
+      "deal": {
+        "title": "Move deals forward",
+        "when": "When a deal at offer stage or beyond has not moved for 7 days.",
+        "then": "A follow-up task for the agent, at most every 7 days."
+      }
     }
   }
 }

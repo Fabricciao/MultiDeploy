@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X } from "lucide-react";
+import { CalendarDays, CalendarPlus, ChartNoAxesColumn, ChevronDown, ChevronRight, CircleCheck, CircleHelp, Handshake, House, ListPlus, LogOut, Megaphone, Menu, Mic, Moon, Plus, ScanLine, Settings, Sun, UserPlus, Users, X, Zap } from "lucide-react";
 import { Link, usePathname, useRouter } from "@/i18n/navigation";
 
 const MODULES = ["tasks", "properties", "clients", "deals", "agenda", "marketing", "automations", "reports", "settings", "intake", "import"] as const;
@@ -91,6 +91,7 @@ export function MobileNav() {
           {line("/deals", t("deals"), <Handshake size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/agenda", t("agenda"), <CalendarDays size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/marketing", t("marketing"), <Megaphone size={20} strokeWidth={1.75} aria-hidden />)}
+          {line("/automations", t("automations"), <Zap size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/reports", t("reports"), <ChartNoAxesColumn size={20} strokeWidth={1.75} aria-hidden />)}
           {line("/settings", t("settings"), <Settings size={20} strokeWidth={1.75} aria-hidden />)}
           <form action="/auth/signout" method="post"><input type="hidden" name="locale" value={locale} /><button className="row" style={{ height: 50, gap: 12, width: "100%", background: "none", border: 0, font: "inherit", color: "var(--danger)", cursor: "pointer" }}><LogOut size={20} strokeWidth={1.75} aria-hidden />{t("signOut")}</button></form>
