@@ -1,4 +1,4 @@
-# Passation de session — état au 12 novembre 2026 (tour complet d'ergonomie : parcours, planification de visite, page Mandats, documents en hébreu)
+# Passation de session — état au 11 novembre 2026 au soir (tour complet d'ergonomie : parcours, planification de visite, page Mandats, documents en hébreu)
 
 > À lire en premier dans une nouvelle session. Aucun secret dans ce fichier : ils sont dans la configuration des projets Docker du VPS (lisibles par `vps_docker_get`, champ `environment`).
 
@@ -8,7 +8,7 @@
 3. **Outils** : serveur MCP `Hostinger` (`search`, `execute`, `multi-execute`) ; s'il n'est pas connecté, relancer la session. Hôte `mcp.hostinger.com` autorisé dans l'environnement cloud. Les hôtes `admin.`, `eliezerimmo.`, `nadlanhub.cloud`, `www.` et le credential `api.resend.com` sont dans l'environnement cloud **« multideploy »** (secrets réseau propres à cet environnement : un autre environnement ne les a pas).
 4. Dire à l'utilisateur en une phrase où on en est (voir « À faire »), puis demander ce qu'il veut attaquer.
 
-## Tour d'ergonomie FR/HE (12/11) — déployé, build `41af9d9` (pas de migration)
+## Tour d'ergonomie FR/HE (11/11 au soir) — déployé, build `41af9d9` (pas de migration)
 Demande : « tour complet de tous les boutons, corriger ce qui est caché ou pas intuitif, le CRM doit suivre le rythme de l'agent, hébreu partout y compris bons de visite et mandats ». Tour fait en local (même code que la production, propriétaire + agent, FR + HE, bureau + téléphone).
 - **Coquille** : la barre latérale et la barre du haut défilaient avec la page (`overflow:hidden` sur `.app` cassait `position:sticky`) → `overflow-x:clip`, `.top` collante, `scroll-margin` sur les ancres. Menu réordonné selon la journée : Aujourd'hui · Agenda · Tâches / Portefeuille / **Documents à signer** (Bons de visite, **Mandats**, avec le nombre en attente) / Développement. Menu « Nouveau » : Nouvelle visite ouvre directement la fenêtre, + Nouveau mandat, + Importer des données.
 - **Planifier une visite** (`components/modal.tsx`, `visit-form.tsx` mode `bare`) : fenêtre ouverte par `/agenda?new=1[&property=…][&contact=…][&at=AAAA-MM-JJTHH:MM]` — bouton principal de l'Agenda, clic sur un créneau libre, boutons « Planifier une visite » des fiches bien et client, Aujourd'hui, Bons de visite. Après création : bon de visite prêt à envoyer dans la même fenêtre. L'ancien formulaire en bas de la colonne de droite est supprimé.
