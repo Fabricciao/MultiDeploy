@@ -60,7 +60,7 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   await p.goto(`${BASE}/fr/import?target=properties`); ok(true, "page d'import des biens accessible");
 
   // ── envoi groupé depuis la liste ──
-  await p.goto(`${BASE}/fr/properties?status=active`); await p.locator('input[name="p"]').nth(0).check(); await p.locator('input[name="p"]').nth(1).check(); await p.click('button:has-text("Envoyer la sélection à un client")');
+  await p.goto(`${BASE}/fr/properties?status=active`); await p.locator('input[name="p"]').nth(0).check(); await p.locator('input[name="p"]').nth(1).check(); await p.click('.bulkbar button:has-text("Envoyer à un client")');
   await p.waitForURL(/\/properties\/send\?/); ok((await p.locator('input[type="hidden"][name="property"]').count()) === 2, "envoi groupé : 2 biens transmis");
   const withMail = (await sql`select id from contacts where organization_id = ${eliezer} and deleted_at is null and marketing_consent->>'granted' = 'true' and jsonb_array_length(emails) > 0 limit 1`)[0].id;
   await p.selectOption('select[name="contact"]', withMail); const before = (await sql`select count(*)::int n from shares`)[0].n; await p.click('button:has-text("Envoyer la sélection")'); await p.waitForSelector('[role="status"] .badge');
@@ -69,10 +69,12 @@ const ok = (c, m) => { if (c) console.log("ok   -", m); else { failed++; console
   // ── agenda : planification, conflits, Chabbat, ICS ──
   const props = await sql`select id from properties p where organization_id = ${eliezer} and status = 'active' and not exists (select 1 from visits v where v.property_id = p.id and v.agent_id = ${yael}) order by id limit 2`;
   const next = (dow, hh) => { const d = new Date(); for (let i = 1; i < 14; i++) { const t = new Date(d.getTime() + i * 86400000); const w = new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", weekday: "short" }).format(t); if (w === dow) { const [y, m, dd] = new Intl.DateTimeFormat("en-CA", { timeZone: "Asia/Jerusalem" }).format(t).split("-"); return `${y}-${m}-${dd}T${hh}`; } } };
-  await p.goto(`${BASE}/fr/agenda`);
+  // La planification s'ouvre dans une fenêtre : /agenda?new=1 (bouton « Planifier une visite » ou clic sur un créneau).
+  await p.goto(`${BASE}/fr/agenda?new=1`);
   const tue = next("Tue", "10:00");
   await p.selectOption('select[name="property"]', props[0].id); await p.fill('input[name="starts_at"]', tue); await p.click('button:has-text("Planifier")'); await p.waitForSelector("text=Visite planifiée");
   ok((await sql`select count(*)::int n from visits where property_id = ${props[0].id} and agent_id = ${yael}`)[0].n >= 1, "visite planifiée (heure de Jérusalem)");
+  await p.goto(`${BASE}/fr/agenda?new=1`);
   await p.selectOption('select[name="property"]', props[1].id); await p.fill('input[name="starts_at"]', tue); await p.click('button:has-text("Planifier")'); await p.waitForSelector("text=déjà une visite sur ce créneau");
   ok(true, "conflit d'agenda détecté (même agent, même créneau)");
   const sat = next("Sat", "11:00"); await p.selectOption('select[name="property"]', props[1].id); await p.fill('input[name="starts_at"]', sat); await p.click('button:has-text("Planifier")'); await p.waitForSelector('[role="alert"]:has-text("Chabbat")');

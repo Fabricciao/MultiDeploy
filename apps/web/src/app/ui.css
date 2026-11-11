@@ -20,7 +20,7 @@ a{color:inherit;text-decoration:none}svg{flex-shrink:0;display:block}
 [dir=rtl] .over,[lang=he] .over{letter-spacing:0;text-transform:none;font-size:12px}
 
 /* Coquille */
-.app{display:flex;min-height:100dvh;background:var(--bg);color:var(--text);overflow:hidden}
+.app{display:flex;min-height:100dvh;background:var(--bg);color:var(--text);overflow-x:clip}
 .side{width:var(--rail-w);flex-shrink:0;background:var(--rail);color:var(--rail-text);padding:12px 10px;display:flex;flex-direction:column;gap:2px;position:sticky;inset-block-start:0;height:100dvh;overflow-y:auto}
 .org{display:flex;align-items:center;gap:10px;padding:6px;border-radius:var(--radius);margin-bottom:10px}
 .org:hover{background:var(--rail-hover)}
@@ -430,3 +430,83 @@ button.swi{border:0;padding:0;cursor:pointer}
 .fb{display:grid;gap:4px;padding:12px 16px;border-block-end:1px solid var(--border)}.fb:last-child{border-block-end:0}
 .fb audio{height:32px;max-width:100%}
 .banner.ok{background:var(--success-soft);color:var(--success)}
+
+/* ---------- 12/11 : coquille fixe, parcours, planification, actions rapides ---------- */
+/* La barre latérale et la barre du haut restent visibles pendant le défilement (overflow:hidden sur .app cassait position:sticky). */
+.top{position:sticky;inset-block-start:0;z-index:25}
+.card[id],section[id],[data-anchor]{scroll-margin-block-start:76px}
+.side{scrollbar-width:thin;scrollbar-color:var(--rail-active) transparent}
+.nav .cnt.todo{color:var(--rail-text);background:var(--rail-active);min-width:18px;height:18px;padding-inline:5px;border-radius:999px;font-size:11px;font-weight:600;display:inline-grid;place-items:center}
+.side.mini .nav .cnt{display:none}
+
+/* Actions rapides (Aujourd'hui, fiches) */
+.quick{display:flex;gap:8px;flex-wrap:wrap;margin-block-end:12px}
+.quick>a,.quick>button{display:inline-flex;align-items:center;gap:8px;height:40px;padding-inline:14px 16px;border-radius:999px;border:1px solid var(--border-strong);background:var(--surface);font-size:13px;font-weight:500;white-space:nowrap;transition:background var(--t-fast) var(--ease),border-color var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease)}
+.quick>a:hover,.quick>button:hover{border-color:var(--accent);box-shadow:var(--shadow-1)}
+.quick>a>span.qi,.quick>button>span.qi{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;background:var(--accent-soft);color:var(--accent-text);margin-inline-start:-6px}
+.quick>.pri{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}.quick>.pri>span.qi{background:color-mix(in oklab,var(--on-accent) 18%,transparent);color:var(--on-accent)}
+.quick>.sig>span.qi{background:var(--signal-soft);color:var(--signal-text)}
+.actbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+
+/* Parcours d'un bien ou d'un client : où on en est, et la prochaine étape */
+.journey{padding:14px 16px 16px;display:flex;flex-direction:column;gap:14px}
+.journey-h{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:var(--text-muted)}
+[dir=rtl] .journey-h{letter-spacing:0;text-transform:none;font-size:12.5px}
+.jsteps{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:0}
+.jstep{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;text-align:center;padding-inline:4px;min-width:0;color:var(--text-muted)}
+.jstep::before{content:"";position:absolute;inset-block-start:13px;inset-inline:-50% 50%;height:2px;background:var(--border-strong)}
+.jsteps>li:first-child .jstep::before{display:none}
+.jsteps>li:has(>.jstep.dn)+li>.jstep.dn::before,.jsteps>li:has(>.jstep.dn)+li>.jstep.cur::before{background:var(--accent)}
+.jstep .jd{position:relative;z-index:1;width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:var(--surface);box-shadow:inset 0 0 0 2px var(--border-strong);font-size:12px;font-weight:600;color:var(--text-muted)}
+.jstep.dn .jd{background:var(--accent);box-shadow:none;color:var(--on-accent)}
+.jstep.cur .jd{box-shadow:inset 0 0 0 2px var(--accent),0 0 0 4px var(--accent-soft);color:var(--accent-text)}
+.jstep b{font-size:12.5px;font-weight:500;line-height:16px;color:var(--text-muted);max-width:100%}
+.jstep.dn b{color:var(--text)}.jstep.cur b{color:var(--text);font-weight:600}
+.jstep small{font-size:11.5px;line-height:15px;color:var(--text-muted);max-width:100%}
+a.jstep:hover b{text-decoration:underline;text-underline-offset:3px}
+.jnext{display:flex;align-items:center;gap:12px;padding:10px 12px;border-radius:var(--radius);background:var(--accent-soft);color:var(--accent-text)}
+.jnext .grow b{display:block;font-weight:600;line-height:19px}.jnext .grow small{display:block;font-size:12.5px;line-height:17px;opacity:.9}
+.jnext.ok{background:var(--success-soft);color:var(--success)}
+/* Téléphone : la ligne d'étapes reste sur une ligne, seule l'étape en cours est nommée ; les barres d'actions défilent au doigt. */
+@media (max-width:700px){
+ .jstep small{display:none}.jstep b{display:none}
+ .jstep.cur b{display:block;overflow:visible;white-space:nowrap;font-size:12px}
+ .jnext{flex-wrap:wrap}.jnext .btn,.jnext .st-sel{width:100%}
+ .quick,.page>.actbar{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-inline:-14px;padding-inline:14px}
+ .quick::-webkit-scrollbar,.page>.actbar::-webkit-scrollbar{display:none}
+ .quick>*,.page>.actbar>*{flex-shrink:0}
+}
+
+/* Agenda : créneaux cliquables, visite sélectionnée */
+.cal-add{position:absolute;inset:0;display:grid;place-items:center;color:transparent;border-radius:2px}
+.cal-add:hover,.cal-add:focus-visible{background:var(--accent-soft);color:var(--accent-text)}
+.cal-c .ev{inset-inline-end:16px}
+.ev:hover{filter:brightness(.97);box-shadow:var(--shadow-1)}
+.dialog.wide{width:560px}
+.dialog .hd{display:flex;align-items:center;gap:10px;padding:14px 20px;border-block-end:1px solid var(--border)}
+.dialog .hd h3{flex:1;min-width:0}
+.vrow{display:grid;grid-template-columns:20px minmax(0,1fr);gap:10px;align-items:start;font-size:13.5px}
+.vrow svg{margin-block-start:3px;color:var(--text-muted)}
+.vrow small{display:block;font-size:12px;color:var(--text-muted)}
+
+/* Barre d'actions groupées (biens sélectionnés) */
+.bulkbar{position:fixed;inset-block-end:20px;inset-inline:0;margin-inline:auto;width:fit-content;max-width:calc(100vw - 24px);z-index:45;animation:v2-up var(--t-base) var(--ease)}
+@media (max-width:900px){.bulkbar{inset-block-end:calc(80px + env(safe-area-inset-bottom))}}
+
+/* Bouton de fichier traduit (le champ natif suit la langue du navigateur, pas celle du CRM) */
+.filebtn{display:flex;align-items:center;gap:8px;min-width:0}
+.filebtn input[type=file]{position:absolute;width:1px;height:1px;opacity:0;pointer-events:none}
+.filebtn .fname{font-size:12.5px;color:var(--text-muted);min-width:0}
+
+/* Sélecteur de langue du document (bons de visite, mandats) */
+.langsel{appearance:none;-webkit-appearance:none;height:28px;max-width:150px;border:1px solid var(--border-strong);border-radius:var(--radius);background:var(--surface);font-size:12px;font-weight:500;padding-inline:8px;cursor:pointer;color:var(--text)}
+.doclang{display:flex;gap:6px;justify-content:center;margin-block-end:16px}
+.doclang a{height:30px;padding-inline:12px;border-radius:999px;border:1px solid var(--border-strong);display:inline-flex;align-items:center;font-size:13px;font-weight:500;background:var(--surface)}
+.doclang a.on{background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.seg.lbl-seg>a{padding-inline:10px}
+.mobnav .sheet{max-height:calc(100dvh - 150px);overflow-y:auto}
+.filebtn{cursor:pointer}.filebtn input[type=file]:focus-visible+.btn{outline:2px solid var(--focus-ring);outline-offset:2px}
+.filebtn input[type=file]:disabled+.btn{cursor:not-allowed}
+/* Une fenêtre ne dépasse jamais l'écran (téléphone) */
+.overlay>.dialog{max-width:calc(100vw - 32px)}
+@media (max-width:700px){.overlay{padding-block-start:6vh!important}.dialog .ft{flex-wrap:wrap}.dialog .ft>*{flex:1}}

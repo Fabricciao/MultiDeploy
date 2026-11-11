@@ -3,13 +3,14 @@ import { db, type Ctx } from "../session";
 import { storage } from "../storage";
 import { visitStage } from "./deals";
 
-export type VisitRow = { id: string; starts_at: Date; ends_at: Date | null; status: string; property_id: string; reference: string; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; title: string | null; contact_id: string | null; first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null; agent_id: string | null; agent_name: string | null; signed_at: Date | null; document_path: string | null; signer_name: string | null };
+export type VisitRow = { id: string; starts_at: Date; ends_at: Date | null; status: string; property_id: string; reference: string; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; title: string | null; contact_id: string | null; first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null; agent_id: string | null; agent_name: string | null; signed_at: Date | null; document_path: string | null; signer_name: string | null; phone: string | null; has_feedback: boolean };
 
 export async function listVisits(ctx: Ctx, from: Date, to: Date) {
   return (await db(ctx, (tx) => tx`
     select v.id, v.starts_at, v.ends_at, v.status, v.property_id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
       (select t.title from public.property_translations t where t.property_id = p.id order by (t.locale = ${ctx.locale}) desc limit 1) as title,
-      v.contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, v.agent_id, a.full_name as agent_name, v.signed_at, v.document_path, v.signer_name
+      v.contact_id, c.first_name, c.last_name, c.first_name_he, c.last_name_he, v.agent_id, a.full_name as agent_name, v.signed_at, v.document_path, v.signer_name,
+      c.phones->0->>'e164' as phone, (v.feedback is not null) as has_feedback
     from public.visits v join public.properties p on p.id = v.property_id left join public.geo_places g on g.id = p.city_id left join public.contacts c on c.id = v.contact_id left join public.profiles a on a.id = v.agent_id
     where v.starts_at >= ${from} and v.starts_at < ${to} order by v.starts_at`)) as unknown as VisitRow[];
 }
@@ -27,6 +28,22 @@ export async function createVisit(ctx: Ctx, i: { propertyId: string; contactId: 
     const [r] = await tx`insert into public.visits (organization_id, property_id, contact_id, agent_id, starts_at, ends_at) values (${ctx.orgId}, ${i.propertyId}, ${i.contactId}, ${ctx.userId}, ${i.startsAt}, ${ends}) returning id`;
     if (i.contactId) await tx`insert into public.activities (organization_id, kind, contact_id, property_id, summary) values (${ctx.orgId}, 'visit', ${i.contactId}, ${i.propertyId}, 'visit_planned')`;
     return { id: r!.id as string };
+  });
+}
+/** Déplacer une visite prévue (même durée). Refusé si le bon de visite est déjà signé ou si le nouveau créneau est pris. */
+export async function moveVisit(ctx: Ctx, id: string, startsAt: Date): Promise<{ ok?: true; error?: VisitError | "signed" }> {
+  if (!ctx.caps.has("properties.write") || ctx.impersonating) return { error: "forbidden" };
+  if (Number.isNaN(startsAt.getTime())) return { error: "invalid" };
+  return db(ctx, async (tx) => {
+    const [v] = await tx`select id, agent_id, signed_at, extract(epoch from (coalesce(ends_at, starts_at + interval '30 minutes') - starts_at))::int as secs from public.visits
+      where id = ${id} and status = 'planned' and (agent_id = ${ctx.userId} or ${ctx.caps.has("properties.write_all")})`;
+    if (!v) return { error: "forbidden" as const };
+    if (v.signed_at) return { error: "signed" as const };
+    const ends = new Date(startsAt.getTime() + Math.max(900, Number(v.secs) || 1800) * 1000);
+    const [clash] = await tx`select 1 from public.visits where agent_id = ${v.agent_id} and id <> ${id} and status = 'planned' and tstzrange(starts_at, coalesce(ends_at, starts_at + interval '30 minutes')) && tstzrange(${startsAt}, ${ends})`;
+    if (clash) return { error: "conflict" as const };
+    await tx`update public.visits set starts_at = ${startsAt}, ends_at = ${ends} where id = ${id}`;
+    return { ok: true as const };
   });
 }
 export async function setVisitStatus(ctx: Ctx, id: string, status: "planned" | "done" | "cancelled" | "no_show") {

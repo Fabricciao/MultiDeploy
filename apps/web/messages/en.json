@@ -29,7 +29,15 @@
     "preview": "Preview",
     "newTask": "New task",
     "newVisit": "New viewing",
-    "newDeal": "New deal"
+    "newDeal": "New deal",
+    "importData": "Import data",
+    "newMandate": "New mandate",
+    "chooseFile": "Choose a file",
+    "chooseFiles": "Choose files",
+    "noFile": "No file chosen",
+    "filesChosen": "{n, plural, one {# file} other {# files}}",
+    "million": "M",
+    "thousand": "k"
   },
   "nav": {
     "label": "Main navigation",
@@ -47,7 +55,9 @@
     "groups": {
       "portfolio": "Portfolio",
       "growth": "Growth",
-      "views": "My views"
+      "views": "My views",
+      "daily": "Daily",
+      "docs": "Documents to sign"
     },
     "poweredBy": "Powered by NadlanHub",
     "collapse": "Collapse sidebar",
@@ -61,7 +71,9 @@
     "tasks": "Tasks",
     "signOut": "Sign out",
     "automations": "Automations",
-    "visit-slips": "Viewing forms"
+    "visit-slips": "Viewing forms",
+    "mandates": "Mandates",
+    "toSign": "{n} to sign"
   },
   "today": {
     "title": "Today",
@@ -158,6 +170,18 @@
       "visit": "Viewing with {name}",
       "status_change": "Property status changed",
       "other": "Activity on {name}"
+    },
+    "helloMorning": "Good morning, {name}",
+    "helloAfternoon": "Good afternoon, {name}",
+    "helloEvening": "Good evening, {name}",
+    "quick": {
+      "label": "Quick actions",
+      "client": "New client",
+      "property": "New property",
+      "visit": "Schedule a viewing",
+      "task": "New task",
+      "dictate": "Dictate a record",
+      "mandate": "Get a mandate signed"
     }
   },
   "login": {
@@ -515,6 +539,17 @@
       "label": "Plain-language search",
       "placeholder": "Describe the property: \"4 rooms Raanana under 3.5M with mamad\"",
       "miss": "No city, rooms or budget recognised. Try \"4 rooms Raanana under 3.5M\"."
+    },
+    "bulk": {
+      "count": "{n, plural, one {# property selected} other {# properties selected}}",
+      "send": "Send to a client",
+      "clear": "Clear selection",
+      "tip": "Tick several properties to send them together to a client."
+    },
+    "viewShort": {
+      "table": "List",
+      "grid": "Grid",
+      "map": "Map"
     }
   },
   "clients": {
@@ -1185,7 +1220,8 @@
       "conflict": "You already have a viewing at that time.",
       "invalid": "Invalid data.",
       "forbidden": "Insufficient rights.",
-      "past": "Date in the past."
+      "past": "Date in the past.",
+      "signed": "The viewing form is already signed."
     },
     "signLink": "Viewing sheet link",
     "signedDoc": "Signed document",
@@ -1198,7 +1234,32 @@
     "slipsNone": "All of this week's viewing forms are sent or signed.",
     "slipsAll": "See all viewing forms",
     "slipNow": "Viewing scheduled. Send the viewing form to the client:",
-    "debriefTitle": "Debriefs to do"
+    "debriefTitle": "Debriefs to do",
+    "planHint": "Click a free slot to schedule a viewing.",
+    "addAt": "Schedule a viewing on {when}",
+    "close": "Close",
+    "another": "Schedule another viewing",
+    "clientHint": "With a client, the viewing form is ready to send as soon as you schedule.",
+    "minutes": "{n} min",
+    "visit": {
+      "title": "Viewing",
+      "noClient": "No client",
+      "agent": "Agent: {name}",
+      "route": "Directions",
+      "call": "Call",
+      "openProperty": "Open property",
+      "openClient": "Open client",
+      "slip": "Viewing form",
+      "debrief": "Debrief",
+      "debriefDone": "Debrief saved",
+      "status": "Viewing status",
+      "noShow": "No-show",
+      "replan": "Set back to planned",
+      "move": "Move the viewing",
+      "moveBtn": "Move",
+      "moved": "Viewing moved.",
+      "signedLocked": "The viewing form is signed: this viewing can no longer be moved."
+    }
   },
   "import": {
     "title": "Import data",
@@ -1382,7 +1443,9 @@
       "no_consent": "You must agree to sign.",
       "already_signed": "This document is already signed.",
       "invalid_token": "This link is invalid or has expired."
-    }
+    },
+    "langs": "Document language",
+    "bilingual": "The signed document is drawn up in Hebrew, with its translation."
   },
   "shortcuts": {
     "title": "Keyboard shortcuts",
@@ -1482,7 +1545,7 @@
       "overview": "Overview",
       "clients": "Matching clients",
       "activity": "Activity",
-      "owner": "Owner"
+      "owner": "Owner & mandate"
     },
     "perf": {
       "title": "Listing reach",
@@ -1574,6 +1637,83 @@
       "none": "No agreement for this property.",
       "signedShort": "signed agreement",
       "toSign": "get the agreement signed"
+    },
+    "planVisit": "Schedule a viewing",
+    "mandateBtn": "Mandate",
+    "statusQuick": "Change status",
+    "visitsCard": "Viewings",
+    "visitsEmpty": "No viewings yet.",
+    "j": {
+      "title": "Property journey",
+      "mandate": "Mandate",
+      "listing": "Listing",
+      "marketing": "Marketing",
+      "visits": "Viewings",
+      "offer": "Offer",
+      "closed": "Sold",
+      "closedRent": "Rented",
+      "s": {
+        "mandateSigned": "Signed",
+        "mandateExclusive": "Exclusive",
+        "mandatePending": "Sent, awaiting signature",
+        "mandatePartner": "Partner listing",
+        "mandateNone": "To be signed",
+        "photos": "{n, plural, =0 {No photos} one {# photo} other {# photos}}",
+        "online": "Live",
+        "draft": "Draft",
+        "sent": "{n, plural, =0 {Not sent} one {# send} other {# sends}}",
+        "visits": "{n, plural, =0 {No viewings} one {# viewing} other {# viewings}}",
+        "offers": "{n, plural, =0 {No offers} one {# open} other {# open}}"
+      },
+      "next": "Next step",
+      "n": {
+        "mandate": {
+          "t": "Get the exclusive mandate signed",
+          "s": "The owner signs online on their phone, in Hebrew and in their language.",
+          "c": "Prepare the mandate"
+        },
+        "mandateSend": {
+          "t": "Remind the owner to sign",
+          "s": "The mandate is ready and sent: only the signature is missing.",
+          "c": "Resend the mandate"
+        },
+        "photos": {
+          "t": "Add photos",
+          "s": "A listing with photos gets far more enquiries.",
+          "c": "Add photos"
+        },
+        "listing": {
+          "t": "Complete the listing",
+          "s": "Price, address and description in French and Hebrew.",
+          "c": "Complete"
+        },
+        "publish": {
+          "t": "Put the property live",
+          "s": "Set the status to “Active” to send it to clients and create a poster."
+        },
+        "send": {
+          "t": "{n, plural, =0 {Send the property to a client} one {Send the property to the matching client} other {Send the property to the # matching clients}}",
+          "s": "By WhatsApp or e-mail, in each client's language.",
+          "c": "Send to a client"
+        },
+        "visit": {
+          "t": "Schedule the first viewing",
+          "s": "The viewing form goes to the client in one click after scheduling."
+        },
+        "offer": {
+          "t": "Turn a viewing into an offer",
+          "s": "Record a debrief after each viewing: the deal moves forward by itself.",
+          "c": "See deals"
+        },
+        "close": {
+          "t": "Close the sale",
+          "s": "An offer is open: follow it through to signing."
+        }
+      },
+      "done": {
+        "t": "Deal closed",
+        "s": "This property has left the active portfolio."
+      }
     }
   },
   "clientV2": {
@@ -1620,6 +1760,58 @@
     "slips": {
       "title": "Viewing forms",
       "empty": "No viewing scheduled for this client."
+    },
+    "j": {
+      "title": "Client journey",
+      "contact": "Contact",
+      "criteria": "Criteria",
+      "selection": "Selection",
+      "visit": "Viewing",
+      "slip": "Form signed",
+      "deal": "Offer",
+      "won": "Closed",
+      "next": "Next step",
+      "n": {
+        "criteria": {
+          "t": "Record what the client is looking for",
+          "s": "Budget, cities, rooms: the CRM will suggest matching properties by itself.",
+          "c": "Add criteria"
+        },
+        "selection": {
+          "t": "{n, plural, =0 {Send a selection of properties} one {Send the matching property} other {Send the # matching properties}}",
+          "s": "The client gets a link; you see when they open it.",
+          "c": "Choose properties"
+        },
+        "visit": {
+          "t": "Schedule a viewing",
+          "s": "The viewing form will be ready to send right away.",
+          "c": "Schedule a viewing"
+        },
+        "slip": {
+          "t": "Get the viewing form signed",
+          "s": "One click by WhatsApp or e-mail; the client signs on their phone.",
+          "c": "See viewing forms"
+        },
+        "deal": {
+          "t": "Turn the viewing into an offer",
+          "s": "Record the viewing debrief or open a deal.",
+          "c": "Open a deal"
+        },
+        "won": {
+          "t": "Move the deal forward",
+          "s": "Current stage: {stage}.",
+          "c": "Open the deal"
+        }
+      },
+      "done": {
+        "t": "Deal closed with this client",
+        "s": "Remember to ask for a referral."
+      }
+    },
+    "act": {
+      "visit": "Schedule a viewing",
+      "send": "Send properties",
+      "task": "Task"
     }
   },
   "automations": {
@@ -1661,7 +1853,7 @@
   },
   "slips": {
     "title": "Viewing forms",
-    "sub": "{signed} signed · {pending} awaiting signature",
+    "sub": "{signed, plural, =0 {None signed} one {# signed} other {# signed}} · {pending} awaiting signature",
     "tabs": {
       "signed": "Signed",
       "pending": "Awaiting signature",
@@ -1695,7 +1887,15 @@
     "copy": "Copy link",
     "emailFailed": "The email did not go out. Try again or use WhatsApp.",
     "noEmail": "This client has no email.",
-    "sentOn": "Sent on {date}"
+    "sentOn": "Sent on {date}",
+    "lang": "Document language",
+    "langHint": "The viewing form is always drawn up in Hebrew; a translation is added if the client reads another language.",
+    "steps": {
+      "plan": "1. Schedule the viewing with a client",
+      "send": "2. Send the form by WhatsApp or e-mail",
+      "sign": "3. The client signs on their phone, the PDF is filed here"
+    },
+    "plan": "Schedule a viewing"
   },
   "debrief": {
     "open": "Debrief",
@@ -1823,5 +2023,43 @@
       "none_found": "No property listing found on this site. It may be built in a way the tool cannot read.",
       "empty": "No property selected."
     }
+  },
+  "mandates": {
+    "title": "Exclusive mandates",
+    "sub": "{signed, plural, =0 {None signed} one {# signed} other {# signed}} · {pending} to sign",
+    "tabs": {
+      "pending": "To sign",
+      "signed": "Signed",
+      "all": "All"
+    },
+    "new": "Prepare a mandate",
+    "pick": "For which property?",
+    "pickNone": "All your properties have a signed or pending mandate.",
+    "col": {
+      "property": "Property",
+      "owner": "Owner",
+      "period": "Exclusivity",
+      "fee": "Fee",
+      "agent": "Agent",
+      "state": "Signature"
+    },
+    "emptyPending": "No mandate is awaiting signature.",
+    "emptySigned": "No mandate signed online yet.",
+    "how": "Open a property, “Owner & mandate” tab: the mandate takes a minute to prepare and the owner signs on their phone.",
+    "signedOn": "Signed on {date}",
+    "pending": "To sign",
+    "pdf": "Signed PDF",
+    "expires": "{days, plural, =0 {Expires today} one {Expires in # day} other {Expires in # days}}",
+    "expired": "Expired",
+    "todo": {
+      "title": "Properties without a signed mandate",
+      "sub": "your properties for sale, excluding partner listings",
+      "cta": "Prepare"
+    },
+    "expiring": {
+      "title": "Exclusives expiring",
+      "none": "No exclusive expires in the next 30 days."
+    },
+    "open": "Open"
   }
 }

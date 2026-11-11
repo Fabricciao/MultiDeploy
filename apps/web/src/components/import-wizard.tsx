@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Upload } from "lucide-react";
 import { previewImport, runImport, type PreviewState } from "@/app/[locale]/(app)/import/actions";
 import { CONTACT_FIELDS, PROPERTY_FIELDS } from "@/lib/import/csv";
+import { FileInput } from "@/components/file-input";
 
 export function ImportWizard({ defaultTarget }: { defaultTarget: "contacts" | "properties" }) {
   const t = useTranslations("import");
@@ -17,7 +18,7 @@ export function ImportWizard({ defaultTarget }: { defaultTarget: "contacts" | "p
       <form action={previewAction} className="card"><div className="card-b row wrap" style={{ gap: 12 }}>
         <input type="hidden" name="locale" value={locale} />
         <select name="target" className="input" style={{ width: 180 }} defaultValue={defaultTarget} aria-label={t("target")}><option value="contacts">{t("contacts")}</option><option value="properties">{t("properties")}</option></select>
-        <input type="file" name="file" accept=".csv,text/csv,text/plain" className="input grow" style={{ height: "auto", padding: 6 }} aria-label={t("file")} />
+        <div className="grow"><FileInput name="file" accept=".csv,text/csv,text/plain" label={t("file")} /></div>
         <button className="btn pri" disabled={previewing}><Upload size={15} aria-hidden />{previewing ? t("reading") : t("preview")}</button>
         <p className="note" style={{ flexBasis: "100%" }}>{t("hint")}</p>
         {prev?.error && <div role="alert" className="err" style={{ flexBasis: "100%" }}>{t(`errors.${prev.error}`)}</div>}

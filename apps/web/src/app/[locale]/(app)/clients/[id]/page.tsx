@@ -16,6 +16,7 @@ import { hasWhatsApp } from "@/lib/data/connections";
 import { SlipActions } from "@/components/slip-actions";
 import { listSlips, siteBase, slipInfo } from "@/lib/data/slips";
 import { addNoteAction, addTaskAction, anonymizeAction, openDealAction, toggleTaskAction } from "../actions";
+import { Journey, type JNext, type JStep } from "@/components/journey";
 
 export default async function ClientPage({ params }: { params: Promise<{ locale: string; id: string }> }) {
   const { locale, id } = await params;
@@ -75,7 +76,36 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
     ...ins.visits.map((v) => ({ key: `v${v.id}`, at: new Date(v.starts_at), icon: <CalendarCheck size={14} aria-hidden />, tone: v.status === "done" ? "ok" : "acc", title: tv(`visit.${["planned", "done", "cancelled", "no_show"].includes(v.status) ? v.status : "planned"}`, { place: v.street ?? v.reference }), sub: v.actor ?? "" })),
     ...data.shares.filter((s) => s.opened_at).map((s) => ({ key: `o${s.id}`, at: new Date(s.opened_at), icon: <Eye size={14} aria-hidden />, tone: "sig", title: tv("opened", { n: Number(s.n) }), sub: "" })),
   ].sort((a, b) => b.at.getTime() - a.at.getTime()).slice(0, 30);
+  // ── Parcours du client : contact → critères → sélection → visite → bon signé → offre → conclu. ──
+  const seeker = (c.kinds as string[]).some((k) => ["buyer", "tenant", "investor"].includes(k)) || data.profiles.length > 0 || data.deals.length > 0;
+  const planHref = `/agenda?new=1&contact=${id}`;
+  const visited = ins.visits.some((v) => v.status !== "cancelled");
+  const won = data.deals.some((d) => d.kind === "won");
+  const offer = won || data.deals.some((d) => d.kind === "open" && Number(d.probability) >= 60);
+  const canPlan = ctx.caps.has("properties.write") && !ctx.impersonating;
+  const steps: JStep[] = [
+    { key: "contact", label: tv("j.contact"), done: true, hint: c.source_name ? pickName(c.source_name, locale) : undefined },
+    { key: "criteria", label: tv("j.criteria"), done: data.profiles.length > 0 || data.shares.length > 0 || visited || offer, href: `/clients/${id}/edit` },
+    { key: "selection", label: tv("j.selection"), done: data.shares.length > 0 || visited || offer, href: "#match" },
+    { key: "visit", label: tv("j.visit"), done: visited || offer, href: canPlan ? planHref : undefined },
+    { key: "slip", label: tv("j.slip"), done: slipList.counts.signed > 0 || won, href: "#slips" },
+    { key: "deal", label: tv("j.deal"), done: offer, href: ins.deal ? `/deals?deal=${ins.deal.id}` : "#deals" },
+    { key: "won", label: tv("j.won"), done: won },
+  ];
+  const cur = steps.findIndex((x) => !x.done);
+  const cta = (href: string, label: string, anchor = false) => anchor ? <a href={href} className="btn pri">{label}</a> : <Link href={href as "/"} className="btn pri">{label}</Link>;
+  const jn = (k: string, action: React.ReactNode, vals?: Record<string, string | number>): JNext => ({ label: tv("j.next"), title: tv(`j.n.${k}.t`, vals), sub: tv(`j.n.${k}.s`, vals), action });
+  const next: JNext | null = cur < 0 ? { label: tv("j.next"), title: tv("j.done.t"), sub: tv("j.done.s"), ok: true }
+    : cur === 1 ? jn("criteria", ctx.caps.has("contacts.write") ? cta(`/clients/${id}/edit`, tv("j.n.criteria.c")) : null)
+    : cur === 2 ? jn("selection", cta("#match", tv("j.n.selection.c"), true), { n: items.length })
+    : cur === 3 ? jn("visit", canPlan ? cta(planHref, tv("j.n.visit.c")) : null)
+    : cur === 4 ? jn("slip", cta("#slips", tv("j.n.slip.c"), true))
+    : cur === 5 ? jn("deal", ins.deal ? cta(`/deals?deal=${ins.deal.id}`, tv("j.n.won.c")) : cta("#deals", tv("j.n.deal.c"), true))
+    : cur === 6 ? jn("won", ins.deal ? cta(`/deals?deal=${ins.deal.id}`, tv("j.n.won.c")) : null, { stage: ins.deal ? pickName(ins.deal.stage, locale) : "—" }) : null;
+
   return (
+    <>
+    {seeker && <div style={{ marginBlockEnd: 16 }}><Journey title={tv("j.title")} steps={steps} next={next} current={cur} /></div>}
     <div className="client">
       <div className="col" style={{ gap: 16 }}>
         <div className="card card-b">
@@ -92,6 +122,10 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
             {phone && act(`https://wa.me/${phone.replace(/\D/g, "")}`, <MessageCircle size={16} aria-hidden />, "WhatsApp", true)}
             {email && act(`mailto:${email}`, <Mail size={16} aria-hidden />, "E-mail")}
           </div>}
+          <div className="col" style={{ gap: 6, marginBlockStart: 14 }}>
+            {canPlan && <Link href={planHref as "/"} className="btn pri block"><CalendarPlus size={14} aria-hidden />{tv("act.visit")}</Link>}
+            <a href="#match" className="btn block"><Send size={14} aria-hidden className="flip" />{tv("act.send")}</a>
+          </div>
         </div>
         {criteria}
         <div className="card"><h2>{t("details")}</h2><div className="card-b col" style={{ gap: 10 }}>
@@ -142,7 +176,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
       <div className="col" style={{ gap: 16 }}>
         {nextAction && <div className="card"><h2><Sparkles size={15} aria-hidden style={{ color: "var(--signal-text)" }} />{tv("next.title")}</h2><div className="card-b col" style={{ gap: 10 }}>
           <div><b style={{ fontWeight: 500 }}>{nextAction.title}</b><p className="note">{nextAction.sub}</p></div>
-          <div className="row wrap">{phone && <a className="btn sm pri" href={`tel:${phone}`}><Phone size={13} aria-hidden />{t("call")}</a>}{phone && <a className="btn sm" href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={13} aria-hidden />WhatsApp</a>}<Link className="btn sm" href="/agenda"><CalendarPlus size={13} aria-hidden />{tv("next.visit")}</Link></div>
+          <div className="row wrap">{phone && <a className="btn sm pri" href={`tel:${phone}`}><Phone size={13} aria-hidden />{t("call")}</a>}{phone && <a className="btn sm" href={`https://wa.me/${phone.replace(/\D/g, "")}`} target="_blank" rel="noopener noreferrer"><MessageCircle size={13} aria-hidden />WhatsApp</a>}{canPlan && <Link className="btn sm" href={planHref as "/"}><CalendarPlus size={13} aria-hidden />{tv("next.visit")}</Link>}</div>
         </div></div>}
         {ins.selection.length > 0 && <div className="card"><h2>{tv("sel.title")}<span className="cnt-b">{ins.selection.length}</span></h2>
           {ins.selection.map((p) => (
@@ -156,7 +190,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
           <div className="progress" role="img" aria-label={tv("deal.step", { i: ins.deal.idx, n: ins.deal.total })}>{Array.from({ length: Number(ins.deal.total) }, (_, i) => <i key={i} className={i < Number(ins.deal!.idx) ? "on" : ""} />)}</div>
           <div className="note">{tv("deal.since", { days: Number(ins.deal.days), fee: money(locale, Number(ins.deal.value ?? 0) * Number(ins.deal.fee_pct ?? 0) / 100) })}</div>
         </div></div>}
-        <div className="card"><h2><Sparkles size={15} aria-hidden />{ts("matchingProperties")}<span className="badge sig">{items.length}</span></h2>
+        <div className="card" id="match"><h2><Sparkles size={15} aria-hidden />{ts("matchingProperties")}<span className="badge sig">{items.length}</span></h2>
           <SendForm mode="contact" fixedId={id} items={items} waApi={await hasWhatsApp(ctx)} /></div>
         <div className="card"><h2>{t("tasks")}</h2><div className="card-b col" style={{ gap: 8 }}>
           {data.tasks.map((k) => (
@@ -176,7 +210,7 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
           )}
         </div></div>
         {ctx.caps.has("deals.write") && (
-          <div className="card"><h2><Handshake size={15} aria-hidden />{t("deals")}</h2><div className="card-b col" style={{ gap: 10 }}>
+          <div className="card" id="deals"><h2><Handshake size={15} aria-hidden />{t("deals")}</h2><div className="card-b col" style={{ gap: 10 }}>
             {data.deals.map((d) => <div key={d.id} className="row"><Badge tone={d.kind === "won" ? "ok" : d.kind === "lost" ? "bad" : "acc"}>{pickName(d.stage_name, locale)}</Badge><span className="sp tab">{money(locale, d.value, d.currency)}</span></div>)}
             <form action={openDealAction.bind(null, id)} className="row" style={{ gap: 6 }}>
               <input type="hidden" name="locale" value={locale} />
@@ -187,5 +221,6 @@ export default async function ClientPage({ params }: { params: Promise<{ locale:
         )}
       </div>
     </div>
+    </>
   );
 }

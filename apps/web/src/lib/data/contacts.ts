@@ -42,7 +42,7 @@ export async function getContact(ctx: Ctx, id: string) {
     const activities = await tx`select a.id, a.kind, a.summary, a.occurred_at, u.full_name as actor_name from public.activities a left join public.profiles u on u.id = a.actor_id where a.contact_id = ${id} order by a.occurred_at desc limit 25`;
     const tasks = await tx`select id, title, due_at, done_at from public.tasks where contact_id = ${id} order by (done_at is not null), due_at nulls last limit 10`;
     const shares = await tx`select s.id, s.channel, s.status, s.sent_at, s.opened_at, s.created_at, cardinality(s.property_ids) as n from public.shares s where s.contact_id = ${id} order by s.created_at desc limit 8`;
-    const deals = await tx`select d.id, d.value, d.currency, st.name as stage_name, st.kind from public.deals d join public.pipeline_stages st on st.id = d.stage_id where d.contact_id = ${id} and d.deleted_at is null order by d.created_at desc`;
+    const deals = await tx`select d.id, d.value, d.currency, st.name as stage_name, st.kind, st.probability from public.deals d join public.pipeline_stages st on st.id = d.stage_id where d.contact_id = ${id} and d.deleted_at is null order by d.created_at desc`;
     return { c: c as Record<string, any>, profiles: profiles as unknown as Record<string, any>[], matches: matches as unknown as Record<string, any>[], activities: activities as unknown as Record<string, any>[], tasks: tasks as unknown as Record<string, any>[], shares: shares as unknown as Record<string, any>[], deals: deals as unknown as Record<string, any>[] };
   });
 }

@@ -27,6 +27,7 @@ export default async function SignPage({ params, searchParams }: { params: Promi
   const fmt = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-GB" : "fr-FR", { dateStyle: "full", timeStyle: "short", timeZone: "Asia/Jerusalem" });
   return (
     <main style={{ maxWidth: 560, margin: "0 auto", padding: "24px 16px 48px" }}>
+      <nav className="doclang" aria-label={t("langs")}>{(["he", "fr", "en"] as const).map((l) => <a key={l} href={`/${l}/sign/${token}`} lang={l} className={l === locale ? "on" : ""} aria-current={l === locale ? "true" : undefined}>{l === "he" ? "עברית" : l === "fr" ? "Français" : "English"}</a>)}</nav>
       <h1 className="t-page" style={{ marginBottom: 2 }}>{TEXT[locale].title}</h1>
       <p className="muted" style={{ marginBottom: 16 }}>{info.orgName}</p>
       <dl className="card card-b" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px", margin: "0 0 16px" }}>
@@ -41,6 +42,7 @@ export default async function SignPage({ params, searchParams }: { params: Promi
         <div><div className="lbl">{TEXT[locale].signature}</div><SignaturePad name="signature" /></div>
         <label className="row" style={{ gap: 8, alignItems: "flex-start" }}><input type="checkbox" className="ck" name="consent" required /><span className="note">{t("consent")}</span></label>
         <button className="btn pri" style={{ height: 42 }}>{t("submit")}</button>
+        {locale !== "he" && <p className="note">{t("bilingual")}</p>}
       </form>
     </main>
   );

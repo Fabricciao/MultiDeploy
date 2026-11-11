@@ -3,7 +3,7 @@ import { revalidatePath } from "next/cache";
 import { getCtx } from "@/lib/session";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
-import { createVisit, setVisitStatus } from "@/lib/data/visits";
+import { createVisit, moveVisit, setVisitStatus } from "@/lib/data/visits";
 import { syncDealOnVisit } from "@/lib/data/deals";
 import { visitSignLink } from "@/lib/data/signature";
 import { getSlip, siteBase, slipInfo, type SlipInfo } from "@/lib/data/slips";
@@ -46,7 +46,20 @@ export async function createVisitAction(_p: VisitState, fd: FormData): Promise<V
 export async function visitStatusAction(id: string, status: "done" | "cancelled" | "no_show" | "planned", fd: FormData) {
   const locale = loc(fd); const ctx = await getCtx(locale);
   if (uuid.test(id)) await setVisitStatus(ctx, id, status);
-  revalidatePath(`/${locale}/agenda`);
+  revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`);
+}
+
+export type MoveState = { ok?: boolean; error?: string; warning?: { kind: string; key?: string } } | null;
+export async function moveVisitAction(id: string, _p: MoveState, fd: FormData): Promise<MoveState> {
+  const locale = loc(fd); const ctx = await getCtx(locale);
+  const startsAt = jerusalemToDate(String(fd.get("starts_at") ?? ""));
+  if (!uuid.test(id) || !startsAt) return { error: "invalid" };
+  const quiet = quietReason(startsAt);
+  if (quiet && fd.get("force") !== "on") return { warning: quiet };
+  const r = await moveVisit(ctx, id, startsAt);
+  if (r.error) return { error: r.error };
+  revalidatePath(`/${locale}/agenda`); revalidatePath(`/${locale}`);
+  return { ok: true };
 }
 
 export async function signLinkAction(visitId: string, fd: FormData) {

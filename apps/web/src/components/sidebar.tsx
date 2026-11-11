@@ -1,19 +1,21 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Bookmark, CalendarDays, ChartNoAxesColumn, CircleCheck, Ellipsis, Handshake, House, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, Settings, Sun, UserRound, Users, Zap, type LucideIcon, FileSignature } from "lucide-react";
+import { Bookmark, CalendarDays, ChartNoAxesColumn, CircleCheck, Ellipsis, FileSignature, Handshake, House, LogOut, Megaphone, PanelLeftClose, PanelLeftOpen, ScrollText, Settings, Sun, UserRound, Users, Zap, type LucideIcon } from "lucide-react";
 import { useLocale } from "next-intl";
 import { Link, usePathname } from "@/i18n/navigation";
 import { Mark } from "@/components/logo";
 
 type Item = { key: string; href: string; icon: LucideIcon; ready?: boolean };
-const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "tasks", href: "/tasks", icon: CircleCheck }, { key: "agenda", href: "/agenda", icon: CalendarDays }, { key: "visit-slips", href: "/visit-slips", icon: FileSignature }];
+// L'ordre suit la journée d'un agent : ce qu'il fait aujourd'hui, son portefeuille, les documents à faire signer, puis le pilotage.
+const DAILY: Item[] = [{ key: "today", href: "/", icon: Sun }, { key: "agenda", href: "/agenda", icon: CalendarDays }, { key: "tasks", href: "/tasks", icon: CircleCheck }];
 const PORTFOLIO: Item[] = [{ key: "properties", href: "/properties", icon: House }, { key: "clients", href: "/clients", icon: Users }, { key: "deals", href: "/deals", icon: Handshake }];
-const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "automations", href: "/automations", icon: Zap }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }];
+const DOCS: Item[] = [{ key: "visit-slips", href: "/visit-slips", icon: FileSignature }, { key: "mandates", href: "/mandates", icon: ScrollText }];
+const GROWTH: Item[] = [{ key: "marketing", href: "/marketing", icon: Megaphone }, { key: "reports", href: "/reports", icon: ChartNoAxesColumn }, { key: "automations", href: "/automations", icon: Zap }];
 
 export type RailView = { id: string; name: string; href: string };
 
-export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, counts, views, mini: miniInit }: { orgName: string; logoUrl?: string | null; userName: string; avatarUrl?: string | null; roleLabel: string; counts: { properties: number; clients: number; deals?: number; due?: number }; views: RailView[]; mini: boolean }) {
+export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, counts, views, mini: miniInit }: { orgName: string; logoUrl?: string | null; userName: string; avatarUrl?: string | null; roleLabel: string; counts: { properties: number; clients: number; deals?: number; due?: number; slips?: number; mandates?: number }; views: RailView[]; mini: boolean }) {
   const t = useTranslations("nav");
   const pathname = usePathname();
   const [mini, setMini] = useState(miniInit);
@@ -21,13 +23,15 @@ export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, coun
   useEffect(() => { const on = () => toggle(); window.addEventListener("toggle-rail", on); return () => window.removeEventListener("toggle-rail", on); }, []);
   const cnt = (k: string) => (k === "properties" ? counts.properties : k === "clients" ? counts.clients : k === "deals" ? counts.deals ?? null : null);
   const alert = (k: string) => (k === "today" || k === "tasks") && counts.due ? counts.due : null;
+  // Documents en attente de signature : visibles d'un coup d'œil, sans ouvrir la page.
+  const todo = (k: string) => (k === "visit-slips" ? counts.slips : k === "mandates" ? counts.mandates : 0) || null;
   const locale = useLocale();
   const link = ({ key, href, icon: Icon, ready = true }: Item) => {
     const on = href === "/" ? pathname === "/" : pathname.startsWith(href);
     const n = cnt(key);
     return ready ? (
       <Link key={key} href={href} className={`nav ${on ? "on" : ""}`} aria-current={on ? "page" : undefined} title={mini ? t(key) : undefined}>
-        <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>{alert(key) ? <span className="cnt alert">{alert(key)}</span> : n !== null && <span className="cnt">{n}</span>}
+        <Icon size={16} strokeWidth={1.75} aria-hidden /><span>{t(key)}</span>{alert(key) ? <span className="cnt alert">{alert(key)}</span> : todo(key) ? <span className="cnt todo" title={t("toSign", { n: todo(key)! })}>{todo(key)}</span> : n !== null && <span className="cnt">{n}</span>}
       </Link>
     ) : (
       <span key={key} className="nav" aria-disabled="true" title={t("soon")} style={{ opacity: 0.55, cursor: "not-allowed" }}>
@@ -45,6 +49,8 @@ export function Sidebar({ orgName, logoUrl, userName, avatarUrl, roleLabel, coun
       {DAILY.map(link)}
       <div className="grp">{t("groups.portfolio")}</div>
       {PORTFOLIO.map(link)}
+      <div className="grp">{t("groups.docs")}</div>
+      {DOCS.map(link)}
       <div className="grp">{t("groups.growth")}</div>
       {GROWTH.map(link)}
       {views.length > 0 && <div className="grp">{t("groups.views")}</div>}

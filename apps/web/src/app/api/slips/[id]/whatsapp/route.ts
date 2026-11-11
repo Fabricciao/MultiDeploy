@@ -11,7 +11,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ctx = await getCtx();
   const r = await getSlip(ctx, id);
   if (!r) return back;
-  const info = slipInfo(ctx, r, await siteBase(), true);
+  const l = req.nextUrl.searchParams.get("l");
+  const info = slipInfo(ctx, r, await siteBase(), true, l === "fr" || l === "he" || l === "en" ? l : undefined);
   if (!info.wa) return back;
   await logSlipSent(ctx, r.id, r.contact_id!, r.property_id, "whatsapp");
   return NextResponse.redirect(info.wa, 303);

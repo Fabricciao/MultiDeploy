@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { AlarmClock, ArrowRightLeft, CalendarCheck, Check, ClipboardCheck, Clock, Eye, FileSignature, Hand, Handshake, MessageCircle, Navigation, Phone, Plus, Send, Snowflake, Sparkles, StickyNote, TrendingDown, TrendingUp } from "lucide-react";
+import { AlarmClock, ArrowRightLeft, CalendarCheck, CalendarPlus, Check, ClipboardCheck, Clock, Eye, FileSignature, Hand, Handshake, House, ListPlus, MessageCircle, Mic, Navigation, Phone, Plus, ScrollText, Send, Snowflake, Sparkles, StickyNote, TrendingDown, TrendingUp, UserPlus } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx, seesAllStats, db } from "@/lib/session";
 import { getOnboarding, getToday } from "@/lib/data/today";
@@ -33,6 +33,8 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
   const slips = await slipMap(ctx, c.day.filter((v) => v.contact_id).map((v) => v.id as string));
   const to = await getTranslations("onboarding");
   const greeting = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", { timeZone: "Asia/Jerusalem", weekday: "long", day: "numeric", month: "long" }).format(new Date());
+  const hour = Number(new Intl.DateTimeFormat("en-GB", { timeZone: "Asia/Jerusalem", hour: "2-digit", hourCycle: "h23" }).format(new Date()));
+  const canProp = ctx.caps.has("properties.write") && !ctx.impersonating, canContact = ctx.caps.has("contacts.write") && !ctx.impersonating;
   const city = (r: Row) => cityName({ name_fr: r.city_fr, name_he: r.city_he, name_en: r.city_en }, locale);
   const place = (r: Row) => [r.street, city(r)].filter(Boolean).join(", ");
 
@@ -70,9 +72,19 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
 
   return (
     <>
-      <PageHeader title={t("hello", { name: ctx.fullName.split(" ")[0] ?? "" })} sub={greeting}>
+      <PageHeader title={t(hour < 12 ? "helloMorning" : hour < 18 ? "helloAfternoon" : "helloEvening", { name: ctx.fullName.split(" ")[0] ?? "" })} sub={greeting}>
         {manager && <div className="seg" role="group" aria-label={t("scope")}><Link href="/?scope=me" className={mine ? "on" : ""}>{t("me")}</Link><Link href="/" className={mine ? "" : "on"}>{t("agency")}</Link></div>}
       </PageHeader>
+
+      {/* Les gestes de tous les jours, visibles sans chercher dans un menu. */}
+      {(canProp || canContact) && <nav className="quick" aria-label={t("quick.label")}>
+        {canProp && <Link href="/agenda?new=1" className="pri"><span className="qi"><CalendarPlus size={14} aria-hidden /></span>{t("quick.visit")}</Link>}
+        {canContact && <Link href="/clients/new"><span className="qi"><UserPlus size={14} aria-hidden /></span>{t("quick.client")}</Link>}
+        {canProp && <Link href="/properties/new"><span className="qi"><House size={14} aria-hidden /></span>{t("quick.property")}</Link>}
+        {ctx.caps.has("tasks.write") && <Link href="/?add=task" scroll={false}><span className="qi"><ListPlus size={14} aria-hidden /></span>{t("quick.task")}</Link>}
+        {canProp && <Link href="/mandates?new=1"><span className="qi"><ScrollText size={14} aria-hidden /></span>{t("quick.mandate")}</Link>}
+        {canContact && <Link href="/intake?mode=voice&target=contact" className="sig"><span className="qi"><Mic size={14} aria-hidden /></span>{t("quick.dictate")}</Link>}
+      </nav>}
 
       <div className="kpis">
         <div className="card kp"><div className="k">{t("kpi.fees")}</div><div className="v">{money(locale, feeNow)}</div><Spark values={fees} label={t("kpi.feesSpark")} />
@@ -103,7 +115,7 @@ export default async function TodayPage({ params, searchParams }: { params: Prom
                   <div key={v.id} className={`slot ${i === nextIdx ? "next" : ""} ${v.status === "done" || (i < nextIdx) || (nextIdx < 0) ? "done" : ""}`}>
                     <time className="ltr">{timeOnly(locale, v.starts_at)}</time><div className="ln"><i /></div>
                     <div className="b"><Link href={`/properties/${v.property_id}`} className="thumb"><Cover path={v.cover_thumb} /></Link>
-                      <div className="grow" style={{ minWidth: 0 }}><b className="trunc">{place(v)}</b><small>{v.contact_id ? contactName(v, locale) : t("day.noClient")}</small></div>
+                      <Link href={`/agenda?v=${v.id}`} className="grow" style={{ minWidth: 0 }}><b className="trunc">{place(v)}</b><small>{v.contact_id ? contactName(v, locale) : t("day.noClient")}</small></Link>
                       {i === nextIdx && <div className="row">
                         <a className="btn pri sm" href={`https://waze.com/ul?q=${encodeURIComponent(place(v))}`} target="_blank" rel="noopener noreferrer"><Navigation size={13} aria-hidden />{t("next.route")}</a>
                         {ph && <a className="btn sm icon" href={`tel:${ph}`} aria-label={t("next.call")}><Phone size={13} aria-hidden /></a>}

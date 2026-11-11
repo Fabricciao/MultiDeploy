@@ -3,6 +3,7 @@ import { useActionState, useEffect, useRef, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Mic, PenLine, ScanLine, Square } from "lucide-react";
 import { startIntake, type IntakeState } from "@/app/[locale]/(app)/intake/actions";
+import { FileInput } from "@/components/file-input";
 
 type Mode = "voice" | "scan" | "text";
 const MAX_SECONDS = 180;
@@ -66,7 +67,7 @@ export function IntakeStart({ mode, target, caps }: { mode: Mode; target: "conta
         <div className="card"><div className="card-b col" style={{ gap: 12 }}>
           {!caps.vision && <div className="note" style={{ color: "var(--warn)" }} role="status">{t("visionMissing")}</div>}
           <p className="muted">{t("scanHint")}</p>
-          <input type="file" name="image" accept="image/*" capture="environment" className="input" style={{ height: "auto", padding: 6 }} aria-label={t("choosePhoto")} />
+          <FileInput name="image" accept="image/*" capture="environment" label={t("choosePhoto")} />
           <button className="btn pri" disabled={pending}>{pending ? t("analyzing") : t("analyze")}</button>
         </div></div>
       )}

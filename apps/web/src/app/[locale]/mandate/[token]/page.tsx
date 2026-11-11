@@ -32,6 +32,7 @@ export default async function MandateSignPage({ params, searchParams }: { params
   const row = (k: string, v: string) => v ? <><dt className="note">{k}</dt><dd style={{ margin: 0 }}>{v}</dd></> : null;
   return (
     <main style={{ maxWidth: 620, margin: "0 auto", padding: "24px 16px 48px" }}>
+      <nav className="doclang" aria-label={ts("langs")}>{(["he", "fr", "en"] as const).map((l) => <a key={l} href={`/${l}/mandate/${token}`} lang={l} className={l === locale ? "on" : ""} aria-current={l === locale ? "true" : undefined}>{l === "he" ? "עברית" : l === "fr" ? "Français" : "English"}</a>)}</nav>
       <h1 className="t-page" style={{ marginBottom: 2 }}>{T.title}</h1>
       <p className="muted" style={{ marginBottom: 16 }}>{info.orgName}</p>
       <dl className="card card-b" style={{ display: "grid", gridTemplateColumns: "auto 1fr", gap: "6px 14px", margin: "0 0 16px" }}>
@@ -49,7 +50,7 @@ export default async function MandateSignPage({ params, searchParams }: { params
         <div><div className="lbl">{T.signature}</div><SignaturePad name="signature" /></div>
         <label className="row" style={{ gap: 8, alignItems: "flex-start" }}><input type="checkbox" className="ck" name="consent" required /><span className="note">{t("consent")}</span></label>
         <button className="btn pri" style={{ height: 42 }}>{t("submit")}</button>
-        <p className="note">{t("privacy")}</p>
+        <p className="note">{t("privacy")}{locale !== "he" ? ` ${ts("bilingual")}` : ""}</p>
       </form>
     </main>
   );

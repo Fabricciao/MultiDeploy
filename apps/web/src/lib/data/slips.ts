@@ -16,7 +16,7 @@ export type SlipRow = {
   property_id: string; reference: string; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; title: string | null;
   contact_id: string | null; first_name: string | null; last_name: string | null; first_name_he: string | null; last_name_he: string | null; preferred_locale: string | null; phone: string | null; email: string | null; sent_at: Date | null; total: string;
 };
-export type SlipInfo = { id: string; signed: boolean; signedAt: Date | null; signer: string | null; doc: string | null; url: string | null; wa: string | null; hasEmail: boolean; hasContact: boolean; sentAt: Date | null };
+export type SlipInfo = { id: string; signed: boolean; signedAt: Date | null; signer: string | null; doc: string | null; url: string | null; wa: string | null; hasEmail: boolean; hasContact: boolean; sentAt: Date | null; lang: Loc };
 export type SlipFilter = { visitId?: string; visitIds?: string[]; contactId?: string; propertyId?: string; state?: "signed" | "pending" | "all"; q?: string; limit?: number; page?: number };
 
 export async function listSlips(ctx: Ctx, f: SlipFilter = {}): Promise<{ rows: SlipRow[]; total: number; counts: { signed: number; pending: number } }> {
@@ -60,8 +60,8 @@ const first = (r: Pick<SlipRow, "first_name" | "first_name_he">, l: Loc) => (l =
 export const canSendSlip = (ctx: Ctx, r: Pick<SlipRow, "agent_id" | "signed_at" | "status" | "contact_id">) =>
   ctx.caps.has("properties.write") && !ctx.impersonating && !r.signed_at && r.status !== "cancelled" && !!r.contact_id && (r.agent_id === ctx.userId || ctx.caps.has("properties.write_all"));
 
-function compose(ctx: Ctx, r: SlipRow, base: string) {
-  const l = loc(r.preferred_locale);
+function compose(ctx: Ctx, r: SlipRow, base: string, lang?: Loc) {
+  const l = lang ?? loc(r.preferred_locale);
   const url = `${base}/${l}/sign/${encodeURIComponent(signToken({ v: r.id }, 7 * 86400))}`;
   const city = (l === "he" ? r.city_he : l === "en" ? r.city_en : r.city_fr) ?? r.city_fr ?? "";
   const date = new Intl.DateTimeFormat(l === "he" ? "he-IL" : l === "en" ? "en-GB" : "fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" }).format(new Date(r.starts_at));
@@ -69,10 +69,10 @@ function compose(ctx: Ctx, r: SlipRow, base: string) {
 }
 
 /** Liens prêts à l'emploi : WhatsApp (message préenregistré + lien) et lien seul à copier. Calculés à l'affichage : un clic suffit. */
-export function slipInfo(ctx: Ctx, r: SlipRow, base: string, direct = false): SlipInfo {
-  const out: SlipInfo = { id: r.id, signed: !!r.signed_at, signedAt: r.signed_at, signer: r.signer_name, doc: r.document_path, url: null, wa: null, hasEmail: !!r.email, hasContact: !!r.contact_id, sentAt: r.sent_at };
+export function slipInfo(ctx: Ctx, r: SlipRow, base: string, direct = false, lang?: Loc): SlipInfo {
+  const out: SlipInfo = { id: r.id, signed: !!r.signed_at, signedAt: r.signed_at, signer: r.signer_name, doc: r.document_path, url: null, wa: null, hasEmail: !!r.email, hasContact: !!r.contact_id, sentAt: r.sent_at, lang: lang ?? loc(r.preferred_locale) };
   if (!canSendSlip(ctx, r)) return out;
-  const c = compose(ctx, r, base);
+  const c = compose(ctx, r, base, lang);
   out.url = c.url;
   const digits = (r.phone ?? "").replace(/\D/g, "");
   // Par défaut, le lien passe par /api/slips/…/whatsapp pour noter l'envoi ; « direct » donne l'adresse wa.me finale.
@@ -83,14 +83,14 @@ export function slipInfo(ctx: Ctx, r: SlipRow, base: string, direct = false): Sl
 export async function getSlip(ctx: Ctx, visitId: string): Promise<SlipRow | undefined> { return (await listSlips(ctx, { visitId, limit: 1 })).rows[0]; }
 
 export type SlipSendResult = "sent" | "dry_run" | "failed" | "no_email" | "forbidden";
-export async function sendSlipEmail(ctx: Ctx, visitId: string, base: string): Promise<SlipSendResult> {
+export async function sendSlipEmail(ctx: Ctx, visitId: string, base: string, lang?: Loc): Promise<SlipSendResult> {
   const r = await db(ctx, async (tx) => (await tx`
       select v.id, v.starts_at, v.status, v.signed_at, v.agent_id, v.contact_id, v.property_id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en,
         c.first_name, c.first_name_he, c.preferred_locale, c.emails->0->>'email' as email, (select b.colors->>'primary' from public.brand_kits b where b.organization_id = v.organization_id) as accent
       from public.visits v join public.properties p on p.id = v.property_id left join public.geo_places g on g.id = p.city_id left join public.contacts c on c.id = v.contact_id where v.id = ${visitId}`)[0]);
   if (!r || !canSendSlip(ctx, r as SlipRow)) return "forbidden";
   if (!r.email) return "no_email";
-  const c = compose(ctx, r as SlipRow, base);
+  const c = compose(ctx, r as SlipRow, base, lang);
   const mail = slipEmail(c.l, { ...c.msg, accent: r.accent ?? undefined });
   let status: SlipSendResult;
   const gm = await getUserTokens(ctx.userId, "gmail");

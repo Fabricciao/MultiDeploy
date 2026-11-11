@@ -6,7 +6,7 @@ import { sql } from "../db";
 import { signToken, verifyToken } from "../crypto";
 import { storage } from "../storage";
 import { loadFonts, renderPdf } from "../poster/render";
-import { visitSheetHtml, type Loc } from "../visit-sheet/html";
+import { docLocales, visitSheetHtml, type Loc } from "../visit-sheet/html";
 
 const DAY = 86400;
 export async function visitSignLink(ctx: Ctx, visitId: string, base: string): Promise<string | null> {
@@ -62,9 +62,10 @@ export async function submitSignature(token: string, locale: Loc, i: { name: str
   const fingerprint = createHash("sha256").update(png).update(`|${info.visitId}|${name}|${signedAt.toISOString()}`).digest("hex");
   const ipHash = createHash("sha256").update(`${i.ip}|${process.env.APP_SECRET ?? ""}`).digest("hex").slice(0, 32);
   const sigKey = `org/${info.orgId}/signatures/${info.visitId}.png`, docKey = `org/${info.orgId}/visit_docs/${info.visitId}.pdf`;
-  const fmt = new Intl.DateTimeFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-GB" : "fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" });
-  const html = visitSheetHtml({ locale, orgName: info.orgName, reference: info.reference, address: info.address, startsAt: fmt.format(info.startsAt), agent: info.agent, signer: name,
-    signaturePng: `data:image/png;base64,${png.toString("base64")}`, signedAt: fmt.format(signedAt), fingerprint }, await loadFonts());
+  // Le PDF est toujours établi en hébreu, suivi de la traduction dans la langue lue par le signataire.
+  const fmt = (l: Loc) => new Intl.DateTimeFormat(l === "he" ? "he-IL" : l === "en" ? "en-GB" : "fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" });
+  const parts = await Promise.all(docLocales(locale).map(async (l) => { const x = l === locale ? info : (await loadSignInfo(token, l)) ?? info; return { locale: l, orgName: x.orgName, address: x.address, startsAt: fmt(l).format(info.startsAt), signedAt: fmt(l).format(signedAt) }; }));
+  const html = visitSheetHtml({ parts, reference: info.reference, agent: info.agent, signer: name, signaturePng: `data:image/png;base64,${png.toString("base64")}`, fingerprint }, await loadFonts());
   const pdf = await renderPdf(html);
   // Verrou atomique : une seule signature par visite, même en cas de double envoi.
   const [claimed] = await sql`update public.visits set signer_name = ${name}, signed_at = ${signedAt}, signature_hash = ${fingerprint}, signed_ip_hash = ${ipHash}, signature_path = ${sigKey}, document_path = ${docKey}, status = case when status = 'planned' then 'done' else status end

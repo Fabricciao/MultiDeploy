@@ -29,7 +29,15 @@
     "preview": "Aperçu",
     "newTask": "Nouvelle tâche",
     "newVisit": "Nouvelle visite",
-    "newDeal": "Nouvelle affaire"
+    "newDeal": "Nouvelle affaire",
+    "importData": "Importer des données",
+    "newMandate": "Nouveau mandat",
+    "chooseFile": "Choisir un fichier",
+    "chooseFiles": "Choisir des fichiers",
+    "noFile": "Aucun fichier choisi",
+    "filesChosen": "{n, plural, one {# fichier} other {# fichiers}}",
+    "million": "M",
+    "thousand": "k"
   },
   "nav": {
     "label": "Navigation principale",
@@ -46,8 +54,10 @@
     "profile": "Mon profil",
     "groups": {
       "portfolio": "Portefeuille",
-      "growth": "Croissance",
-      "views": "Mes vues"
+      "growth": "Développement",
+      "views": "Mes vues",
+      "daily": "Au quotidien",
+      "docs": "Documents à signer"
     },
     "poweredBy": "Propulsé par NadlanHub",
     "collapse": "Replier la barre latérale",
@@ -61,7 +71,9 @@
     "tasks": "Tâches",
     "signOut": "Se déconnecter",
     "automations": "Automatisations",
-    "visit-slips": "Bons de visite"
+    "visit-slips": "Bons de visite",
+    "mandates": "Mandats",
+    "toSign": "{n} à faire signer"
   },
   "today": {
     "title": "Aujourd'hui",
@@ -158,6 +170,18 @@
       "visit": "Visite avec {name}",
       "status_change": "Statut d'un bien modifié",
       "other": "Activité sur {name}"
+    },
+    "helloMorning": "Bonjour {name}",
+    "helloAfternoon": "Bon après-midi {name}",
+    "helloEvening": "Bonsoir {name}",
+    "quick": {
+      "label": "Actions rapides",
+      "client": "Nouveau client",
+      "property": "Nouveau bien",
+      "visit": "Planifier une visite",
+      "task": "Nouvelle tâche",
+      "dictate": "Dicter une fiche",
+      "mandate": "Faire signer un mandat"
     }
   },
   "login": {
@@ -515,6 +539,17 @@
       "label": "Recherche en langage courant",
       "placeholder": "Décrivez le bien : « 4 pièces Raanana moins de 3,5 M avec mamad »",
       "miss": "Je n'ai reconnu ni ville, ni pièces, ni budget. Essayez « 4 pièces Raanana moins de 3,5 M »."
+    },
+    "bulk": {
+      "count": "{n, plural, one {# bien sélectionné} other {# biens sélectionnés}}",
+      "send": "Envoyer à un client",
+      "clear": "Tout désélectionner",
+      "tip": "Cochez plusieurs biens pour les envoyer ensemble à un client."
+    },
+    "viewShort": {
+      "table": "Liste",
+      "grid": "Grille",
+      "map": "Carte"
     }
   },
   "clients": {
@@ -1185,7 +1220,8 @@
       "conflict": "Vous avez déjà une visite sur ce créneau.",
       "invalid": "Données invalides.",
       "forbidden": "Droits insuffisants.",
-      "past": "Date passée."
+      "past": "Date passée.",
+      "signed": "Le bon de visite est déjà signé."
     },
     "signLink": "Lien du bon de visite",
     "signedDoc": "Document signé",
@@ -1198,7 +1234,32 @@
     "slipsNone": "Tous les bons de visite de la semaine sont envoyés ou signés.",
     "slipsAll": "Voir tous les bons de visite",
     "slipNow": "Visite programmée. Envoyez le bon de visite au client :",
-    "debriefTitle": "Comptes rendus à faire"
+    "debriefTitle": "Comptes rendus à faire",
+    "planHint": "Cliquez sur un créneau libre pour planifier une visite.",
+    "addAt": "Planifier une visite le {when}",
+    "close": "Fermer",
+    "another": "Planifier une autre visite",
+    "clientHint": "Avec un client, le bon de visite est prêt à envoyer dès la planification.",
+    "minutes": "{n} min",
+    "visit": {
+      "title": "Visite",
+      "noClient": "Sans client",
+      "agent": "Agent : {name}",
+      "route": "Itinéraire",
+      "call": "Appeler",
+      "openProperty": "Ouvrir le bien",
+      "openClient": "Ouvrir le client",
+      "slip": "Bon de visite",
+      "debrief": "Compte rendu",
+      "debriefDone": "Compte rendu enregistré",
+      "status": "Statut de la visite",
+      "noShow": "Client absent",
+      "replan": "Remettre en « prévue »",
+      "move": "Déplacer la visite",
+      "moveBtn": "Déplacer",
+      "moved": "Visite déplacée.",
+      "signedLocked": "Bon de visite signé : la visite ne peut plus être déplacée."
+    }
   },
   "import": {
     "title": "Importer des données",
@@ -1382,7 +1443,9 @@
       "no_consent": "Vous devez accepter pour signer.",
       "already_signed": "Ce document est déjà signé.",
       "invalid_token": "Ce lien n'est pas valide ou a expiré."
-    }
+    },
+    "langs": "Langue du document",
+    "bilingual": "Le document signé est établi en hébreu, accompagné de sa traduction."
   },
   "shortcuts": {
     "title": "Raccourcis clavier",
@@ -1482,7 +1545,7 @@
       "overview": "Vue d'ensemble",
       "clients": "Clients correspondants",
       "activity": "Activité",
-      "owner": "Propriétaire"
+      "owner": "Propriétaire et mandat"
     },
     "perf": {
       "title": "Diffusion de l'annonce",
@@ -1574,6 +1637,83 @@
       "none": "Aucun mandat pour ce bien.",
       "signedShort": "mandat signé",
       "toSign": "faire signer le mandat"
+    },
+    "planVisit": "Planifier une visite",
+    "mandateBtn": "Mandat",
+    "statusQuick": "Changer le statut",
+    "visitsCard": "Visites",
+    "visitsEmpty": "Aucune visite pour l'instant.",
+    "j": {
+      "title": "Parcours du bien",
+      "mandate": "Mandat",
+      "listing": "Annonce",
+      "marketing": "Diffusion",
+      "visits": "Visites",
+      "offer": "Offre",
+      "closed": "Vendu",
+      "closedRent": "Loué",
+      "s": {
+        "mandateSigned": "Signé",
+        "mandateExclusive": "Exclusif",
+        "mandatePending": "Envoyé, à signer",
+        "mandatePartner": "Bien partenaire",
+        "mandateNone": "À faire signer",
+        "photos": "{n, plural, =0 {Sans photo} one {# photo} other {# photos}}",
+        "online": "En ligne",
+        "draft": "Brouillon",
+        "sent": "{n, plural, =0 {Aucun envoi} one {# envoi} other {# envois}}",
+        "visits": "{n, plural, =0 {Aucune visite} one {# visite} other {# visites}}",
+        "offers": "{n, plural, =0 {Aucune offre} one {# en cours} other {# en cours}}"
+      },
+      "next": "Prochaine étape",
+      "n": {
+        "mandate": {
+          "t": "Faire signer le mandat d'exclusivité",
+          "s": "Le propriétaire signe en ligne sur son téléphone, en hébreu et dans sa langue.",
+          "c": "Préparer le mandat"
+        },
+        "mandateSend": {
+          "t": "Relancer le propriétaire pour la signature",
+          "s": "Le mandat est prêt et envoyé : il manque sa signature.",
+          "c": "Renvoyer le mandat"
+        },
+        "photos": {
+          "t": "Ajouter des photos",
+          "s": "Une annonce avec photos reçoit bien plus de demandes.",
+          "c": "Ajouter des photos"
+        },
+        "listing": {
+          "t": "Compléter l'annonce",
+          "s": "Prix, adresse et description en français et en hébreu.",
+          "c": "Compléter"
+        },
+        "publish": {
+          "t": "Mettre le bien en ligne",
+          "s": "Passez le statut sur « Actif » pour l'envoyer aux clients et créer une affiche."
+        },
+        "send": {
+          "t": "{n, plural, =0 {Envoyer le bien à un client} one {Envoyer le bien au client qui correspond} other {Envoyer le bien aux # clients qui correspondent}}",
+          "s": "Par WhatsApp ou e-mail, dans la langue de chaque client.",
+          "c": "Envoyer à un client"
+        },
+        "visit": {
+          "t": "Planifier la première visite",
+          "s": "Le bon de visite part au client en un clic après la planification."
+        },
+        "offer": {
+          "t": "Transformer une visite en offre",
+          "s": "Notez le compte rendu après chaque visite : l'affaire avance toute seule.",
+          "c": "Voir les affaires"
+        },
+        "close": {
+          "t": "Conclure la vente",
+          "s": "Une offre est en cours : suivez-la jusqu'à la signature."
+        }
+      },
+      "done": {
+        "t": "Affaire conclue",
+        "s": "Ce bien est sorti du portefeuille actif."
+      }
     }
   },
   "clientV2": {
@@ -1620,6 +1760,58 @@
     "slips": {
       "title": "Bons de visite",
       "empty": "Aucune visite programmée pour ce client."
+    },
+    "j": {
+      "title": "Parcours du client",
+      "contact": "Contact",
+      "criteria": "Critères",
+      "selection": "Sélection",
+      "visit": "Visite",
+      "slip": "Bon signé",
+      "deal": "Offre",
+      "won": "Conclu",
+      "next": "Prochaine étape",
+      "n": {
+        "criteria": {
+          "t": "Renseigner ce que le client recherche",
+          "s": "Budget, villes, pièces : le CRM proposera tout seul les biens qui correspondent.",
+          "c": "Ajouter les critères"
+        },
+        "selection": {
+          "t": "{n, plural, =0 {Envoyer une sélection de biens} one {Envoyer le bien qui correspond} other {Envoyer les # biens qui correspondent}}",
+          "s": "Le client reçoit un lien ; vous voyez quand il l'ouvre.",
+          "c": "Choisir les biens"
+        },
+        "visit": {
+          "t": "Planifier une visite",
+          "s": "Le bon de visite sera prêt à envoyer aussitôt.",
+          "c": "Planifier une visite"
+        },
+        "slip": {
+          "t": "Faire signer le bon de visite",
+          "s": "Un clic par WhatsApp ou e-mail ; le client signe sur son téléphone.",
+          "c": "Voir les bons de visite"
+        },
+        "deal": {
+          "t": "Transformer la visite en offre",
+          "s": "Notez le compte rendu de visite ou ouvrez une affaire.",
+          "c": "Ouvrir une affaire"
+        },
+        "won": {
+          "t": "Faire avancer l'affaire",
+          "s": "Étape actuelle : {stage}.",
+          "c": "Ouvrir l'affaire"
+        }
+      },
+      "done": {
+        "t": "Affaire conclue avec ce client",
+        "s": "Pensez à demander une recommandation."
+      }
+    },
+    "act": {
+      "visit": "Planifier une visite",
+      "send": "Envoyer des biens",
+      "task": "Tâche"
     }
   },
   "automations": {
@@ -1661,7 +1853,7 @@
   },
   "slips": {
     "title": "Bons de visite",
-    "sub": "{signed} signés · {pending} à faire signer",
+    "sub": "{signed, plural, =0 {Aucun signé} one {# signé} other {# signés}} · {pending} à faire signer",
     "tabs": {
       "signed": "Signés",
       "pending": "À faire signer",
@@ -1695,7 +1887,15 @@
     "copy": "Copier le lien",
     "emailFailed": "L'e-mail n'est pas parti. Réessayez ou utilisez WhatsApp.",
     "noEmail": "Ce client n'a pas d'e-mail.",
-    "sentOn": "Envoyé le {date}"
+    "sentOn": "Envoyé le {date}",
+    "lang": "Langue du document",
+    "langHint": "Le bon de visite est toujours établi en hébreu ; la traduction s'ajoute si le client lit une autre langue.",
+    "steps": {
+      "plan": "1. Planifiez la visite avec un client",
+      "send": "2. Envoyez le bon par WhatsApp ou e-mail",
+      "sign": "3. Le client signe sur son téléphone, le PDF est rangé ici"
+    },
+    "plan": "Planifier une visite"
   },
   "debrief": {
     "open": "Compte rendu",
@@ -1823,5 +2023,43 @@
       "none_found": "Aucune fiche de bien trouvée sur ce site. Il est peut-être construit d'une façon que l'outil ne sait pas lire.",
       "empty": "Aucun bien sélectionné."
     }
+  },
+  "mandates": {
+    "title": "Mandats d'exclusivité",
+    "sub": "{signed, plural, =0 {Aucun signé} one {# signé} other {# signés}} · {pending} à faire signer",
+    "tabs": {
+      "pending": "À faire signer",
+      "signed": "Signés",
+      "all": "Tous"
+    },
+    "new": "Préparer un mandat",
+    "pick": "Pour quel bien ?",
+    "pickNone": "Tous vos biens ont un mandat signé ou en attente.",
+    "col": {
+      "property": "Bien",
+      "owner": "Propriétaire",
+      "period": "Exclusivité",
+      "fee": "Commission",
+      "agent": "Agent",
+      "state": "Signature"
+    },
+    "emptyPending": "Aucun mandat en attente de signature.",
+    "emptySigned": "Aucun mandat signé en ligne pour l'instant.",
+    "how": "Ouvrez un bien, onglet « Propriétaire et mandat » : le mandat se prépare en une minute et le propriétaire le signe sur son téléphone.",
+    "signedOn": "Signé le {date}",
+    "pending": "À signer",
+    "pdf": "PDF signé",
+    "expires": "{days, plural, =0 {Expire aujourd'hui} one {Expire dans # jour} other {Expire dans # jours}}",
+    "expired": "Expiré",
+    "todo": {
+      "title": "Biens sans mandat signé",
+      "sub": "vos biens en vente, hors biens partenaires",
+      "cta": "Préparer"
+    },
+    "expiring": {
+      "title": "Exclusivités qui expirent",
+      "none": "Aucune exclusivité n'expire dans les 30 jours."
+    },
+    "open": "Ouvrir"
   }
 }

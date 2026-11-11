@@ -10,7 +10,8 @@ export async function sendSlipEmailAction(visitId: string, _p: SlipEmailState, f
   const l = String(fd.get("locale")); const locale = ["fr", "he", "en"].includes(l) ? l : "fr";
   if (!uuid.test(visitId)) return { status: "forbidden" };
   const ctx = await getCtx(locale);
-  const status = await sendSlipEmail(ctx, visitId, await siteBase());
+  const lang = String(fd.get("lang") ?? "");
+  const status = await sendSlipEmail(ctx, visitId, await siteBase(), lang === "fr" || lang === "he" || lang === "en" ? lang : undefined);
   revalidatePath(`/${locale}/visit-slips`);
   return { status };
 }

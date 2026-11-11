@@ -26,6 +26,7 @@ export async function cancelMandateAction(propertyId: string, id: string, fd: Fo
 }
 export async function sendMandateEmailAction(id: string, _p: MandateEmailState, fd: FormData): Promise<MandateEmailState> {
   const locale = loc(fd); if (!uuid.test(id)) return { status: "forbidden" };
-  const status = await sendMandateEmail(await getCtx(locale), id, await siteBase());
+  const lang = String(fd.get("lang") ?? "");
+  const status = await sendMandateEmail(await getCtx(locale), id, await siteBase(), lang === "fr" || lang === "he" || lang === "en" ? lang : undefined);
   return { status };
 }

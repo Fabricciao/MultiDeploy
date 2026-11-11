@@ -9,7 +9,7 @@ import { sendViaGmail } from "../integrations/gmail";
 import { getUserTokens, saveUserTokens } from "./connections";
 import { loadFonts, renderPdf } from "../poster/render";
 import { ACTIONS, mandateHtml, type MandateAction } from "../mandate/html";
-import type { Loc } from "../visit-sheet/html";
+import { docLocales, type Loc } from "../visit-sheet/html";
 import { checkSignaturePng } from "./signature";
 import { pickName } from "./types";
 
@@ -28,6 +28,42 @@ export async function listMandates(ctx: Ctx, propertyId: string): Promise<Mandat
       (select max(x.occurred_at) from public.activities x where x.kind = 'mandate_sent' and x.payload->>'mandate_id' = m.id::text) as sent_at
     from public.property_mandates m left join public.contacts c on c.id = m.contact_id left join public.profiles a on a.id = m.agent_id
     where m.property_id = ${propertyId} order by m.created_at desc limit 10`)) as unknown as MandateRow[];
+}
+
+/* ───────── Vue d'ensemble de l'agence : tous les mandats, les biens sans mandat, les exclusivités qui expirent ───────── */
+export type MandateListRow = MandateRow & { reference: string; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; total: string };
+export type PropRef = { id: string; reference: string; street: string | null; city_fr: string | null; city_he: string | null; city_en: string | null; days?: number };
+export async function listAllMandates(ctx: Ctx, state: "pending" | "signed" | "all", all: boolean, page = 1, limit = 50): Promise<{ rows: MandateListRow[]; total: number; counts: { signed: number; pending: number } }> {
+  return db(ctx, async (tx) => {
+    const scope = tx`m.status <> 'cancelled' and p.deleted_at is null and (${all} or p.agent_id = ${ctx.userId} or m.agent_id = ${ctx.userId})`;
+    const where = state === "pending" ? tx`${scope} and m.status = 'sent'` : state === "signed" ? tx`${scope} and m.status = 'signed'` : scope;
+    const rows = (await tx`select m.id, m.property_id, m.contact_id, m.owner_name, m.broker_license, m.starts_on::text, m.ends_on::text, m.price, m.currency, m.commission_pct, m.actions, m.status, m.signer_name, m.signed_at, m.document_path, m.created_at,
+        m.agent_id, a.full_name as agent_name, c.phones->0->>'e164' as phone, c.emails->0->>'email' as email, c.preferred_locale,
+        (select max(x.occurred_at) from public.activities x where x.kind = 'mandate_sent' and x.payload->>'mandate_id' = m.id::text) as sent_at,
+        p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, count(*) over() as total
+      from public.property_mandates m join public.properties p on p.id = m.property_id left join public.geo_places g on g.id = p.city_id
+        left join public.contacts c on c.id = m.contact_id left join public.profiles a on a.id = m.agent_id
+      where ${where} order by coalesce(m.signed_at, m.created_at) desc limit ${limit} offset ${(Math.max(1, page) - 1) * limit}`) as unknown as MandateListRow[];
+    const [k] = await tx`select count(*) filter (where m.status = 'signed')::int as signed, count(*) filter (where m.status = 'sent')::int as pending
+      from public.property_mandates m join public.properties p on p.id = m.property_id where ${scope}`;
+    return { rows, total: rows[0] ? Number(rows[0].total) : 0, counts: { signed: Number(k?.signed ?? 0), pending: Number(k?.pending ?? 0) } };
+  });
+}
+/** Biens de l'agence (hors biens partenaires) en vente ou en location sans mandat signé ni en attente, et exclusivités qui expirent sous 30 jours. */
+export async function mandateOverview(ctx: Ctx, all: boolean): Promise<{ todo: PropRef[]; expiring: PropRef[] }> {
+  return db(ctx, async (tx) => {
+    const mine = tx`p.deleted_at is null and (${all} or p.agent_id = ${ctx.userId})`;
+    const todo = (await tx`select p.id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en
+      from public.properties p left join public.geo_places g on g.id = p.city_id
+      where ${mine} and p.status in ('draft','active','under_offer') and coalesce(p.mandate->>'origin', 'own') <> 'partner' and coalesce((p.mandate->>'signed')::boolean, false) = false
+        and not exists (select 1 from public.property_mandates m where m.property_id = p.id and m.status in ('sent','signed'))
+      order by p.created_at desc limit 40`) as unknown as PropRef[];
+    const expiring = (await tx`select p.id, p.reference, p.street, g.name_fr as city_fr, g.name_he as city_he, g.name_en as city_en, ((p.mandate->>'end')::date - current_date)::int as days
+      from public.properties p left join public.geo_places g on g.id = p.city_id
+      where ${mine} and p.status in ('active','under_offer') and p.mandate->>'type' = 'exclusive' and (p.mandate->>'end')::date between current_date - 7 and current_date + 30
+      order by (p.mandate->>'end')::date limit 12`) as unknown as PropRef[];
+    return { todo, expiring };
+  });
 }
 
 export type MandateInput = { propertyId: string; contactId: string | null; ownerName: string; license: string | null; startsOn: string; endsOn: string; price: number | null; commission: number; actions: string[] };
@@ -65,14 +101,14 @@ const MSG: Record<Loc, (first: string, url: string, agent: string, org: string) 
   he: (n, u, a, o) => `שלום ${n},\nמצורפת הזמנת התיווך בבלעדיות עבור הנכס שלך, לקריאה ולחתימה אונליין: ${u}\n\n${a} · ${o}`,
   en: (n, u, a, o) => `Hello ${n},\nHere is the exclusive agreement for your property, to read and sign online: ${u}\n\n${a} · ${o}`,
 };
-function compose(ctx: Ctx, m: MandateRow, base: string) {
-  const l = loc(m.preferred_locale);
+function compose(ctx: Ctx, m: MandateRow, base: string, lang?: Loc) {
+  const l = lang ?? loc(m.preferred_locale);
   const url = `${base}/${l}/mandate/${encodeURIComponent(signToken({ m: m.id }, 14 * DAY))}`;
   return { l, url, text: MSG[l](m.owner_name.split(" ")[0] ?? "", url, ctx.fullName, pickName(ctx.orgName, l)) };
 }
-export function mandateLinks(ctx: Ctx, m: MandateRow, base: string, direct = false): MandateLinks {
+export function mandateLinks(ctx: Ctx, m: MandateRow, base: string, direct = false, lang?: Loc): MandateLinks {
   if (!canSend(ctx, m)) return { url: null, wa: null, hasEmail: false };
-  const c = compose(ctx, m, base), digits = (m.phone ?? "").replace(/\D/g, "");
+  const c = compose(ctx, m, base, lang), digits = (m.phone ?? "").replace(/\D/g, "");
   return { url: c.url, wa: digits ? (direct ? `https://wa.me/${digits}?text=${encodeURIComponent(c.text)}` : `/api/mandates/${m.id}/whatsapp`) : null, hasEmail: !!m.email };
 }
 export async function getMandate(ctx: Ctx, id: string): Promise<MandateRow | undefined> {
@@ -82,11 +118,11 @@ export async function getMandate(ctx: Ctx, id: string): Promise<MandateRow | und
 export async function logMandateSent(ctx: Ctx, m: MandateRow, channel: "email" | "whatsapp") {
   await db(ctx, (tx) => tx`insert into public.activities (organization_id, kind, contact_id, property_id, summary, payload) values (${ctx.orgId}, 'mandate_sent', ${m.contact_id}, ${m.property_id}, ${channel}, ${tx.json({ mandate_id: m.id, channel })})`);
 }
-export async function sendMandateEmail(ctx: Ctx, id: string, base: string): Promise<"sent" | "dry_run" | "failed" | "no_email" | "forbidden"> {
+export async function sendMandateEmail(ctx: Ctx, id: string, base: string, lang?: Loc): Promise<"sent" | "dry_run" | "failed" | "no_email" | "forbidden"> {
   const m = await getMandate(ctx, id);
   if (!m || !canSend(ctx, m)) return "forbidden";
   if (!m.email) return "no_email";
-  const c = compose(ctx, m, base);
+  const c = compose(ctx, m, base, lang);
   const subject = c.l === "he" ? `הזמנת תיווך בבלעדיות — ${pickName(ctx.orgName, c.l)}` : c.l === "en" ? `Exclusive agreement — ${pickName(ctx.orgName, c.l)}` : `Mandat d'exclusivité — ${pickName(ctx.orgName, c.l)}`;
   const esc = (x: string) => x.replace(/[&<>"']/g, (ch) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[ch]!);
   const html = `<div dir="${c.l === "he" ? "rtl" : "ltr"}" style="font-family:Arial,sans-serif;font-size:15px;line-height:1.55;color:#112127">${c.text.split("\n").map((x) => esc(x).replace(esc(c.url), `<a href="${esc(c.url)}">${esc(c.url)}</a>`)).join("<br>")}</div>`;
@@ -136,9 +172,11 @@ export async function submitMandate(token: string, locale: string, i: { name: st
   const fingerprint = createHash("sha256").update(png).update(`|${info.id}|${name}|${idn}|${signedAt.toISOString()}`).digest("hex");
   const ipHash = createHash("sha256").update(`${i.ip}|${process.env.APP_SECRET ?? ""}`).digest("hex").slice(0, 32);
   const sigKey = `org/${info.orgId}/signatures/${info.id}.png`, docKey = `org/${info.orgId}/mandate_docs/${info.id}.pdf`;
-  const fmt = new Intl.DateTimeFormat(l === "he" ? "he-IL" : l === "en" ? "en-GB" : "fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" });
-  const pdf = await renderPdf(mandateHtml({ locale: l, orgName: info.orgName, broker: info.broker, license: info.license, owner: name, idNumber: idn, ownerAddress: address, reference: info.reference, address: info.address,
-    price: info.price, from: info.from, to: info.to, pct: info.pct, actions: info.actions, signaturePng: `data:image/png;base64,${png.toString("base64")}`, signedAt: fmt.format(signedAt), fingerprint }, await loadFonts()));
+  // Le PDF est toujours établi en hébreu, suivi de la traduction dans la langue lue par le propriétaire.
+  const fmt = (x: Loc) => new Intl.DateTimeFormat(x === "he" ? "he-IL" : x === "en" ? "en-GB" : "fr-FR", { dateStyle: "long", timeStyle: "short", timeZone: "Asia/Jerusalem" });
+  const parts = await Promise.all(docLocales(l).map(async (x) => { const v = x === l ? info : (await loadMandateInfo(token, x)) ?? info; return { locale: x, orgName: v.orgName, address: v.address, price: v.price, from: v.from, to: v.to, pct: v.pct, signedAt: fmt(x).format(signedAt) }; }));
+  const pdf = await renderPdf(mandateHtml({ parts, broker: info.broker, license: info.license, owner: name, idNumber: idn, ownerAddress: address, reference: info.reference, actions: info.actions,
+    signaturePng: `data:image/png;base64,${png.toString("base64")}`, fingerprint }, await loadFonts()));
   // Verrou atomique : une seule signature par mandat.
   const [m] = await sql`update public.property_mandates set status = 'signed', signer_name = ${name}, signed_at = ${signedAt}, signature_hash = ${fingerprint}, signed_ip_hash = ${ipHash}, signature_path = ${sigKey}, document_path = ${docKey}
     where id = ${info.id} and status = 'sent' returning id, property_id, contact_id, starts_on::text, ends_on::text, commission_pct, organization_id`;

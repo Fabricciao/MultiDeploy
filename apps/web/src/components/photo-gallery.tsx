@@ -4,6 +4,7 @@ import { useLocale, useTranslations } from "next-intl";
 import { Star, Trash2, Upload } from "lucide-react";
 import { Photo } from "@/components/ui";
 import { deletePhotoAction, setCoverAction, uploadPhotos, type UploadState } from "@/app/[locale]/(app)/properties/media-actions";
+import { FileInput } from "@/components/file-input";
 
 export type GalleryItem = { id: string; url: string; isCover: boolean };
 
@@ -37,7 +38,7 @@ export function PhotoGallery({ propertyId, items, canEdit, seed }: { propertyId:
           )}
           <form action={action} className="row wrap" style={{ gap: 8 }}>
             <input type="hidden" name="locale" value={locale} />
-            <input type="file" name="photos" accept="image/jpeg,image/png,image/webp" multiple className="input" style={{ maxWidth: 340, height: "auto", padding: 5, display: "block" }} aria-label={t("choose")} />
+            <FileInput name="photos" accept="image/jpeg,image/png,image/webp" multiple label={t("choose")} />
             <button className="btn sm" disabled={pending}><Upload size={14} aria-hidden />{pending ? t("uploading") : t("upload")}</button>
           </form>
           {state && (state.errors?.length || state.ok === false) && !pending ? <div className="err" role="alert">{state.errors?.length ? state.errors.map((e) => `${e.name}: ${t(`errors.${e.code}`)}`).join(" · ") : t("errors.none")}</div> : null}

@@ -5,6 +5,7 @@ import { Check, Copy, Mail, MessageCircle } from "lucide-react";
 import { createMandateAction, sendMandateEmailAction, type MandateEmailState, type MandateFormState } from "@/app/[locale]/(app)/properties/[id]/mandate-actions";
 import { ACTIONS } from "@/lib/mandate/actions";
 import type { MandateLinks } from "@/lib/data/mandates";
+import { DocLangSelect, withLang, type DocLang } from "@/components/doc-lang";
 
 type Owner = { id: string; name: string };
 /** Nouveau mandat d'exclusivité : propriétaire, durée (6 mois max. pour un logement), prix, commission, actions de commercialisation (2 au moins). */
@@ -39,19 +40,21 @@ export function MandateForm({ propertyId, owners, price, commission, license }: 
 }
 
 /** Envoi du mandat au propriétaire en un clic : WhatsApp, e-mail ou lien. */
-export function MandateSend({ id, links }: { id: string; links: MandateLinks }) {
+export function MandateSend({ id, links, lang: initial }: { id: string; links: MandateLinks; lang?: string | null }) {
   const ts = useTranslations("slips");
   const locale = useLocale();
   const [state, action, pending] = useActionState<MandateEmailState, FormData>(sendMandateEmailAction.bind(null, id), null);
   const [copied, setCopied] = useState(false);
+  const [lang, setLang] = useState<DocLang>(initial === "he" || initial === "en" || initial === "fr" ? initial : "he");
   if (!links.url) return null;
   const sent = state?.status === "sent" || state?.status === "dry_run";
   return (
     <div className="row wrap" style={{ gap: 6 }}>
-      {links.wa && <a href={links.wa} target="_blank" rel="noopener noreferrer" className="btn sm pri"><MessageCircle size={14} aria-hidden />{ts("whatsapp")}</a>}
-      {links.hasEmail && <form action={action}><input type="hidden" name="locale" value={locale} /><button className="btn sm" disabled={pending || sent}>{sent ? <Check size={14} aria-hidden /> : <Mail size={14} aria-hidden />}{sent ? ts("emailSent") : pending ? ts("sending") : ts("email")}</button></form>}
-      <button type="button" className="btn sm ghost" onClick={async () => { try { await navigator.clipboard.writeText(links.url!); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refusé */ } }}>
+      {links.wa && <a href={links.wa.startsWith("/api/") ? `${links.wa}?l=${lang}` : links.wa} target="_blank" rel="noopener noreferrer" className="btn sm pri"><MessageCircle size={14} aria-hidden />{ts("whatsapp")}</a>}
+      {links.hasEmail && <form action={action}><input type="hidden" name="locale" value={locale} /><input type="hidden" name="lang" value={lang} /><button className="btn sm" disabled={pending || sent}>{sent ? <Check size={14} aria-hidden /> : <Mail size={14} aria-hidden />}{sent ? ts("emailSent") : pending ? ts("sending") : ts("email")}</button></form>}
+      <button type="button" className="btn sm ghost" onClick={async () => { try { await navigator.clipboard.writeText(withLang(links.url!, lang)); setCopied(true); setTimeout(() => setCopied(false), 2000); } catch { /* refusé */ } }}>
         {copied ? <Check size={14} aria-hidden /> : <Copy size={14} aria-hidden />}{copied ? ts("copied") : ts("copy")}</button>
+      <DocLangSelect value={lang} onChange={setLang} label={ts("lang")} />
       {state?.status === "failed" && <span role="alert" className="err note">{ts("emailFailed")}</span>}
       {state?.status === "no_email" && <span role="alert" className="err note">{ts("noEmail")}</span>}
     </div>

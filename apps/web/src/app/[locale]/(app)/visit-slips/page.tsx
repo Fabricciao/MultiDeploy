@@ -1,5 +1,5 @@
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { FileSignature, Search } from "lucide-react";
+import { CalendarPlus, FileSignature, Search } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { getCtx } from "@/lib/session";
 import { listSlips, siteBase, slipInfo } from "@/lib/data/slips";
@@ -14,7 +14,7 @@ export default async function VisitSlipsPage({ params, searchParams }: { params:
   setRequestLocale(locale);
   const ctx = await getCtx(locale);
   const t = await getTranslations("slips");
-  const state = sp.state === "pending" || sp.state === "all" ? sp.state : "signed";
+  const state = sp.state === "signed" || sp.state === "all" ? sp.state : "pending"; // ce qui reste à faire d'abord
   const q = sp.q?.trim().slice(0, 80) || undefined, page = Math.max(1, Number(sp.page) || 1);
   const { rows, total, counts } = await listSlips(ctx, { state, q, limit: PAGE, page });
   const base = await siteBase();
@@ -23,15 +23,17 @@ export default async function VisitSlipsPage({ params, searchParams }: { params:
   const tab = (k: "signed" | "pending" | "all", n?: number) => <Link href={qs({ state: k, page: undefined }) as "/"} className={`chip ${state === k ? "on" : ""}`} aria-current={state === k ? "page" : undefined}>{t(`tabs.${k}`)}{n !== undefined && <span className="cnt-b">{n}</span>}</Link>;
   return (
     <>
-      <PageHeader title={t("title")} sub={t("sub", { signed: counts.signed, pending: counts.pending })} />
+      <PageHeader title={t("title")} sub={t("sub", { signed: counts.signed, pending: counts.pending })}>
+        {ctx.caps.has("properties.write") && !ctx.impersonating && <Link href="/agenda?new=1" className="btn pri"><CalendarPlus size={15} aria-hidden />{t("plan")}</Link>}
+      </PageHeader>
       <div className="row wrap" style={{ gap: 8, marginBlockEnd: 12 }}>
-        {tab("signed", counts.signed)}{tab("pending", counts.pending)}{tab("all")}
+        {tab("pending", counts.pending)}{tab("signed", counts.signed)}{tab("all")}
         <span className="sp" />
         <form className="row" style={{ gap: 6 }} action={`/${locale}/visit-slips`}><input type="hidden" name="state" value={state} />
           <input name="q" defaultValue={q} className="input" placeholder={t("search")} aria-label={t("search")} style={{ width: 220 }} /><button className="btn icon" aria-label={t("search")}><Search size={15} aria-hidden /></button></form>
       </div>
       <section className="card">
-        {rows.length === 0 ? <div className="card-b col" style={{ gap: 6, alignItems: "center", padding: 32 }}><FileSignature size={22} aria-hidden /><p className="muted">{t(state === "pending" ? "emptyPending" : "empty")}</p><p className="note">{t("how")}</p></div> : (
+        {rows.length === 0 ? <div className="card-b col" style={{ gap: 6, alignItems: "center", padding: 32 }}><FileSignature size={22} aria-hidden /><p className="muted">{t(state === "pending" ? "emptyPending" : "empty")}</p><ol className="note col" style={{ gap: 2, textAlign: "start" }}><li>{t("steps.plan")}</li><li>{t("steps.send")}</li><li>{t("steps.sign")}</li></ol></div> : (
           <div style={{ overflowX: "auto" }}><table className="tbl">
             <thead><tr><th>{t("col.visit")}</th><th>{t("col.property")}</th><th>{t("col.client")}</th><th>{t("col.agent")}</th><th>{t("col.slip")}</th></tr></thead>
             <tbody>{rows.map((r) => (
@@ -44,6 +46,7 @@ export default async function VisitSlipsPage({ params, searchParams }: { params:
               </tr>))}</tbody>
           </table></div>)}
       </section>
+      <p className="note" style={{ marginBlockStart: 10 }}>{t("langHint")}</p>
       {total > PAGE && <div className="row" style={{ gap: 8, marginBlockStart: 12, justifyContent: "center" }}>
         {page > 1 && <Link href={qs({ page: String(page - 1) }) as "/"} className="btn sm">{t("prev")}</Link>}
         <span className="note">{page} / {Math.ceil(total / PAGE)}</span>

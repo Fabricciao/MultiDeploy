@@ -7,12 +7,13 @@ import { getCtx } from "@/lib/session";
 import { listProperties } from "@/lib/data/properties";
 import { listAgents, listCities, cityName } from "@/lib/data/geo";
 import { MUST_HAVE, PAGE_SIZE, parsePropertyFilters, toQuery, type SP } from "@/lib/data/filters";
-import { dateShort, initials, money, num } from "@/lib/format";
+import { dateShort, initials, money, moneyCompact, num } from "@/lib/format";
 import { Badge, Avatar, Cover, PageHeader, statusTone } from "@/components/ui";
 import { AutoSubmit } from "@/components/shell";
 import { StatusSelect } from "@/components/status-select";
 import { PropertyPeek } from "@/components/peek";
 import { SavedViews } from "@/components/saved-views";
+import { BulkBar } from "@/components/bulk-bar";
 import { listViews } from "@/lib/data/views";
 
 export default async function PropertiesPage({ params, searchParams }: { params: Promise<{ locale: string }>; searchParams: Promise<SP> }) {
@@ -106,9 +107,9 @@ export default async function PropertiesPage({ params, searchParams }: { params:
         <button className="sr-only">{tc("apply")}</button>
         {chips.length > 0 && <Link href="/properties" className="btn ghost sm">{tc("reset")}</Link>}
         <div className="seg sp" role="group" aria-label={t("viewLabel")}>
-          <Link href={`/properties${toQuery({ ...base, view: undefined })}`} className={view ? "" : "on"} aria-label={t("viewTable")} title={t("viewTable")}><Rows3 size={14} aria-hidden /></Link>
-          <Link href={`/properties${toQuery({ ...base, view: "grid" })}`} className={view === "grid" ? "on" : ""} aria-label={t("viewGrid")} title={t("viewGrid")}><LayoutGrid size={14} aria-hidden /></Link>
-          <Link href={`/properties${toQuery({ ...base, view: "map" })}`} className={view === "map" ? "on" : ""} aria-label={t("map.view")} title={t("map.view")}><MapIcon size={14} aria-hidden /></Link>
+          <Link href={`/properties${toQuery({ ...base, view: undefined })}`} className={view ? "" : "on"} title={t("viewTable")}><Rows3 size={14} aria-hidden /><span className="hide-m">{t("viewShort.table")}</span></Link>
+          <Link href={`/properties${toQuery({ ...base, view: "grid" })}`} className={view === "grid" ? "on" : ""} title={t("viewGrid")}><LayoutGrid size={14} aria-hidden /><span className="hide-m">{t("viewShort.grid")}</span></Link>
+          <Link href={`/properties${toQuery({ ...base, view: "map" })}`} className={view === "map" ? "on" : ""} title={t("map.view")}><MapIcon size={14} aria-hidden /><span className="hide-m">{t("viewShort.map")}</span></Link>
         </div>
       </form>
       <AutoSubmit formId="filters" />
@@ -130,7 +131,7 @@ export default async function PropertiesPage({ params, searchParams }: { params:
               <div className="pr"><b>{money(locale, p.price, p.currency)}</b>{p.price && p.area_built ? <small className="note tab" style={{ display: "block" }}>{money(locale, Number(p.price) / Number(p.area_built))} / {t("sqm")}</small> : null}</div>
             </Link>))}</div>
           <PropertyMap points={rows.filter((p) => p.lat !== null && p.lng !== null).map((p) => ({ id: p.id, lat: Number(p.lat), lng: Number(p.lng), approx: !!p.approx, href: peekHref(p.id), title: `${name(p)} · ${money(locale, p.price, p.currency)}`,
-            label: p.price ? (Number(p.price) >= 1_000_000 ? `${num(locale, Number(p.price) / 1_000_000, 2)} M` : `${num(locale, Number(p.price) / 1000, 0)} k`) : "—" }))} />
+            label: p.price ? moneyCompact(locale, p.price, p.currency) : "—" }))} />
         </div>
       ) : view === "grid" ? (
         <div className="pgrid">
@@ -179,7 +180,9 @@ export default async function PropertiesPage({ params, searchParams }: { params:
         </div>
       )}
 
-      <form id="bulk" action={`/${locale}/properties/send`} method="get" className="row" style={{ marginTop: 12, gap: 8 }}><button className="btn sm">{t("bulkSend")}</button><span className="note">{t("bulkHint")}</span></form>
+      <form id="bulk" action={`/${locale}/properties/send`} method="get" />
+      {!view && rows.length > 0 && <p className="note hide-m" style={{ marginBlockStart: 10 }}>{t("bulk.tip")}</p>}
+      <BulkBar formId="bulk" />
 
       {pages > 1 && (
         <div className="row" style={{ justifyContent: "center", marginTop: 16 }}>

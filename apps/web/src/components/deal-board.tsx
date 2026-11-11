@@ -5,6 +5,7 @@ import { AlarmClock, ArrowRight, Award, X } from "lucide-react";
 import { Link } from "@/i18n/navigation";
 import { Avatar, Cover } from "@/components/ui";
 import { moveDealAction } from "@/app/[locale]/(app)/deals/actions";
+import { money, moneyCompact, pct } from "@/lib/format";
 
 export type BoardStage = { id: string; name: string; kind: string; probability: number };
 export type BoardDeal = { id: string; stageId: string; client: string; sub: string; value: number | null; fee: number | null; agent: string; agentName: string; contactId: string; stale?: boolean; cover: string | null; next: string | null; nextDue: string | null };
@@ -19,9 +20,8 @@ export function DealBoard({ stages, deals, canMove, current, query }: { stages: 
   const [drag, setDrag] = useState<string | null>(null);
   const [toast, setToast] = useState<{ msg: string; undo?: () => void; bad?: boolean } | null>(null);
   useEffect(() => { if (!toast) return; const id = setTimeout(() => setToast(null), toast.undo ? 8000 : 4000); return () => clearTimeout(id); }, [toast]);
-  const nf = (o: Intl.NumberFormatOptions) => new Intl.NumberFormat(locale === "he" ? "he-IL" : locale === "en" ? "en-IL" : "fr-FR", o);
-  const fmt = (v: number) => (v >= 1_000_000 ? `${nf({ maximumFractionDigits: 2 }).format(v / 1_000_000)} M ₪` : nf({ style: "currency", currency: "ILS", maximumFractionDigits: 0 }).format(v));
-  const k = (v: number) => `${nf({ maximumFractionDigits: 0 }).format(v / 1000)} k ₪`;
+  const fmt = (v: number) => (v >= 1_000_000 ? moneyCompact(locale, v) : money(locale, v));
+  const k = (v: number) => moneyCompact(locale, v);
   const open = stages.filter((s) => s.kind === "open");
   const won = stages.find((s) => s.kind === "won"), lost = stages.find((s) => s.kind === "lost");
   const color = (i: number) => `var(--stage-${Math.min(6, Math.max(1, Math.round(((i + 1) / Math.max(1, open.length)) * 6)))})`;
@@ -53,7 +53,7 @@ export function DealBoard({ stages, deals, canMove, current, query }: { stages: 
             <section key={s.id} className={`kcol ${over === s.id ? "drop-on" : ""}`} aria-label={s.name} {...dropProps(s.id)}>
               <div className="kcol-h">
                 <div className="t"><i className="st" style={{ background: color(i) }} /><span className="trunc">{s.name}</span><span className="sp cnt-b" style={{ background: "var(--surface)" }}>{list.length}</span></div>
-                <div className="s">{sum ? fmt(sum) : "—"} · {s.probability} %</div>
+                <div className="s"><bdi>{sum ? fmt(sum) : "—"}</bdi> · <bdi>{pct(locale, s.probability, 0)}</bdi></div>
               </div>
               {list.map((d) => (
                 <article key={d.id} className={`deal ${drag === d.id ? "drag" : ""} ${current === d.id ? "cur" : ""}`} style={{ cursor: canMove ? "grab" : "default" }} draggable={canMove}

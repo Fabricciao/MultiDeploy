@@ -6,6 +6,7 @@ import { accentStep, brandScale, contrast } from "@/lib/theme";
 import { Field } from "@/components/ui";
 import { analyzeBrandAction, saveBrandAction, type AnalyzeState, type SaveBrandState } from "@/app/[locale]/(app)/settings/brand/actions";
 import type { BrandKit } from "@/lib/data/brand";
+import { FileInput } from "@/components/file-input";
 
 export function BrandEditor({ initial, logoUrl }: { initial: BrandKit; logoUrl: string | null }) {
   const t = useTranslations("brand");
@@ -64,7 +65,7 @@ export function BrandEditor({ initial, logoUrl }: { initial: BrandKit; logoUrl: 
             <Field label={t("logo")}>
               <div className="row" style={{ gap: 10 }}>
                 {(logoB64 || logoUrl) && <img alt="" src={logoB64 ? `data:image/png;base64,${logoB64}` : logoUrl!} style={{ height: 40, maxWidth: 120, objectFit: "contain", border: "1px solid var(--line)", borderRadius: 6, padding: 4, background: "#fff" }} />}
-                <input type="file" name="logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" className="input" style={{ height: "auto", padding: 5 }} />
+                <FileInput name="logo" accept="image/png,image/jpeg,image/webp,image/svg+xml" />
               </div>
             </Field>
             <Field label={t("fontLatin")}><input name="font_latin" className="input" value={font} onChange={(e) => setFont(e.target.value)} /></Field>

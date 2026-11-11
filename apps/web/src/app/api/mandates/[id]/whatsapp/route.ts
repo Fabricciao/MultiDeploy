@@ -12,7 +12,8 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
   const ctx = await getCtx();
   const m = await getMandate(ctx, id);
   if (!m) return back;
-  const l = mandateLinks(ctx, m, await siteBase(), true);
+  const lang = req.nextUrl.searchParams.get("l");
+  const l = mandateLinks(ctx, m, await siteBase(), true, lang === "fr" || lang === "he" || lang === "en" ? lang : undefined);
   if (!l.wa) return back;
   await logMandateSent(ctx, m, "whatsapp");
   return NextResponse.redirect(l.wa, 303);

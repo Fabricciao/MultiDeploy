@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { getTranslations, setRequestLocale } from "next-intl/server";
-import { ClipboardCheck, Star, FileSignature, Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, StickyNote, Phone, Globe } from "lucide-react";
+import { ClipboardCheck, Star, FileSignature, Pencil, Archive, Image as ImageIcon, MessageCircle, Send, Sparkles, CalendarCheck, CalendarPlus, Camera, Circle, CircleCheck, Handshake, Eye, ArrowRightLeft, ScrollText, StickyNote, Phone, Globe } from "lucide-react";
 import { getPropertyInsights } from "@/lib/data/insights";
 import { CopyButton } from "@/components/copy-button";
 import { Link } from "@/i18n/navigation";
@@ -25,6 +25,8 @@ import { propertyFeedback } from "@/lib/data/visits";
 import { listMandates, mandateLinks } from "@/lib/data/mandates";
 import { MandateForm, MandateSend } from "@/components/mandate-panel";
 import { cancelMandateAction } from "./mandate-actions";
+import { Journey, type JNext, type JStep } from "@/components/journey";
+import { StatusSelect } from "@/components/status-select";
 
 export default async function PropertyPage({ params, searchParams }: { params: Promise<{ locale: string; id: string }>; searchParams: Promise<{ send?: string; tab?: string }> }) {
   const { locale, id } = await params; const sp = await searchParams;
@@ -90,22 +92,61 @@ export default async function PropertyPage({ params, searchParams }: { params: P
   const tlIcon = (k: string) => ({ visit: <CalendarCheck size={14} aria-hidden />, share: <Send size={14} aria-hidden className="flip" />, deal: <Handshake size={14} aria-hidden />, note: <StickyNote size={14} aria-hidden />, stage_change: <ArrowRightLeft size={14} aria-hidden /> } as Record<string, React.ReactNode>)[k] ?? <ArrowRightLeft size={14} aria-hidden />;
   const tlText = (r: Record<string, any>) => { const n = r.contact_id ? contactName(r, locale) : ""; return r.kind === "visit" ? tv(`tl.visit.${["planned", "done", "cancelled", "no_show"].includes(r.detail) ? r.detail : "planned"}`, { name: n }) : r.kind === "share" ? tv(String(r.detail).endsWith(":opened") ? "tl.shareOpened" : "tl.share", { name: n }) : r.kind === "deal" ? tv("tl.deal", { name: n }) : r.kind === "visit_slip_sent" ? tv("tl.slipSent", { name: n }) : r.kind === "visit_signed" ? tv("tl.signed", { name: n }) : r.kind === "visit_feedback" ? tv("tl.feedback", { name: n }) : r.kind === "mandate_signed" ? tv("tl.mandateSigned") : r.kind === "mandate_sent" ? tv("tl.mandateSent") : r.kind === "mandate_created" ? tv("tl.mandateCreated") : r.kind === "status_change" ? tv("tl.status") : r.kind === "note" ? (r.detail ?? tv("tl.note")) : tv("tl.other"); };
 
+  // ── Parcours du bien : mandat → annonce → diffusion → visites → offre → vendu. Une seule « prochaine étape ». ──
+  const rent = String(p.transaction).includes("rent");
+  const closed = p.status === "sold" || p.status === "rented";
+  const online = ["active", "under_offer", "sold", "rented"].includes(p.status);
+  const partner = m?.origin === "partner";
+  const mandateDone = partner || !!signedMandate || (m?.type === "exclusive" && !!m.end);
+  const hasDesc = !!(tr.fr?.description || tr.he?.description || tr.en?.description);
+  const sentAll = Number(ins.k.sent_all), visitsAll = Number(ins.k.visits_all), offers = Number(ins.k.offers);
+  const planHref = `/agenda?new=1&property=${id}`;
+  const mandateHref = `${tabHref("owner")}#mandate`;
+  const steps: JStep[] = [
+    { key: "mandate", label: tv("j.mandate"), done: mandateDone, href: mandateHref, hint: signedMandate ? tv("j.s.mandateSigned") : partner ? tv("j.s.mandatePartner") : openMandate ? tv("j.s.mandatePending") : mandateDone ? tv("j.s.mandateExclusive") : tv("j.s.mandateNone") },
+    { key: "listing", label: tv("j.listing"), done: closed || (media.length > 0 && !!p.price && !!p.street && !!p.city_fr && hasDesc), href: canEdit ? `/properties/${id}/edit` : undefined, hint: tv("j.s.photos", { n: media.length }) },
+    { key: "marketing", label: tv("j.marketing"), done: closed || (online && sentAll > 0), href: tabHref("clients"), hint: online ? tv("j.s.sent", { n: sentAll }) : tv("j.s.draft") },
+    { key: "visits", label: tv("j.visits"), done: closed || visitsAll > 0, href: canEdit ? planHref : undefined, hint: tv("j.s.visits", { n: visitsAll }) },
+    { key: "offer", label: tv("j.offer"), done: closed || offers > 0 || p.status === "under_offer", href: "/deals", hint: tv("j.s.offers", { n: offers }) },
+    { key: "closed", label: rent ? tv("j.closedRent") : tv("j.closed"), done: closed },
+  ];
+  // Le mandat se signe à l'entrée du bien : une fois le bien en ligne, le parcours avance, et l'étape « Mandat » reste cliquable.
+  const after = steps.findIndex((x, i) => i > 0 && !x.done);
+  const curStep = closed ? -1 : !mandateDone && !online ? 0 : after;
+  const cta = (href: string, label: string, icon: React.ReactNode) => <Link href={href as "/"} scroll={false} className="btn pri">{icon}{label}</Link>;
+  const jn = (k: string, action: React.ReactNode, vals?: Record<string, number>): JNext => ({ label: tv("j.next"), title: tv(`j.n.${k}.t`, vals), sub: tv(`j.n.${k}.s`), action });
+  const next: JNext | null = closed ? { label: tv("j.next"), title: tv("j.done.t"), sub: tv("j.done.s"), ok: true }
+    : !canEdit ? null
+    : curStep === 0 ? (openMandate ? jn("mandateSend", cta(mandateHref, tv("j.n.mandateSend.c"), <ScrollText size={14} aria-hidden />)) : jn("mandate", cta(mandateHref, tv("j.n.mandate.c"), <ScrollText size={14} aria-hidden />)))
+    : curStep === 1 ? (media.length === 0 ? jn("photos", <a href="#photos" className="btn pri"><Camera size={14} aria-hidden />{tv("j.n.photos.c")}</a>) : jn("listing", cta(`/properties/${id}/edit`, tv("j.n.listing.c"), <Pencil size={14} aria-hidden />)))
+    : curStep === 2 ? (!online ? jn("publish", <StatusSelect id={id} status={p.status} canEdit />) : jn("send", canSend ? cta(`${tabHref("clients")}#wa`, tv("j.n.send.c"), <Send size={14} aria-hidden className="flip" />) : null, { n: items.length }))
+    : curStep === 3 ? jn("visit", cta(planHref, tv("planVisit"), <CalendarPlus size={14} aria-hidden />))
+    : curStep === 4 ? jn("offer", cta("/deals", tv("j.n.offer.c"), <Handshake size={14} aria-hidden />))
+    : curStep === 5 ? { label: tv("j.next"), title: tv("j.n.close.t"), sub: tv("j.n.close.s"), action: cta("/deals", tv("j.n.offer.c"), <Handshake size={14} aria-hidden />) } : null;
+
   return (
     <>
       <PageHeader title={title} sub={[city, p.street && `${p.street}${p.address_visibility === "exact" && p.house_number ? " " + p.house_number : ""}`].filter(Boolean).join(" · ")}>
-        <Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>
+        {canEdit && !ctx.impersonating ? <StatusSelect id={id} status={p.status} canEdit /> : <Badge tone={statusTone(p.status)}><i className="dot" />{t(`status.${p.status}`)}</Badge>}
         <span className="badge"><span className="ltr tab">{p.reference}</span></span>
         {days !== null && days >= 0 && days <= 30 && <Badge tone="warn">{t("mandate.expiresIn", { days })}</Badge>}
         {m?.origin === "partner" && <Badge tone="info">{t("origin.partner")}</Badge>}
         {m?.co_broke && <Badge tone="sig">{t("origin.coBrokeTag")}</Badge>}
-        {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><ImageIcon size={14} aria-hidden />{t("poster")}</Link>}
-        {canEdit && <Link href={`/properties/${id}/edit`} className="btn"><Pencil size={14} aria-hidden />{tc("edit")}</Link>}
-        {canSend && <Link href={`/properties/${id}?tab=clients#wa`} className="btn pri" scroll={false}><Send size={14} aria-hidden className="flip" />{ts("sendToClient")}</Link>}
       </PageHeader>
+
+      <div className="actbar" style={{ marginBlockEnd: 12 }}>
+        {canSend && <Link href={`/properties/${id}?tab=clients#wa`} className="btn pri" scroll={false}><Send size={14} aria-hidden className="flip" />{ts("sendToClient")}</Link>}
+        {canEdit && !ctx.impersonating && <Link href={planHref as "/"} className="btn"><CalendarPlus size={14} aria-hidden />{tv("planVisit")}</Link>}
+        {ctx.caps.has("posters.create") && p.status !== "draft" && <Link href={`/properties/${id}/poster`} className="btn"><ImageIcon size={14} aria-hidden />{t("poster")}</Link>}
+        {!partner && <Link href={mandateHref as "/"} scroll={false} className="btn"><ScrollText size={14} aria-hidden />{tv("mandateBtn")}</Link>}
+        {canEdit && <Link href={`/properties/${id}/edit`} className="btn"><Pencil size={14} aria-hidden />{tc("edit")}</Link>}
+      </div>
+
+      <div style={{ marginBlockEnd: 12 }}><Journey title={tv("j.title")} steps={steps} next={next} current={curStep} /></div>
 
       <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1fr) 344px", gap: 16, alignItems: "start" }} className="split">
         <div className="col" style={{ gap: 12, minWidth: 0 }}>
-          <PhotoGallery propertyId={id} seed={id} canEdit={canEdit} items={media.map((m) => ({ id: m.id, url: `/api/files/${m.storage_path}`, isCover: m.is_cover }))} />
+          <div id="photos" data-anchor><PhotoGallery propertyId={id} seed={id} canEdit={canEdit} items={media.map((m) => ({ id: m.id, url: `/api/files/${m.storage_path}`, isCover: m.is_cover }))} /></div>
 
           <nav className="tabs" aria-label={tv("tabs")}>
             {(["overview", "clients", "activity", "owner"] as const).map((k) => <Link key={k} href={tabHref(k) as "/"} scroll={false} className={tab === k ? "on" : ""} aria-current={tab === k ? "page" : undefined}>{tv(`tab.${k}`)}{k === "clients" && <span className="cnt-b">{items.length}</span>}</Link>)}
@@ -188,7 +229,7 @@ export default async function PropertyPage({ params, searchParams }: { params: P
                 <div key={x.id} className="li wrap" style={{ gap: 8 }}>
                   <div className="grow" style={{ minWidth: 0 }}><b className="trunc">{x.owner_name}</b><small>{dateShort(locale, x.starts_on)} → {dateShort(locale, x.ends_on)} · {num(locale, x.commission_pct, 2)} %{x.sent_at ? ` · ${tv("mandate.sentOn", { d: dateShort(locale, x.sent_at) })}` : ""}</small></div>
                   {x.status === "signed" ? <><Badge tone="ok"><CircleCheck size={12} aria-hidden />{tv("mandate.signedOn", { d: dateShort(locale, x.signed_at) })}</Badge>{x.document_path && <a className="btn sm" href={`/api/files/${x.document_path}`} target="_blank" rel="noreferrer">{tv("mandate.pdf")}</a>}</>
-                    : <><Badge tone="warn">{tv("mandate.pending")}</Badge><MandateSend id={x.id} links={mandateLinks(ctx, x, base)} />
+                    : <><Badge tone="warn">{tv("mandate.pending")}</Badge><MandateSend id={x.id} links={mandateLinks(ctx, x, base)} lang={x.preferred_locale} />
                       {canEdit && <form action={cancelMandateAction.bind(null, id, x.id)}><input type="hidden" name="locale" value={locale} /><button className="btn sm ghost">{tv("mandate.cancel")}</button></form>}</>}
                 </div>))}
               {canEdit && !openMandate && <details className="card-b" open={!signedMandate}><summary className="btn sm" style={{ display: "inline-flex" }}>{tv("mandate.new")}</summary><div style={{ marginBlockStart: 12 }}>

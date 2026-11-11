@@ -2,6 +2,8 @@
 const TZ = "Asia/Jerusalem";
 const parts = (d: Date) => Object.fromEntries(new Intl.DateTimeFormat("en-CA", { timeZone: TZ, year: "numeric", month: "2-digit", day: "2-digit", hour: "2-digit", minute: "2-digit", hourCycle: "h23", weekday: "short" }).formatToParts(d).map((p) => [p.type, p.value])) as Record<string, string>;
 export const dayKey = (d: Date) => { const p = parts(d); return `${p.year}-${p.month}-${p.day}`; };
+/** Instant → « 2026-11-05T14:30 » à l'heure de Jérusalem (valeur d'un champ datetime-local). */
+export const jerusalemInput = (d: Date) => { const p = parts(d); return `${p.year}-${p.month}-${p.day}T${p.hour}:${p.minute}`; };
 
 /** « 2026-11-05T14:30 » saisi à l'heure de Jérusalem → instant UTC (gère l'heure d'été). */
 export function jerusalemToDate(local: string): Date | null {

@@ -6,6 +6,7 @@ import { initials } from "@/lib/format";
 import { Avatar, PageHeader } from "@/components/ui";
 import { SettingsNav } from "@/components/settings-nav";
 import { saveProfileAction } from "./actions";
+import { FileInput } from "@/components/file-input";
 
 const ERRORS = ["name_required", "phone_invalid", "avatar_too_large", "avatar_invalid", "forbidden"];
 
@@ -30,7 +31,7 @@ export default async function ProfilePage({ params, searchParams }: { params: Pr
             <Avatar cls="xl" text={initials(p.fullName || p.email || "?")} src={src} />
             <div className="col" style={{ gap: 6 }}>
               <label className="note" htmlFor="avatar">{t("photo")}</label>
-              <input id="avatar" name="avatar" type="file" accept="image/png,image/jpeg,image/webp" disabled={readOnly} />
+              <FileInput id="avatar" name="avatar" accept="image/png,image/jpeg,image/webp" disabled={readOnly} />
               {src && <label className="row note" style={{ gap: 6 }}><input type="checkbox" name="remove_avatar" disabled={readOnly} />{t("removePhoto")}</label>}
               <span className="note">{t("photoHint")}</span>
             </div>
